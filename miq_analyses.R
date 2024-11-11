@@ -2,6 +2,7 @@ library(tidyverse)
 library(lme4)
 library(psyphy)
 library(nlme)
+library(lmtest)
 
 item_bank <- 
   read_csv("~/Downloads/PhD MELODY SET/item-bank.csv") |>
@@ -37,6 +38,12 @@ scores_by_item |>
     score = mean(score)
   )
 
+# express scores as mean for each item and store alongside other predictors
+
+df2 <- df %>%
+  group_by(item_id) %>%
+  mutate(
+    score_item = mean(score))
 
 # As oddity has such a dramatic effect on mean score for a given item,
 # lets instead consider it a factor in the regression 
@@ -49,13 +56,60 @@ plot(reg2)
 
 # Problem: doesn't account for the adaptive nature of the test
 
-reg3 <- lm(score ~ item_id + as.factor(oddity) + difficulty:length_crotchets
-         + displacement + contour_dif + in_key, data = scores_by_item)
+reg3 <- lm(score_item ~ item_id + as.factor(oddity) + difficulty:length_crotchets 
+           + displacement + contour_dif + in_key, data = df2)
 
-model1 <- glmer(score ~ difficulty + (1 | user_id), data=df, 
+# since it's adaptive and we're updating these parameters using WL, maybe
+# this is a good predictor?
+
+reg4 <- lm(score_item ~ item_id + as.factor(oddity) + difficulty:length_crotchets
+           + displacement + contour_dif + in_key + ability_WL, data=df2)
+
+
+# check the effect of the interaction term
+reg5 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif +
+             in_key + ability_WL, data=df2)
+
+# reinsert the difficulty predictor
+reg6 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+             in_key + difficulty + ability_WL, data=df2)
+
+
+names(df2)
+
+# add the participant predictor - result is N.S. and doesn't really make sense
+# to do
+
+reg7 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+             in_key + difficulty + user_id + ability_WL, data=df2)
+
+reg8 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+             in_key + change_note + difficulty + ability_WL, data=df2)
+
+reg8a <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+              in_key + change_note + ability_WL, data=df2)
+
+reg9 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+             in_key + change_note + ability_WL, data=df2)
+
+coxtest(reg8, reg8a)
+jtest(reg8, reg9)
+
+reg10 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+              change_note + num_notes + ability_WL, data=df2)
+
+model1 <- lmer(score_item ~ difficulty + (1 | user_id), data=df2,
+               verbose = 100)
+
+model2 <- lmer(score_item ~ difficulty:length_crotchets + (1 | user_id), data=df2, verbose = 100)
+
+model3 <- lmer(score_item ~ as.factor(oddity) + ability_WL + (1 | user_id), data=df2, verbose = 100)
+
+model4 <- lmer(score_item ~ as.factor(oddity) + ability_WL + num_notes + (1 | user_id), data=df2)
+
+model5 <- glmer(score ~ as.factor(oddity) + ability_WL + num_notes + (1 | user_id), data=df2,
                 family = binomial(mafc.logit(3)), verbose = 100)
-model2 <- glmer(score ~ difficulty:length_crotchets + (1 | user_id), data=df,
-                family = binomial(mafc.logit(3)), verbose = 100)
+anova(model1, model2, model3)
 
 # Stratify by length
 scores_by_item |> 
@@ -112,27 +166,3 @@ df |> names()
 #   glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
 #         data = df,
 #         family = binomial())
-
-# bias free estimation
-
-library(dplyr)
-
-# Load data (make sure to use correct file path)
-data <- read_csv("Downloads/PhD MELODY SET/miq_trials.csv", n_max=1e6)
-
-# Create new variables and recode y
-data <- data %>%
-  mutate(
-    trial = row_number(),
-    y1 = 2 - ytemp1,
-    y2 = 2 - ytemp2,
-    z = x1 - x2,
-    z1 = 1 - 2 * x1 - x2,
-    z2 = 1 - x1 - 2 * x2
-  ) %>%
-  gather(key = "i", value = "y", y1, y2) %>%  # Reshape the data into long format
-  mutate(
-    i1 = ifelse(i == "y1", 1, 0),
-    i2 = ifelse(i == "y2", 1, 0)
-  ) %>%
-  select(trial, z, z1, z2, i1, i2, y)  # Select the necessary variables
