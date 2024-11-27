@@ -89,6 +89,21 @@ reg8 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif +
 reg8a <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
               in_key + change_note + ability_WL, data=df2)
 
+reg8b <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
+              in_key + change_note + ability_WL + num_notes, data=df2)
+
+# Produce a plot of reg8a against the data it's fitted to
+plot(df2$score_item, predict(reg8a))
+
+anova(reg8, reg8a, reg8b)
+anova(reg8a, reg8b)
+
+# 8b preferred
+
+# Visualise the difference between reg8a and reg8b
+plot(df2$score_item, predict(reg8a))
+
+
 reg9 <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
              in_key + change_note + ability_WL, data=df2)
 
@@ -109,7 +124,9 @@ model4 <- lmer(score_item ~ as.factor(oddity) + ability_WL + num_notes + (1 | us
 
 model5 <- glmer(score ~ as.factor(oddity) + ability_WL + num_notes + (1 | user_id), data=df2,
                 family = binomial(mafc.logit(3)), verbose = 100)
-anova(model1, model2, model3)
+
+anova(model1, model2, model3, model4, model5)
+
 
 # Stratify by length
 scores_by_item |> 
@@ -151,10 +168,18 @@ chisq_test
 
 df |> names()
 
+# T-test whether the mean score for oddity 1 is different from oddity 2
+t.test(df |> filter(oddity == 1) |> pull(score), df |> filter(oddity == 2) |> pull(score))
+
+# T-test whether the mean score for oddity 2 is different from oddity 3
+t.test(df |> filter(oddity == 2) |> pull(score), df |> filter(oddity == 3) |> pull(score))
+
+# T-test whether the mean score for oddity 1 is different from oddity 3
+t.test(df |> filter(oddity == 1) |> pull(score), df |> filter(oddity == 3) |> pull(score))
+
 # df$score
 # df$item_id
 # df$user_id
-
 
 # mod <-
 #   glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
@@ -166,3 +191,31 @@ df |> names()
 #   glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
 #         data = df,
 #         family = binomial())
+
+
+# Another way of looking at this kind of data - 
+# Instead of creating linear models, which filter everything through
+# a pre-existing set of hypothesised features, 
+# we can just compute average scores for each item and compare
+# the hardest and easiest items by listening to them.
+
+tmp <- 
+  df2 %>% 
+  group_by(item_id) %>% 
+  summarise(
+    item_index = unique(item_index), 
+    difficulty = unique(difficulty), 
+    file_name = unique(file_name),
+    score = mean(score), 
+    n = n()
+  ) %>% 
+  filter(item_index == 10) %>% 
+  arrange(score)
+
+tmp$file_name %>% first()
+tmp$file_name %>% last()
+
+
+
+# TODO - IDyOM features?
+# TODO - FANTASTIC features?
