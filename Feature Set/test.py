@@ -43,6 +43,32 @@ def test_distribution_proportions():
     with pytest.raises(TypeError):
         distribution_proportions([1, 2, "a", "b"])
 
+def test_ratio():
+    # Basic test
+    assert ratio([2, 4, 6], [1, 2, 3]) == [2.0, 2.0, 2.0]
+    
+    # Empty lists return empty list
+    assert ratio([], []) == []
+    
+    # Different length lists return empty list
+    assert ratio([1, 2], [1, 2, 3]) == []
+    
+    # Division by zero returns None
+    assert ratio([1, 2, 3], [1, 0, 2]) == [1.0, None, 1.5]
+    
+    # Handles floats
+    assert ratio([1.5, 3.0, 4.5], [0.5, 1.0, 1.5]) == [3.0, 3.0, 3.0]
+    
+    # Handles negative numbers
+    assert ratio([-2, -4, -6], [1, 2, 3]) == [-2.0, -2.0, -2.0]
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        ratio([1, 2, "a"], [1, 2, 3])
+    with pytest.raises(TypeError):
+        ratio([1, 2, 3], [1, "b", 3])
+
+
 def test_rank_values():
     # Test ascending ranks (default)
     assert rank_values([1, 2, 3]) == [1, 2, 3]
@@ -109,6 +135,326 @@ def test_mode():
     with pytest.raises(TypeError):
         mode([1, 2, "a", "b"])
 
+def test_length():
+    assert length([1, 2, 3]) == 3  # Basic length calculation
+    assert length([]) == 0  # Empty list returns 0
+    assert length([1.5, 2.5]) == 2  # Handles floats
+    with pytest.raises(TypeError):
+        length([1, 2, "a", "b"])
+
+
+def test_modulo_twelve():
+    assert modulo_twelve([12, 13, 24, 25]) == [0.0, 1.0, 0.0, 1.0]  # Basic modulo calculation
+    assert modulo_twelve([]) == []  # Empty list returns empty list
+    assert modulo_twelve([11.5, 12.5]) == [11.5, 0.5]  # Handles floats
+    with pytest.raises(TypeError):
+        modulo_twelve([1, 2, "a", "b"])
+
+def test_histogram_bins():
+    # Basic histogram with 2 bins
+    assert histogram_bins([1, 1.5, 2, 2.5, 3], 2) == {'1.00-2.00': 2, '2.00-3.00': 3}
+    
+    # Empty list returns empty dict
+    assert histogram_bins([], 5) == {}
+    
+    # Single bin contains all values
+    assert histogram_bins([1, 2, 3], 1) == {'1.00-3.00': 3}
+    
+    # Handles negative numbers
+    assert histogram_bins([-2, -1, 0, 1, 2], 2) == {'-2.00-0.00': 2, '0.00-2.00': 3}
+    
+    # Handles floats
+    assert histogram_bins([0.5, 1.5, 2.5], 3) == {'0.50-1.17': 1, '1.17-1.83': 1, '1.83-2.50': 1}
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        histogram_bins([1, 2, "a", "b"], 2)
+    with pytest.raises(ValueError):
+        histogram_bins([1, 2, 3], 0)
+
+def test_standardize_distribution():
+    # Basic standardization - should have mean 0 and std dev 1
+    result = standardize_distribution([1, 2, 3, 4, 5])
+    assert np.allclose(np.mean(result), 0)
+    assert np.allclose(np.std(result), 1)
+    
+    # Empty list returns empty list
+    assert standardize_distribution([]) == []
+    
+    # Handles negative numbers
+    result = standardize_distribution([-2, -1, 0, 1, 2])
+    assert np.allclose(np.mean(result), 0)
+    assert np.allclose(np.std(result), 1)
+    
+    # Handles floats
+    result = standardize_distribution([1.5, 2.5, 3.5])
+    assert np.allclose(np.mean(result), 0)
+    assert np.allclose(np.std(result), 1)
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        standardize_distribution([1, 2, "a", "b"])
+        
+    # Raises error when std dev is 0 (all same numbers)
+    with pytest.raises(ValueError):
+        standardize_distribution([2, 2, 2])
+
+def test_normalize_distribution():
+    # Basic normalization - should be between 0 and 1
+    result, mean, std = normalize_distribution([1, 2, 3, 4, 5])
+    assert all(0 <= x <= 1 for x in result)
+    assert np.allclose(result, [0, 0.25, 0.5, 0.75, 1])
+    assert np.allclose(mean, 0.5)
+    assert np.allclose(std, np.std([0, 0.25, 0.5, 0.75, 1]))
+    
+    # Empty list returns empty list and zeros
+    assert normalize_distribution([]) == ([], 0, 0)
+    
+    # Handles negative numbers
+    result, mean, std = normalize_distribution([-2, -1, 0, 1, 2])
+    assert all(0 <= x <= 1 for x in result)
+    assert np.allclose(result, [0, 0.25, 0.5, 0.75, 1])
+    
+    # Handles floats
+    result, mean, std = normalize_distribution([1.5, 2.5, 3.5])
+    assert all(0 <= x <= 1 for x in result)
+    assert np.allclose(result, [0, 0.5, 1])
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        normalize_distribution([1, 2, "a", "b"])
+        
+    # Raises error when all values are identical
+    with pytest.raises(ValueError):
+        normalize_distribution([2, 2, 2])
+
+def test_kurtosis():
+    # Normal distribution has kurtosis close to 0
+    assert np.allclose(kurtosis([-3, -2, -1, 0, 0, 1, 1, 2, 3]), 0, atol=0.5)
+    
+    # Empty list returns 0
+    assert kurtosis([]) == 0
+    
+    # List with less than 2 unique values returns 0 
+    assert kurtosis([2, 2, 2]) == 0
+    assert kurtosis([]) == 0
+    
+    # Handles negative numbers
+    assert isinstance(kurtosis([-2, -1, 0, 1, 2]), float)
+    
+    # Handles floats
+    assert isinstance(kurtosis([1.5, 2.5, 3.5]), float)
+    
+    # High kurtosis (peaked distribution with heavy tails)
+    high_kurt = [1, 1, 1, 5, 1, 1, 1]
+    assert kurtosis(high_kurt) > 0
+
+    # Low kurtosis (uniform distribution)
+    low_kurt = [1, 1.5, 2, 2.5, 3]
+    assert kurtosis(low_kurt) < 0
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        kurtosis([1, 2, "a", "b"])
+
+def test_skew():
+    # Normal distribution has skew close to 0
+    assert np.allclose(skew([-3, -2, -1, 0, 0, 1, 1, 2, 3]), 0, atol=0.5)
+    
+    # Empty list returns 0
+    assert skew([]) == 0
+    
+    # List with less than 2 unique values returns 0
+    assert skew([2, 2, 2]) == 0
+    assert skew([]) == 0
+    
+    # Handles negative numbers
+    assert isinstance(skew([-2, -1, 0, 1, 2]), float)
+    
+    # Handles floats 
+    assert isinstance(skew([1.5, 2.5, 3.5]), float)
+    
+    # Positive skew (longer tail on right)
+    right_skewed = [1, 1, 1, 1, 5]
+    assert skew(right_skewed) > 0
+    
+    # Negative skew (longer tail on left)
+    left_skewed = [0, 4, 4, 4, 4]
+    assert skew(left_skewed) < 0
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        skew([1, 2, "a", "b"])
+
+def test_absolute_values():
+    # Basic test with positive and negative numbers
+    assert absolute_values([1, -2, 3, -4]) == [1, 2, 3, 4]
+    
+    # Empty list returns empty list
+    assert absolute_values([]) == []
+    
+    # All positive numbers remain unchanged
+    assert absolute_values([1, 2, 3]) == [1, 2, 3]
+    
+    # All negative numbers become positive
+    assert absolute_values([-1, -2, -3]) == [1, 2, 3]
+    
+    # Handles zero
+    assert absolute_values([-1, 0, 1]) == [1, 0, 1]
+    
+    # Handles floats
+    assert absolute_values([-1.5, 2.5, -3.5]) == [1.5, 2.5, 3.5]
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        absolute_values([1, 2, "a", "b"])
+
+def test_limit():
+    # Basic test with both limits
+    assert limit([1, 2, 3, 4, 5], x=4, y=2) == [2, 3, 4]
+    
+    # Empty list returns empty list
+    assert limit([]) == []
+    
+    # Only upper limit
+    assert limit([1, 2, 3, 4, 5], x=3) == [1, 2, 3]
+    
+    # Only lower limit 
+    assert limit([1, 2, 3, 4, 5], y=3) == [3, 4, 5]
+    
+    # No limits returns original list
+    assert limit([1, 2, 3]) == [1, 2, 3]
+    
+    # Handles negative numbers
+    assert limit([-3, -2, -1, 0, 1, 2, 3], x=1, y=-2) == [-2, -1, 0, 1]
+    
+    # Handles floats
+    assert limit([1.5, 2.5, 3.5, 4.5], x=4.0, y=2.0) == [2.5, 3.5]
+    
+    # Inclusive limits
+    assert limit([1, 2, 3, 4, 5], x=5, y=1) == [1, 2, 3, 4, 5]
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        limit([1, 2, "a", "b"])
+
+
+def test_correlation():
+    # Basic positive correlation
+    assert correlation([1, 2, 3], [2, 4, 6]) == 1.0
+    
+    # Basic negative correlation
+    assert correlation([1, 2, 3], [-2, -4, -6]) == -1.0
+
+    # No correlation (zero variance in second list)
+    assert correlation([1, 2, 3], [1, 1, 1]) == 0.0
+    
+    # Empty lists return None
+    assert correlation([], []) is None
+    
+    # Different length lists return None
+    assert correlation([1, 2], [1, 2, 3]) is None
+    
+    # Handles floats
+    assert abs(correlation([1.5, 2.5, 3.5], [1.0, 2.0, 3.0]) - 1.0) < 0.0001
+    
+    # Handles negative numbers
+    assert abs(correlation([-1, -2, -3], [-2, -4, -6]) - 1.0) < 0.0001
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        correlation([1, 2, "a"], [1, 2, 3])
+    with pytest.raises(TypeError):
+        correlation([1, 2, 3], [1, "b", 3])
+
+def test_nine_percent_significant_values():
+    # Basic test - value appears exactly 9% of time (1/11)
+    assert nine_percent_significant_values([1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3]) == [2]
+    
+    # Multiple values above 9% threshold
+    assert nine_percent_significant_values([1, 1, 1, 2, 2, 2, 2, 2, 3, 3]) == [1, 2, 3]
+    
+    # No values above 9% threshold (each appears 8.3%)
+    assert nine_percent_significant_values([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) == []
+    
+    # Empty list returns empty list
+    assert nine_percent_significant_values([]) == []
+    
+    # Custom threshold overriding default 9%
+    assert nine_percent_significant_values([1, 2, 2, 3, 3, 3], threshold=0.45) == [3]
+
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        nine_percent_significant_values([1, 2, "a", "b"])
+
+def test_contour_extrema():
+    # Basic test with clear maxima and minima
+    assert contour_extrema([1, 3, 2, 4, 1, 5, 2]) == [(0, 1), (1, 3), (2, 2), (3, 4), (4, 1), (5, 5), (6, 2)]
+    
+    # Test with plateau
+    assert contour_extrema([1, 2, 2, 2, 1]) == [(0, 1), (4, 1)]
+    
+    # Empty list returns empty list
+    assert contour_extrema([]) == []
+    
+    # Single value returns empty list
+    assert contour_extrema([1]) == []
+    
+    # Two values returns both points
+    assert contour_extrema([1, 2]) == [(0, 1), (1, 2)]
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        contour_extrema([1, "a", 2])
+
+def test_contour_gradients():
+    # Basic test with clear slopes
+    assert contour_gradients([1, 3, 2, 4, 1, 5, 2]) == [2.0, -1.0, 2.0, -3.0, 4.0, -3.0]
+    
+    # Test with plateau
+    gradients = contour_gradients([1, 2, 2, 2, 1])
+    assert len(gradients) == 1
+    
+    # Empty list returns empty list
+    assert contour_gradients([]) == []
+    
+    # Single value returns empty list
+    assert contour_gradients([1]) == []
+    
+    # Two values returns single gradient
+    assert contour_gradients([1, 2]) == [1.0]
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        contour_gradients([1, "a", 2])
+
+def test_compute_tonality_vector():
+    # Empty list returns zeros
+    assert compute_tonality_vector([]) == [0] * 24
+    
+    # Test with C major scale (pitch classes 0,2,4,5,7,9,11)
+    c_major = [0, 2, 4, 5, 7, 9, 11]
+    result = compute_tonality_vector(c_major)
+    # C major (index 0) should have highest correlation
+    assert result[0] == max(result)
+    
+    # Test with A minor scale (pitch classes 9,11,0,2,4,5,7)
+    a_minor = [9, 11, 0, 2, 4, 5, 7] 
+    result = compute_tonality_vector(a_minor)
+    # A minor (index 21) should have high correlation
+    assert result[21] in sorted(result)[-3:]
+    
+    # Test with chromatic scale
+    chromatic = list(range(12))
+    result = compute_tonality_vector(chromatic)
+    # All correlations should be similar due to equal distribution
+    assert max(result) - min(result) < 0.5
+    
+    # Raises error for invalid inputs
+    with pytest.raises(TypeError):
+        compute_tonality_vector([0, 1, 13])  # Invalid pitch class
+    with pytest.raises(TypeError):
+        compute_tonality_vector([0, 1, "C"])  # Non-integer
 
 
 if __name__ == '__main__':

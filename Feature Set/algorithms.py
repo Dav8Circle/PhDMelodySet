@@ -1,7 +1,18 @@
 import numpy as np
-
+import scipy.stats
 
 def range_func(values):
+    """Calculates the range (difference between max and min) of a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The range of the values. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element is not an integer
+    """
     if not values:
         return 0
     if not all(isinstance(x, int) for x in values):
@@ -10,6 +21,17 @@ def range_func(values):
 
 
 def standard_deviation(values):
+    """Calculates the population standard deviation of a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The standard deviation of the values. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
     if not values:
         return 0
     try:
@@ -20,6 +42,17 @@ def standard_deviation(values):
 
 
 def shannon_entropy(values):
+    """Calculates the Shannon entropy (base-2) of a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The Shannon entropy of the values. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
     if not values:
         return 0
     try:
@@ -37,6 +70,17 @@ def shannon_entropy(values):
 
 
 def natural_entropy(values):
+    """Calculates the natural entropy (base-e) of a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The natural entropy of the values. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
     if not values:
         return 0
     try:
@@ -54,6 +98,18 @@ def natural_entropy(values):
 
 
 def distribution_proportions(values):
+    """Calculates the proportion of each unique value in a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        Dictionary mapping each unique value to its proportion in the list.
+        Returns empty dict for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
     if not values:
         return {}
     try:
@@ -71,6 +127,41 @@ def distribution_proportions(values):
     return dist
 
 
+def ratio(x, y):
+    """Calculates the ratio between corresponding elements in two lists.
+    
+    Args:
+        x: First list of numeric values
+        y: Second list of numeric values. Must have same length as x.
+        
+    Returns:
+        List containing ratios of corresponding elements (x[i]/y[i]).
+        Returns empty list if input lists are empty or have different lengths.
+        Returns None for any division by zero.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not x or not y or len(x) != len(y):
+        return []
+        
+    try:
+        x_array = np.array(x, dtype=float)
+        y_array = np.array(y, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Handle division by zero by converting to None
+    ratios = []
+    for i in range(len(x_array)):
+        if y_array[i] == 0 or x_array[i] == 0:
+            ratios.append(None)
+        else:
+            ratios.append(float(x_array[i] / y_array[i]))
+            
+    return ratios
+
+
 def rank_values(values, descending=False):
     """Ranks the input values from 1 to n. Ties get the same rank.
 
@@ -80,7 +171,11 @@ def rank_values(values, descending=False):
                    If False, lowest value gets rank 1.
 
     Returns:
-        List of ranks corresponding to the input values
+        List of ranks corresponding to the input values.
+        Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return []
@@ -116,6 +211,9 @@ def repetition_rate(values):
     Returns:
         Integer representing shortest distance between repeats.
         Returns 0 if list is empty or has no repeats.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return 0
@@ -153,6 +251,10 @@ def repetition_count(values):
     Returns:
         Dictionary mapping values to their repetition counts.
         Only includes values that appear more than once.
+        Returns empty dict for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return {}
@@ -182,6 +284,10 @@ def consecutive_repetition_count(values):
     Returns:
         Dictionary mapping values to their consecutive repetition counts.
         Only includes values that appear consecutively more than once.
+        Returns empty dict for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return {}
@@ -220,6 +326,9 @@ def mean(values):
         
     Returns:
         The arithmetic mean of the values. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return 0
@@ -240,6 +349,9 @@ def mode(values):
     Returns:
         The mode of the values. If multiple modes exist, returns the smallest one.
         Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
     """
     if not values:
         return 0
@@ -264,3 +376,537 @@ def mode(values):
     # Return smallest mode
     return float(np.min(modes))
 
+def length(values):
+    """Returns the length (number of elements) of a list of numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The length of the list. Returns 0 for empty list.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return 0
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    return len(values_array)
+
+def modulo_twelve(values):
+    """Takes modulo 12 of each number in the input list.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        List with modulo 12 of each value. Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    return [float(x) for x in values_array % 12]
+
+def histogram_bins(values, num_bins):
+    """Places data into histogram bins and counts occurrences in each bin.
+    
+    Creates a histogram by dividing the range of values into equal-width bins
+    and counting how many values fall into each bin.
+    
+    Args:
+        values: List of numeric values to bin
+        num_bins: Integer specifying number of equal-width bins to create
+        
+    Returns:
+        Dictionary where keys are strings representing bin ranges (e.g. "0.00-1.00")
+        and values are integer counts of items in each bin. Returns empty dict for
+        empty input list.
+        
+    Raises:
+        TypeError: If any element in values cannot be converted to float
+        ValueError: If num_bins is less than 1
+        
+    Example:
+        >>> histogram_bins([1, 1.5, 2, 2.5, 3], 2)
+        {'1.00-2.00': 2, '2.00-3.00': 3}
+    """
+    if not values:
+        return {}
+        
+    if num_bins < 1:
+        raise ValueError("Number of bins must be at least 1")
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    counts, bins = np.histogram(values_array, bins=num_bins)
+    return {f"{bins[i]:.2f}-{bins[i+1]:.2f}": int(counts[i]) for i in range(len(counts))}
+
+def standardize_distribution(values):
+    """Converts a list of numbers to a normal distribution with mean 0 and std dev 1.
+    
+    Applies z-score normalization (standardization) to transform the input values
+    into a standard normal distribution.
+    
+    Args:
+        values: List of numeric values to normalize
+        
+    Returns:
+        List of normalized values with mean 0 and standard deviation 1.
+        Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+        ValueError: If input has zero standard deviation
+    """
+    if not values:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    mean = np.mean(values_array)
+    std = np.std(values_array)
+    
+    if std == 0:
+        raise ValueError("Cannot normalize - standard deviation is zero")
+        
+    normalized = (values_array - mean) / std
+    return normalized.tolist()
+
+def normalize_distribution(values):
+    """Converts a list of numbers to a normal distribution.
+    
+    Applies min-max normalization to transform the input values into 
+    a normal distribution between 0 and 1.
+    
+    Args:
+        values: List of numeric values to normalize
+        
+    Returns:
+        Tuple containing:
+        - List of normalized values between 0 and 1
+        - Mean of the normalized distribution
+        - Standard deviation of the normalized distribution
+        Returns ([], 0, 0) for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+        ValueError: If all input values are identical
+    """
+    if not values:
+        return [], 0, 0
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    min_val = np.min(values_array)
+    max_val = np.max(values_array)
+    
+    if min_val == max_val:
+        raise ValueError("Cannot normalize - all values are identical")
+        
+    normalized = (values_array - min_val) / (max_val - min_val)
+    mean = float(np.mean(normalized))
+    std = float(np.std(normalized))
+    
+    return normalized.tolist(), mean, std
+
+def kurtosis(values):
+    """Calculates the kurtosis (peakedness) of a list of numbers.
+    
+    Kurtosis measures how heavy-tailed or light-tailed a distribution is
+    compared to a normal distribution. Higher kurtosis means more outliers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The kurtosis of the values. Returns 0 for empty list or lists with less than 2 unique values.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return 0
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Check if there are at least 2 unique values
+    if len(np.unique(values_array)) < 2:
+        return 0
+        
+    # Use bias=False to get the correct kurtosis for small sample sizes
+    return float(scipy.stats.kurtosis(values_array, fisher=True, bias=False))
+
+def skew(values):
+    """Calculates the skewness (asymmetry) of a list of numbers.
+    
+    Skewness measures the asymmetry of the probability distribution of a dataset
+    around its mean. Positive skew indicates a longer tail on the right,
+    negative skew indicates a longer tail on the left.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        The skewness of the values. Returns 0 for empty list or lists with less than 2 unique values.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return 0
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Check if there are at least 2 unique values
+    if len(np.unique(values_array)) < 2:
+        return 0
+        
+    # Use bias=False to get the correct skewness for small sample sizes
+    return float(scipy.stats.skew(values_array, bias=False))
+
+def absolute_values(values):
+    """Returns a list with absolute values of all input numbers.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        List containing absolute values of input numbers. Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    return list(np.abs(values_array))
+def limit(values, x=None, y=None):
+    """Removes values larger than x or smaller than y from the input list.
+    
+    Args:
+        values: List of numeric values
+        x: Upper limit (inclusive). If None, no upper limit is applied.
+        y: Lower limit (inclusive). If None, no lower limit is applied.
+        
+    Returns:
+        List containing only values within the specified limits. Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    mask = np.ones(len(values_array), dtype=bool)
+    
+    if x is not None:
+        mask &= values_array <= x
+        
+    if y is not None:
+        mask &= values_array >= y
+        
+    return [float(x) for x in values_array[mask]]
+def correlation(x, y):
+    """Calculates the Pearson-Bravais correlation coefficient between two lists of values.
+    
+    Args:
+        x: First list of numeric values
+        y: Second list of numeric values. Must have same length as x.
+        
+    Returns:
+        Float value representing correlation coefficient between -1 and 1.
+        Returns None if input lists are empty or have different lengths.
+        Returns 0 if there is no correlation (e.g. if one list has zero variance).
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not x or not y or len(x) != len(y):
+        return None
+        
+    try:
+        x_array = np.array(x, dtype=float)
+        y_array = np.array(y, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Check for zero variance in either array
+    if np.var(x_array) == 0 or np.var(y_array) == 0:
+        return 0.0
+        
+    # Use numpy's built-in corrcoef function which implements Pearson correlation
+    correlation_matrix = np.corrcoef(x_array, y_array)
+    
+    # corrcoef returns a 2x2 matrix, we want the off-diagonal element
+    return float(correlation_matrix[0, 1])
+
+def nine_percent_significant_values(values, threshold=0.09):
+    """Returns values that appear more than a given proportion of times in the input list.
+    
+    Args:
+        values: List of numeric values to analyze
+        threshold: Minimum proportion (between 0 and 1) required for a value to be considered significant.
+                  Default is 0.09 (9%)
+                  
+    Returns:
+        List of values that appear more than the threshold proportion of times.
+        Returns empty list for empty input.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Get counts of unique values
+    unique, counts = np.unique(values_array, return_counts=True)
+    
+    # Calculate proportions
+    proportions = counts / len(values_array)
+    
+    # Get values that exceed threshold
+    significant = [float(val) for val, prop in zip(unique, proportions) 
+                  if prop >= threshold]
+                  
+    return significant
+
+def circle_of_fifths(values):
+    """Organizes input values into bins according to the circle of fifths pattern (0,6,2,8,4,10,5,11,7,1,9,3).
+    
+    Args:
+        values: List of integers between 0 and 12 to organize
+        
+    Returns:
+        Dictionary mapping values to their counts, organized by their position in the circle of fifths.
+        Empty input returns empty dictionary with zero counts for all bins.
+        
+    Raises:
+        ValueError: If any value is not an integer between 0 and 12
+    """
+    if not values:
+        return {i: 0 for i in range(12)}
+        
+    # Validate input values
+    for val in values:
+        if not isinstance(val, int) or val < 0 or val > 12:
+            raise ValueError("Values must be integers between 0 and 12")
+            
+    # Define circle of fifths order
+    fifths_order = [0,6,2,8,4,10,5,11,7,1,9,3]
+    
+    # Initialize result dictionary with zeros for all bins
+    result = {i: 0 for i in range(12)}
+    
+    # Count the values according to circle of fifths positions
+    for val in values:
+        if val < 12:  # Skip 12 since it's equivalent to 0
+            result[val] += 1
+            
+    return result
+
+def contour_extrema(values):
+    """Finds all contour extremum notes in a sequence.
+    
+    Identifies:
+    - First and last notes
+    - Local maxima where surrounding notes are lower
+    - Local minima where surrounding notes are higher
+    - Handles plateaus by looking at extended context
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        List of tuples (index, value) where extrema occur. Returns empty list for empty input
+        or lists shorter than 2 elements.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values or len(values) < 2:
+        return []
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+    
+    extrema = [(0, int(values_array[0]))]  # First note is always included
+    n = len(values_array)
+    
+    # Check each interior point
+    for i in range(1, n-1):
+        # Get values for comparison
+        prev = values_array[i-1]
+        curr = values_array[i]
+        next_val = values_array[i+1]
+        
+        # Simple case: clear maximum or minimum
+        if (prev < curr and next_val < curr) or (prev > curr and next_val > curr):
+            extrema.append((i, int(curr)))
+            continue
+            
+        # Handle plateaus by looking at extended context
+        if prev == curr or next_val == curr:
+            # Look back up to 2 positions if available
+            back2 = values_array[i-2] if i >= 2 else None
+            
+            # Look forward up to 2 positions if available
+            forward2 = values_array[i+2] if i < n-2 else None
+            
+            # Check plateau cases
+            if prev == curr and forward2 is not None:
+                if (back2 is not None and back2 < curr and next_val < curr) or \
+                   (back2 is not None and back2 > curr and next_val > curr):
+                    extrema.append((i, int(curr)))
+            elif next_val == curr and back2 is not None:
+                if (forward2 is not None and forward2 < curr and prev < curr) or \
+                   (forward2 is not None and forward2 > curr and prev > curr):
+                    extrema.append((i, int(curr)))
+    
+    extrema.append((n-1, int(values_array[n-1])))  # Last note is always included
+    return extrema
+
+def contour_gradients(values):
+    """Calculates gradients between consecutive contour extrema points.
+    
+    For each pair of consecutive extrema points (ti,pi) and (tj,pj),
+    calculates the gradient m = (pj-pi)/(tj-ti)
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        List of gradients between consecutive extrema points.
+        Returns empty list for empty input or lists shorter than 2 elements.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not values or len(values) < 2:
+        return []
+        
+    # Get extrema points using existing function
+    extrema = contour_extrema(values)
+    
+    # Calculate gradients between consecutive extrema
+    gradients = []
+    for i in range(len(extrema)-1):
+        t1, p1 = extrema[i]
+        t2, p2 = extrema[i+1]
+        
+        # Skip if time difference is zero (shouldn't happen with current extrema logic)
+        if t2 - t1 == 0:
+            continue
+            
+        # Calculate gradient
+        gradient = (p2 - p1) / (t2 - t1)
+        gradients.append(float(gradient))
+        
+    return gradients
+
+def compute_tonality_vector(pitch_classes):
+    """Computes the Krumhansl-Schmuckler key-finding correlation vector.
+    
+    Correlates the distribution of pitch classes in the input with the Krumhansl-Kessler
+    key profiles for all 24 possible major and minor keys to determine key likelihood.
+    
+    Args:
+        pitch_classes: List of integers representing pitch classes (0-11)
+        
+    Returns:
+        List of 24 correlation coefficients where:
+        - Indices 0-11 correspond to major keys (C, C#, D, etc.)
+        - Indices 12-23 correspond to minor keys (c, c#, d, etc.)
+        Returns list of zeros if input is empty.
+        
+    Raises:
+        TypeError: If pitch classes are not integers between 0-11
+    """
+    # Krumhansl-Kessler key profiles
+    maj_vector = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
+    min_vector = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
+    
+    if not pitch_classes:
+        return [0] * 24
+        
+    # Validate pitch classes
+    if not all(isinstance(pc, int) and 0 <= pc < 12 for pc in pitch_classes):
+        raise TypeError("Pitch classes must be integers between 0-11")
+        
+    # Compute distribution of pitch classes
+    pc_dist = [0] * 12
+    for pc in pitch_classes:
+        pc_dist[pc] += 1
+    
+    # Normalize distribution
+    total = sum(pc_dist)
+    if total > 0:  # Avoid division by zero
+        pc_dist = [count / total for count in pc_dist]
+    
+    # Initialize correlation vector
+    correlations = []
+    
+    # Compute correlations for all possible keys
+    for i in range(12):  # For each possible root note
+        # Rotate profiles to current root
+        shifted_maj = maj_vector[-i:] + maj_vector[:-i]
+        shifted_min = min_vector[-i:] + min_vector[:-i]
+        
+        # Calculate correlations
+        maj_corr = correlation(pc_dist, shifted_maj)
+        min_corr = correlation(pc_dist, shifted_min)
+        
+        # Handle None results from correlation function
+        correlations.append(maj_corr if maj_corr is not None else 0.0)
+    
+    # Add minor key correlations
+    for i in range(12):
+        shifted_min = min_vector[-i:] + min_vector[:-i]
+        min_corr = correlation(pc_dist, shifted_min)
+        correlations.append(min_corr if min_corr is not None else 0.0)
+    
+    return correlations
