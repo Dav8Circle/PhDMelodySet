@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.stats
+from scipy import stats, signal
 
 def range_func(values):
     """Calculates the range (difference between max and min) of a list of numbers.
@@ -559,7 +559,7 @@ def kurtosis(values):
         return 0
         
     # Use bias=False to get the correct kurtosis for small sample sizes
-    return float(scipy.stats.kurtosis(values_array, fisher=True, bias=False))
+    return float(stats.kurtosis(values_array, fisher=True, bias=False))
 
 def skew(values):
     """Calculates the skewness (asymmetry) of a list of numbers.
@@ -590,7 +590,7 @@ def skew(values):
         return 0
         
     # Use bias=False to get the correct skewness for small sample sizes
-    return float(scipy.stats.skew(values_array, bias=False))
+    return float(stats.skew(values_array, bias=False))
 
 def absolute_values(values):
     """Returns a list with absolute values of all input numbers.
@@ -910,3 +910,388 @@ def compute_tonality_vector(pitch_classes):
         correlations.append(min_corr if min_corr is not None else 0.0)
     
     return correlations
+
+def yules_k(values):
+    """Calculates Yule's K statistic, a measure of lexical diversity.
+    Must be called multiple times and averaged over all m-types to match FANTASTIC.
+    
+    Yule's K is calculated as: K = 10000 * (∑(Vm * m²) - N) / N²
+    where:
+    - N is the total number of tokens
+    - m is the frequency class
+    - Vm is the number of types that occur m times
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        Float value representing Yule's K statistic.
+        Returns 0 for empty list or lists with less than 2 elements.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+        ValueError: If calculation would result in division by zero
+    """
+    if not values or len(values) < 2:
+        return 0
+        
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+    
+    # Count frequency of each unique value
+    unique, counts = np.unique(values_array, return_counts=True)
+    
+    # Create frequency spectrum (how many values appear 1 time, 2 times, etc)
+    freq_of_freqs = np.bincount(counts)
+    
+    # Calculate N (total tokens)
+    N = len(values_array)
+    
+    if N == 0:
+        raise ValueError("Cannot calculate Yule's K - no values provided")
+    
+    # Calculate denominator sum (Vm * m²)
+    denom_k = 0
+    for m in range(1, len(freq_of_freqs)):
+        Vm = freq_of_freqs[m]  # number of types occurring m times
+        denom_k += Vm * (m * m)
+    
+    # Calculate Yule's K with scaling factor of 10000
+    k = 10000 * ((denom_k - N) / (N * N))
+    
+    return float(k)
+
+def simpsons_d(values):
+    """
+    Compute Simpson's D diversity index for a sequence of values.
+    Must be called multiple times and averaged over all m-types to match FANTASTIC.
+    
+    Args:
+        values: List of numeric values
+        
+    Returns:
+        float: Simpson's D value
+    """
+    if not values or len(values) < 2:
+        return 0.0
+        
+    # Get frequency spectrum using numpy
+    unique, counts = np.unique(values, return_counts=True)
+    freq_spec = dict(zip(unique, counts))
+    
+    # Calculate N (total tokens)
+    N = sum(freq_spec.values())
+    
+    if N == 1:
+        return 0.0
+        
+    # Calculate sum of D components
+    D = 0
+    for m, Vm in freq_spec.items():
+        # Formula: D = sum(Vm * (m/N) * ((m-1)/(N-1)))
+        D += Vm * (m/N) * ((m-1)/(N-1))
+        
+    return float(D)
+
+def sichels_s(values):
+    """
+    Computes Sichel's S statistic from a list of values.
+    S is the proportion of types that occur exactly twice in the sample.
+    Must be called multiple times and averaged over all m-types to match FANTASTIC.
+    
+    Args:
+        values: List of values to analyze
+        
+    Returns:
+        float: Sichel's S value
+    """
+    if not values:
+        return 0.0
+        
+    if len(values) == 1:
+        return 0.0
+        
+    # Get frequency spectrum using numpy
+    unique, counts = np.unique(values, return_counts=True)
+    
+    # Find number of types that occur exactly twice
+    doubles = np.sum(counts == 2)
+    
+    # Total number of types
+    V = len(unique)
+    
+    # S = V2/V where V2 is number of types occurring twice
+    if V == 0:
+        return 0.0
+        
+    return float(doubles) / V
+
+def honores_h(values):
+    """
+    Compute Honore's H statistic for a sequence of values.
+    Must be called multiple times and averaged over all m-types to match FANTASTIC.
+
+    H = 100 * (log(N) / (1 - (V1/V)))
+    where:
+    N = total tokens
+    V1 = number of types occurring exactly once (hapax legomena)
+    V = total number of unique types
+    """
+    if not values:
+        return 0.0
+    
+    if len(values) == 1:
+        return 0.0
+        
+    # Get frequency spectrum using numpy
+    unique, counts = np.unique(values, return_counts=True)
+    
+    # Calculate components
+    V1 = np.sum(counts == 1)  # Number of types occurring once
+    V = len(unique)  # Total unique types
+    N = len(values)  # Total tokens
+    
+    # Handle edge cases
+    if V1 == 0 or V == 0:
+        return 0.0
+        
+    if V1 == V:
+        return 0.0
+        
+    # Calculate H
+    H = 100.0 * (np.log(N) / (1.0 - (float(V1)/V)))
+    
+    return H
+def spearman_correlation(x, y):
+    """Calculate Spearman's rank correlation coefficient between two lists of numbers.
+    
+    Args:
+        x: First list of numeric values
+        y: Second list of numeric values
+        
+    Returns:
+        Float value representing Spearman's correlation coefficient.
+        Returns 0 if either list is empty or lists have different lengths.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not x or not y or len(x) != len(y):
+        return 0.0
+        
+    try:
+        x_array = np.array(x, dtype=float)
+        y_array = np.array(y, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+    
+    correlation, _ = stats.spearmanr(x_array, y_array)
+    
+    # Handle NaN result
+    if np.isnan(correlation):
+        return 0.0
+        
+    return correlation
+
+def kendall_tau(x, y):
+    """Calculate Kendall's tau correlation coefficient between two lists of numbers.
+    
+    Args:
+        x: First list of numeric values
+        y: Second list of numeric values
+        
+    Returns:
+        Float value representing Kendall's tau correlation coefficient.
+        Returns 0 if either list is empty or lists have different lengths.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not x or not y or len(x) != len(y):
+        return 0.0
+        
+    try:
+        x_array = np.array(x, dtype=float)
+        y_array = np.array(y, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+    
+    tau, _ = stats.kendalltau(x_array, y_array)
+    
+    # Handle NaN result
+    if np.isnan(tau):
+        return 0.0
+        
+    return tau
+
+def diffexp(melody1, melody2):
+    """Calculates the differential expression score between two melodies based on their pitch intervals.
+    
+    Implements σ(μ₁,μ₂) = e^(-Δp/(N-1)) where Δp is the L1 norm (Manhattan distance) 
+    between the pitch interval vectors of the two melodies.
+    
+    Args:
+        melody1: First list of numeric pitch values
+        melody2: Second list of numeric pitch values
+        
+    Returns:
+        Float value representing the differential expression score.
+        Returns 0.0 if either melody has fewer than 2 notes (no intervals possible).
+        
+    Raises:
+        TypeError: If inputs contain non-numeric values
+    """
+    # Need at least 2 notes to form intervals
+    if len(melody1) < 2 or len(melody2) < 2:
+        return 0.0
+        
+    try:
+        # Convert melodies to numpy arrays
+        m1 = np.array(melody1, dtype=float)
+        m2 = np.array(melody2, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("Melody inputs must contain numeric values")
+    
+    # Calculate pitch intervals (differences between consecutive notes)
+    intervals1 = np.diff(m1)
+    intervals2 = np.diff(m2)
+    
+    # If interval vectors have different lengths, pad shorter one with zeros
+    if len(intervals1) != len(intervals2):
+        max_len = max(len(intervals1), len(intervals2))
+        intervals1 = np.pad(intervals1, (0, max_len - len(intervals1)))
+        intervals2 = np.pad(intervals2, (0, max_len - len(intervals2)))
+    
+    # Calculate Δp as L1 norm (sum of absolute differences) between interval vectors
+    delta_p = np.sum(np.abs(intervals1 - intervals2))
+    
+    # N is the length of the longer melody
+    N = max(len(melody1), len(melody2))
+    
+    # Calculate final score
+    score = np.exp(-delta_p / (N - 1))
+    
+    return float(score)
+
+def diff(melody1, melody2):
+    """Calculates the differential score between two melodies based on their pitch intervals.
+    
+    Implements σ(μ₁,μ₂) = 1 - Δp/((N-1)Δp��) where:
+    - Δp is the L1 norm (Manhattan distance) between the pitch interval vectors
+    - Δp∞ is the maximum absolute interval difference across both melodies
+    - N is the length of the longer melody
+    
+    Args:
+        melody1: First list of numeric pitch values
+        melody2: Second list of numeric pitch values
+        
+    Returns:
+        Float value representing the differential score.
+        Returns 0.0 if either melody has fewer than 2 notes (no intervals possible).
+        
+    Raises:
+        TypeError: If inputs contain non-numeric values
+        ValueError: If Δp∞ is zero (no pitch differences between melodies)
+    """
+    # Need at least 2 notes to form intervals
+    if len(melody1) < 2 or len(melody2) < 2:
+        return 0.0
+        
+    try:
+        # Convert melodies to numpy arrays
+        m1 = np.array(melody1, dtype=float)
+        m2 = np.array(melody2, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("Melody inputs must contain numeric values")
+    
+    # Calculate pitch intervals (differences between consecutive notes)
+    intervals1 = np.diff(m1)
+    intervals2 = np.diff(m2)
+    
+    # If interval vectors have different lengths, pad shorter one with zeros
+    if len(intervals1) != len(intervals2):
+        max_len = max(len(intervals1), len(intervals2))
+        intervals1 = np.pad(intervals1, (0, max_len - len(intervals1)))
+        intervals2 = np.pad(intervals2, (0, max_len - len(intervals2)))
+    
+    # Calculate Δp as L1 norm (sum of absolute differences) between interval vectors
+    delta_p = np.sum(np.abs(intervals1 - intervals2))
+    
+    # Calculate Δp∞ as max of absolute intervals across both melodies
+    delta_p_inf = max(np.max(np.abs(intervals1)), np.max(np.abs(intervals2)))
+    
+    if delta_p_inf == 0:
+        raise ValueError("Cannot calculate diff score - no pitch differences between melodies")
+    
+    # N is the length of the longer melody
+    N = max(len(melody1), len(melody2))
+    
+    # Calculate final score
+    score = 1 - (delta_p / ((N - 1) * delta_p_inf))
+    
+    return float(score)
+
+def cross_correlation(x, y):
+    """Calculates the cross-correlation between two lists of numbers using scipy.signal.correlate.
+    
+    Args:
+        x: First list of numeric values
+        y: Second list of numeric values
+        
+    Returns:
+        List containing the cross-correlation values. Returns empty list for empty inputs.
+        
+    Raises:
+        TypeError: If any element cannot be converted to float
+    """
+    if not x or not y:
+        return []
+        
+    try:
+        x_array = np.array(x, dtype=float)
+        y_array = np.array(y, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+        
+    # Calculate cross-correlation using scipy.signal.correlate
+    correlation = signal.correlate(x_array, y_array, mode='full')
+    
+    return correlation.tolist()
+def edit_distance(list1, list2, insertion_cost=1, deletion_cost=1, substitution_cost=1):
+    """Calculates the edit distance (Levenshtein distance) between two lists of numbers.
+    
+    Args:
+        list1: First list of numbers
+        list2: Second list of numbers
+        insertion_cost: Cost of inserting an element (default=1)
+        deletion_cost: Cost of deleting an element (default=1) 
+        substitution_cost: Cost of substituting an element (default=1)
+        
+    Returns:
+        Float representing the weighted edit distance between the two lists.
+    """
+    len1, len2 = len(list1), len(list2)
+    
+    # Create a matrix to store distances
+    dp = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+    
+    # Initialize the matrix
+    for i in range(len1 + 1):
+        dp[i][0] = i * deletion_cost
+    for j in range(len2 + 1):
+        dp[0][j] = j * insertion_cost
+    
+    # Compute the edit distance
+    for i in range(1, len1 + 1):
+        for j in range(1, len2 + 1):
+            if list1[i - 1] == list2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = min(dp[i - 1][j] + deletion_cost,     # Deletion
+                              dp[i][j - 1] + insertion_cost,      # Insertion
+                              dp[i - 1][j - 1] + substitution_cost) # Substitution
+    
+    return dp[len1][len2]
+
