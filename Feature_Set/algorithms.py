@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats, signal
 
-def range_func(values):
+def range_func(values: list[float]) -> float:
     """Calculates the range (difference between max and min) of a list of numbers.
     
     Args:
@@ -11,16 +11,17 @@ def range_func(values):
         The range of the values. Returns 0 for empty list.
         
     Raises:
-        TypeError: If any element is not an integer
+        TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
-    if not all(isinstance(x, int) for x in values):
-        raise TypeError("All elements must be integers")
-    return max(values) - min(values)
+        return 0.0
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("All elements must be numbers")
+    return float(max(values_array) - min(values_array))
 
-
-def standard_deviation(values):
+def standard_deviation(values: list[float]) -> float:
     """Calculates the population standard deviation of a list of numbers.
     
     Args:
@@ -33,15 +34,15 @@ def standard_deviation(values):
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
     try:
         values_array = np.array(values, dtype=float)
     except (TypeError, ValueError):
         raise TypeError("All elements must be numbers")
-    return np.std(values_array, ddof=0)
+    return float(np.std(values_array, ddof=0))
 
 
-def shannon_entropy(values):
+def shannon_entropy(values: list[float]) -> float:
     """Calculates the Shannon entropy (base-2) of a list of numbers.
     
     Args:
@@ -54,7 +55,7 @@ def shannon_entropy(values):
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
     try:
         values_array = np.array(values, dtype=float)
     except (TypeError, ValueError):
@@ -66,10 +67,10 @@ def shannon_entropy(values):
 
     # Calculate entropy using the formula: -sum(p * log2(p))
     entropy = -np.sum(probabilities * np.log2(probabilities))
-    return entropy
+    return float(entropy)
 
 
-def natural_entropy(values):
+def natural_entropy(values: list[float]) -> float:
     """Calculates the natural entropy (base-e) of a list of numbers.
     
     Args:
@@ -82,7 +83,7 @@ def natural_entropy(values):
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
     try:
         values_array = np.array(values, dtype=float)
     except (TypeError, ValueError):
@@ -94,18 +95,18 @@ def natural_entropy(values):
 
     # Calculate entropy using the formula: -sum(p * ln(p))
     entropy = -np.sum(probabilities * np.log(probabilities))
-    return entropy
+    return float(entropy)
 
 
-def distribution_proportions(values):
+def distribution_proportions(values: list[float]) -> list[float]:
     """Calculates the proportion of each unique value in a list of numbers.
     
     Args:
         values: List of numeric values
         
     Returns:
-        Dictionary mapping each unique value to its proportion in the list.
-        Returns empty dict for empty list.
+        List of proportions for each unique value.
+        Returns empty list for empty input.
         
     Raises:
         TypeError: If any element cannot be converted to float
@@ -120,14 +121,12 @@ def distribution_proportions(values):
     # Calculate frequencies of each unique value
     unique, counts = np.unique(values_array, return_counts=True)
 
-    # Create dictionary mapping values to their proportions
-    # (frequencies scaled from 0 to 1)
-    dist = {float(val): count * (1.0/len(values_array))
-            for val, count in zip(unique, counts)}
-    return dist
+    # Calculate proportions
+    proportions = counts * (1.0/len(values_array))
+    return {float(u): float(p) for u, p in zip(unique, proportions)}
 
 
-def ratio(x, y):
+def ratio(x: list[float], y: list[float]) -> list[float]:
     """Calculates the ratio between corresponding elements in two lists.
     
     Args:
@@ -162,7 +161,7 @@ def ratio(x, y):
     return ratios
 
 
-def rank_values(values, descending=False):
+def rank_values(values: list[float], descending: bool = False) -> list[float]:
     """Ranks the input values from 1 to n. Ties get the same rank.
 
     Args:
@@ -194,7 +193,7 @@ def rank_values(values, descending=False):
     # Create rank mapping for each unique value
     rank_map = {}
     for i, val in enumerate(unique_vals, 1):
-        rank_map[val] = i
+        rank_map[val] = float(i)
         
     # Map each value to its rank
     ranks = [rank_map[order * val] for val in values_array]
@@ -202,21 +201,21 @@ def rank_values(values, descending=False):
     return ranks
 
 
-def repetition_rate(values):
+def repetition_rate(values: list[float]) -> float:
     """Finds the shortest distance between any repeated value in the list.
     
     Args:
         values: List of numeric values to check for repetitions
         
     Returns:
-        Integer representing shortest distance between repeats.
+        Shortest distance between repeats.
         Returns 0 if list is empty or has no repeats.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -239,19 +238,18 @@ def repetition_rate(values):
                 # Can break inner loop since we found closest repeat
                 break
                 
-    return min_distance if found_repeat else 0
+    return float(min_distance) if found_repeat else 0.0
 
 
-def repetition_count(values):
+def repetition_count(values: list[float]) -> list[float]:
     """Counts the number of times each value repeats in the list.
     
     Args:
         values: List of numeric values to count repetitions
         
     Returns:
-        Dictionary mapping values to their repetition counts.
-        Only includes values that appear more than once.
-        Returns empty dict for empty list.
+        List of repetition counts for values that appear more than once.
+        Returns empty list for empty input.
         
     Raises:
         TypeError: If any element cannot be converted to float
@@ -267,24 +265,20 @@ def repetition_count(values):
     # Get counts of each unique value
     unique, counts = np.unique(values_array, return_counts=True)
     
-    # Create dict of only values that repeat (count > 1)
-    repetitions = {}
-    for val, count in zip(unique, counts):
-        if count > 1:
-            repetitions[float(val)] = int(count)
+    # Get counts only for values that repeat (count > 1)
+    repeat_counts = [float(count) for count in counts if count > 1]
             
-    return repetitions
+    return {int(unique[i]): repeat_counts[i] for i in range(len(repeat_counts))}
 
-def consecutive_repetition_count(values):
+def consecutive_repetition_count(values: list[float]) -> dict[float, float]:
     """Counts the number of times each value appears consecutively in the list.
     
     Args:
         values: List of numeric values to check for consecutive repetitions
         
     Returns:
-        Dictionary mapping values to their consecutive repetition counts.
-        Only includes values that appear consecutively more than once.
-        Returns empty dict for empty list.
+        Dictionary of consecutive repetition counts for values that appear consecutively more than once.
+        Returns empty dictionary for empty input.
         
     Raises:
         TypeError: If any element cannot be converted to float
@@ -308,30 +302,30 @@ def consecutive_repetition_count(values):
         else:
             # When value changes, record count if > 1 and reset
             if current_count > 1:
-                repetitions[float(current_value)] = int(current_count)
+                repetitions[float(current_value)] = float(current_count)
             current_value = val
             current_count = 1
             
     # Check final run
     if current_count > 1:
-        repetitions[float(current_value)] = int(current_count)
+        repetitions[float(current_value)] = float(current_count)
             
     return repetitions
 
-def mean(values):
+def mean(values: list[float]) -> float:
     """Calculates the arithmetic mean of a list of numbers.
     
     Args:
         values: List of numeric values
         
     Returns:
-        The arithmetic mean of the values. Returns 0 for empty list.
+        The arithmetic mean. Returns 0 for empty list.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -340,21 +334,21 @@ def mean(values):
         
     return float(np.mean(values_array))
 
-def mode(values):
+def mode(values: list[float]) -> float:
     """Calculates the mode (most frequent value) of a list of numbers.
     
     Args:
         values: List of numeric values
         
     Returns:
-        The mode of the values. If multiple modes exist, returns the smallest one.
+        The mode. If multiple modes exist, returns the smallest one.
         Returns 0 for empty list.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -362,7 +356,7 @@ def mode(values):
         raise TypeError("All elements must be numbers")
         
     if len(values_array) == 0:
-        return 0
+        return 0.0
         
     # Get value counts
     unique, counts = np.unique(values_array, return_counts=True)
@@ -376,29 +370,29 @@ def mode(values):
     # Return smallest mode
     return float(np.min(modes))
 
-def length(values):
+def length(values: list[float]) -> float:
     """Returns the length (number of elements) of a list of numbers.
     
     Args:
         values: List of numeric values
         
     Returns:
-        The length of the list. Returns 0 for empty list.
+        The length. Returns 0 for empty list.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
     except (TypeError, ValueError):
         raise TypeError("All elements must be numbers")
         
-    return len(values_array)
+    return float(len(values_array))
 
-def modulo_twelve(values):
+def modulo_twelve(values: list[float]) -> list[float]:
     """Takes modulo 12 of each number in the input list.
     
     Args:
@@ -420,7 +414,7 @@ def modulo_twelve(values):
         
     return [float(x) for x in values_array % 12]
 
-def histogram_bins(values, num_bins):
+def histogram_bins(values: list[float], num_bins: int) -> dict[str, int]:
     """Places data into histogram bins and counts occurrences in each bin.
     
     Creates a histogram by dividing the range of values into equal-width bins
@@ -431,17 +425,12 @@ def histogram_bins(values, num_bins):
         num_bins: Integer specifying number of equal-width bins to create
         
     Returns:
-        Dictionary where keys are strings representing bin ranges (e.g. "0.00-1.00")
-        and values are integer counts of items in each bin. Returns empty dict for
-        empty input list.
+        Dictionary mapping bin range strings (e.g. '1.00-2.00') to counts.
+        Returns empty dictionary for empty input.
         
     Raises:
-        TypeError: If any element in values cannot be converted to float
+        TypeError: If any element cannot be converted to float
         ValueError: If num_bins is less than 1
-        
-    Example:
-        >>> histogram_bins([1, 1.5, 2, 2.5, 3], 2)
-        {'1.00-2.00': 2, '2.00-3.00': 3}
     """
     if not values:
         return {}
@@ -454,10 +443,18 @@ def histogram_bins(values, num_bins):
     except (TypeError, ValueError):
         raise TypeError("All elements must be numbers")
         
-    counts, bins = np.histogram(values_array, bins=num_bins)
-    return {f"{bins[i]:.2f}-{bins[i+1]:.2f}": int(counts[i]) for i in range(len(counts))}
+    # Calculate histogram
+    counts, bin_edges = np.histogram(values_array, bins=num_bins)
+    
+    # Create dictionary with formatted bin ranges as keys
+    result = {}
+    for i in range(len(counts)):
+        bin_label = f"{bin_edges[i]:.2f}-{bin_edges[i+1]:.2f}"
+        result[bin_label] = int(counts[i])  # Convert count to integer
+    
+    return result
 
-def standardize_distribution(values):
+def standardize_distribution(values: list[float]) -> list[float]:
     """Converts a list of numbers to a normal distribution with mean 0 and std dev 1.
     
     Applies z-score normalization (standardization) to transform the input values
@@ -489,13 +486,10 @@ def standardize_distribution(values):
         raise ValueError("Cannot normalize - standard deviation is zero")
         
     normalized = (values_array - mean) / std
-    return normalized.tolist()
+    return [float(x) for x in normalized]
 
-def normalize_distribution(values):
-    """Converts a list of numbers to a normal distribution.
-    
-    Applies min-max normalization to transform the input values into 
-    a normal distribution between 0 and 1.
+def normalize_distribution(values: list[float]) -> tuple[list[float], float, float, float, float]:
+    """Normalizes a list of numbers to a range between 0 and 1 using min-max normalization.
     
     Args:
         values: List of numeric values to normalize
@@ -503,16 +497,16 @@ def normalize_distribution(values):
     Returns:
         Tuple containing:
         - List of normalized values between 0 and 1
-        - Mean of the normalized distribution
-        - Standard deviation of the normalized distribution
-        Returns ([], 0, 0) for empty input.
+        - Mean of original values
+        - Standard deviation of original values
+        Returns ([], 0, 0, 0, 0) for empty input.
         
     Raises:
         TypeError: If any element cannot be converted to float
         ValueError: If all input values are identical
     """
     if not values:
-        return [], 0, 0
+        return [], 0.0, 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -526,12 +520,12 @@ def normalize_distribution(values):
         raise ValueError("Cannot normalize - all values are identical")
         
     normalized = (values_array - min_val) / (max_val - min_val)
-    mean = float(np.mean(normalized))
-    std = float(np.std(normalized))
+    mean = np.mean(normalized)
+    std_dev = np.std(normalized)
     
-    return normalized.tolist(), mean, std
+    return [float(x) for x in normalized], float(mean), float(std_dev)
 
-def kurtosis(values):
+def kurtosis(values: list[float]) -> float:
     """Calculates the kurtosis (peakedness) of a list of numbers.
     
     Kurtosis measures how heavy-tailed or light-tailed a distribution is
@@ -541,13 +535,13 @@ def kurtosis(values):
         values: List of numeric values
         
     Returns:
-        The kurtosis of the values. Returns 0 for empty list or lists with less than 2 unique values.
+        The kurtosis. Returns 0 for empty list or lists with less than 2 unique values.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -556,12 +550,12 @@ def kurtosis(values):
         
     # Check if there are at least 2 unique values
     if len(np.unique(values_array)) < 2:
-        return 0
+        return 0.0
         
     # Use bias=False to get the correct kurtosis for small sample sizes
     return float(stats.kurtosis(values_array, fisher=True, bias=False))
 
-def skew(values):
+def skew(values: list[float]) -> float:
     """Calculates the skewness (asymmetry) of a list of numbers.
     
     Skewness measures the asymmetry of the probability distribution of a dataset
@@ -572,13 +566,13 @@ def skew(values):
         values: List of numeric values
         
     Returns:
-        The skewness of the values. Returns 0 for empty list or lists with less than 2 unique values.
+        The skewness. Returns 0 for empty list or lists with less than 2 unique values.
         
     Raises:
         TypeError: If any element cannot be converted to float
     """
     if not values:
-        return 0
+        return 0.0
         
     try:
         values_array = np.array(values, dtype=float)
@@ -587,12 +581,12 @@ def skew(values):
         
     # Check if there are at least 2 unique values
     if len(np.unique(values_array)) < 2:
-        return 0
+        return 0.0
         
     # Use bias=False to get the correct skewness for small sample sizes
     return float(stats.skew(values_array, bias=False))
 
-def absolute_values(values):
+def absolute_values(values: list[float]) -> list[float]:
     """Returns a list with absolute values of all input numbers.
     
     Args:
@@ -612,8 +606,9 @@ def absolute_values(values):
     except (TypeError, ValueError):
         raise TypeError("All elements must be numbers")
         
-    return list(np.abs(values_array))
-def limit(values, x=None, y=None):
+    return [float(x) for x in np.abs(values_array)]
+
+def limit(values: list[float], x: float = None, y: float = None) -> list[float]:
     """Removes values larger than x or smaller than y from the input list.
     
     Args:
@@ -644,7 +639,8 @@ def limit(values, x=None, y=None):
         mask &= values_array >= y
         
     return [float(x) for x in values_array[mask]]
-def correlation(x, y):
+
+def correlation(x: list[float], y: list[float]) -> float:
     """Calculates the Pearson-Bravais correlation coefficient between two lists of values.
     
     Args:
@@ -652,7 +648,7 @@ def correlation(x, y):
         y: Second list of numeric values. Must have same length as x.
         
     Returns:
-        Float value representing correlation coefficient between -1 and 1.
+        Correlation coefficient between -1 and 1.
         Returns None if input lists are empty or have different lengths.
         Returns 0 if there is no correlation (e.g. if one list has zero variance).
         
@@ -678,7 +674,7 @@ def correlation(x, y):
     # corrcoef returns a 2x2 matrix, we want the off-diagonal element
     return float(correlation_matrix[0, 1])
 
-def nine_percent_significant_values(values, threshold=0.09):
+def nine_percent_significant_values(values: list[float], threshold: float = 0.09) -> list[float]:
     """Returns values that appear more than a given proportion of times in the input list.
     
     Args:
@@ -713,41 +709,41 @@ def nine_percent_significant_values(values, threshold=0.09):
                   
     return significant
 
-def circle_of_fifths(values):
+def circle_of_fifths(values: list[float]) -> list[float]:
     """Organizes input values into bins according to the circle of fifths pattern (0,6,2,8,4,10,5,11,7,1,9,3).
     
     Args:
         values: List of integers between 0 and 12 to organize
         
     Returns:
-        Dictionary mapping values to their counts, organized by their position in the circle of fifths.
-        Empty input returns empty dictionary with zero counts for all bins.
+        List of counts for each position in circle of fifths order.
+        Empty input returns list of zeros.
         
     Raises:
         ValueError: If any value is not an integer between 0 and 12
     """
     if not values:
-        return {i: 0 for i in range(12)}
+        return [0.0] * 12
         
     # Validate input values
     for val in values:
-        if not isinstance(val, int) or val < 0 or val > 12:
-            raise ValueError("Values must be integers between 0 and 12")
+        if not isinstance(val, (int, float)) or val < 0 or val > 12:
+            raise ValueError("Values must be numbers between 0 and 12")
             
     # Define circle of fifths order
     fifths_order = [0,6,2,8,4,10,5,11,7,1,9,3]
     
-    # Initialize result dictionary with zeros for all bins
-    result = {i: 0 for i in range(12)}
+    # Initialize result list with zeros
+    result = [0.0] * 12
     
     # Count the values according to circle of fifths positions
     for val in values:
         if val < 12:  # Skip 12 since it's equivalent to 0
-            result[val] += 1
+            result[int(val)] += 1.0
             
     return result
 
-def contour_extrema(values):
+def contour_extrema(values: list[float]) -> list[float]:
     """Finds all contour extremum notes in a sequence.
     
     Identifies:
@@ -760,7 +756,7 @@ def contour_extrema(values):
         values: List of numeric values
         
     Returns:
-        List of tuples (index, value) where extrema occur. Returns empty list for empty input
+        List of extrema values. Returns empty list for empty input
         or lists shorter than 2 elements.
         
     Raises:
@@ -774,7 +770,7 @@ def contour_extrema(values):
     except (TypeError, ValueError):
         raise TypeError("All elements must be numbers")
     
-    extrema = [(0, int(values_array[0]))]  # First note is always included
+    extrema = [values_array[0]]  # First note is always included
     n = len(values_array)
     
     # Check each interior point
@@ -786,7 +782,7 @@ def contour_extrema(values):
         
         # Simple case: clear maximum or minimum
         if (prev < curr and next_val < curr) or (prev > curr and next_val > curr):
-            extrema.append((i, int(curr)))
+            extrema.append(curr)
             continue
             
         # Handle plateaus by looking at extended context
@@ -801,16 +797,16 @@ def contour_extrema(values):
             if prev == curr and forward2 is not None:
                 if (back2 is not None and back2 < curr and next_val < curr) or \
                    (back2 is not None and back2 > curr and next_val > curr):
-                    extrema.append((i, int(curr)))
+                    extrema.append(curr)
             elif next_val == curr and back2 is not None:
                 if (forward2 is not None and forward2 < curr and prev < curr) or \
                    (forward2 is not None and forward2 > curr and prev > curr):
-                    extrema.append((i, int(curr)))
+                    extrema.append(curr)
     
-    extrema.append((n-1, int(values_array[n-1])))  # Last note is always included
-    return extrema
+    extrema.append(values_array[n-1])  # Last note is always included
+    return [float(x) for x in extrema]
 
-def contour_gradients(values):
+def contour_gradients(values: list[float]) -> list[float]:
     """Calculates gradients between consecutive contour extrema points.
     
     For each pair of consecutive extrema points (ti,pi) and (tj,pj),
@@ -835,8 +831,8 @@ def contour_gradients(values):
     # Calculate gradients between consecutive extrema
     gradients = []
     for i in range(len(extrema)-1):
-        t1, p1 = extrema[i]
-        t2, p2 = extrema[i+1]
+        t1, p1 = i, extrema[i]
+        t2, p2 = i+1, extrema[i+1]
         
         # Skip if time difference is zero (shouldn't happen with current extrema logic)
         if t2 - t1 == 0:
@@ -848,7 +844,7 @@ def contour_gradients(values):
         
     return gradients
 
-def compute_tonality_vector(pitch_classes):
+def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     """Computes the Krumhansl-Schmuckler key-finding correlation vector.
     
     Correlates the distribution of pitch classes in the input with the Krumhansl-Kessler
@@ -864,23 +860,27 @@ def compute_tonality_vector(pitch_classes):
         Returns list of zeros if input is empty.
         
     Raises:
-        TypeError: If pitch classes are not integers between 0-11
+        TypeError: If pitch classes cannot be converted to integers between 0-11
     """
     # Krumhansl-Kessler key profiles
     maj_vector = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
     min_vector = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
     
     if not pitch_classes:
-        return [0] * 24
+        return [0.0] * 24
         
-    # Validate pitch classes
-    if not all(isinstance(pc, int) and 0 <= pc < 12 for pc in pitch_classes):
-        raise TypeError("Pitch classes must be integers between 0-11")
+    # Validate and convert pitch classes to integers
+    try:
+        pc_ints = [int(pc) for pc in pitch_classes]
+        if not all(0 <= pc < 12 for pc in pc_ints):
+            raise ValueError
+    except (TypeError, ValueError):
+        raise TypeError("Pitch classes must be convertible to integers between 0-11")
         
     # Compute distribution of pitch classes
-    pc_dist = [0] * 12
-    for pc in pitch_classes:
-        pc_dist[pc] += 1
+    pc_dist = [0.0] * 12
+    for pc in pc_ints:
+        pc_dist[pc] += 1.0
     
     # Normalize distribution
     total = sum(pc_dist)
@@ -897,11 +897,10 @@ def compute_tonality_vector(pitch_classes):
         shifted_min = min_vector[-i:] + min_vector[:-i]
         
         # Calculate correlations
-        maj_corr = correlation(pc_dist, shifted_maj)
+        maj_corr = correlation(pc_dist, shifted_maj)  # correlation() now returns float
         min_corr = correlation(pc_dist, shifted_min)
         
-        # Handle None results from correlation function
-        correlations.append(maj_corr if maj_corr is not None else 0.0)
+        correlations.append(float(maj_corr))
     
     # Add minor key correlations
     for i in range(12):
@@ -911,7 +910,7 @@ def compute_tonality_vector(pitch_classes):
     
     return correlations
 
-def yules_k(values):
+def yules_k(values: list[float]) -> float:
     """Calculates Yule's K statistic, a measure of lexical diversity.
     Must be called multiple times and averaged over all m-types to match FANTASTIC.
     
@@ -963,7 +962,7 @@ def yules_k(values):
     
     return float(k)
 
-def simpsons_d(values):
+def simpsons_d(values: list[float]) -> float:
     """
     Compute Simpson's D diversity index for a sequence of values.
     Must be called multiple times and averaged over all m-types to match FANTASTIC.
@@ -995,7 +994,7 @@ def simpsons_d(values):
         
     return float(D)
 
-def sichels_s(values):
+def sichels_s(values: list[float]) -> float:
     """
     Computes Sichel's S statistic from a list of values.
     S is the proportion of types that occur exactly twice in the sample.
@@ -1028,7 +1027,7 @@ def sichels_s(values):
         
     return float(doubles) / V
 
-def honores_h(values):
+def honores_h(values: list[float]) -> float:
     """
     Compute Honore's H statistic for a sequence of values.
     Must be called multiple times and averaged over all m-types to match FANTASTIC.
@@ -1064,7 +1063,7 @@ def honores_h(values):
     H = 100.0 * (np.log(N) / (1.0 - (float(V1)/V)))
     
     return H
-def spearman_correlation(x, y):
+def spearman_correlation(x: list[float], y: list[float]) -> float:
     """Calculate Spearman's rank correlation coefficient between two lists of numbers.
     
     Args:
@@ -1095,7 +1094,7 @@ def spearman_correlation(x, y):
         
     return correlation
 
-def kendall_tau(x, y):
+def kendall_tau(x: list[float], y: list[float]) -> float:
     """Calculate Kendall's tau correlation coefficient between two lists of numbers.
     
     Args:
@@ -1126,7 +1125,7 @@ def kendall_tau(x, y):
         
     return tau
 
-def diffexp(melody1, melody2):
+def diffexp(melody1: list[float], melody2: list[float]) -> float:
     """Calculates the differential expression score between two melodies based on their pitch intervals.
     
     Implements σ(μ₁,μ₂) = e^(-Δp/(N-1)) where Δp is the L1 norm (Manhattan distance) 
@@ -1175,7 +1174,7 @@ def diffexp(melody1, melody2):
     
     return float(score)
 
-def diff(melody1, melody2):
+def diff(melody1: list[float], melody2: list[float]) -> float:
     """Calculates the differential score between two melodies based on their pitch intervals.
     
     Implements σ(μ₁,μ₂) = 1 - Δp/((N-1)Δp∞) where:
@@ -1233,7 +1232,7 @@ def diff(melody1, melody2):
     
     return float(score)
 
-def cross_correlation(x, y):
+def cross_correlation(x: list[float], y: list[float]) -> list[float]:
     """Calculates the cross-correlation between two lists of numbers using scipy.signal.correlate.
     
     Args:
@@ -1259,7 +1258,7 @@ def cross_correlation(x, y):
     correlation = signal.correlate(x_array, y_array, mode='full')
     
     return correlation.tolist()
-def edit_distance(list1, list2, insertion_cost=1, deletion_cost=1, substitution_cost=1):
+def edit_distance(list1: list[float], list2: list[float], insertion_cost: float=1, deletion_cost: float=1, substitution_cost: float=1) -> float:
     """Calculates the edit distance (Levenshtein distance) between two lists of numbers.
     
     Args:
@@ -1295,7 +1294,7 @@ def edit_distance(list1, list2, insertion_cost=1, deletion_cost=1, substitution_
     
     return dp[len1][len2]
 
-def proximity(values):
+def proximity(values: list[float]) -> float:
     """Calculates the proximity score between consecutive notes.
     
     Implements a proximity measure where:
@@ -1330,7 +1329,7 @@ def proximity(values):
     # Return 0 if proximity would be negative (interval ≥ 6)
     return max(0, float(proximity_score))
 
-def registral_return(values):
+def registral_return(values: list[float]) -> float:
     """Calculates the registral return score for a sequence of three notes.
     
     Returns:
@@ -1381,7 +1380,7 @@ def registral_return(values):
     
     return 0
 
-def registral_direction(values):
+def registral_direction(values: list[float]) -> float:
     """Determines the registral direction based on the last three notes.
     
     Checks if a large interval is followed by a direction change or if a small interval
@@ -1430,7 +1429,7 @@ def registral_direction(values):
     else:
         return 0
 
-def intervallic_difference(values):
+def intervallic_difference(values: list[float]) -> float:
     """Determines if a large interval is followed by a smaller interval or if a small interval is followed by a similar interval.
     
     Args:
@@ -1479,7 +1478,7 @@ def intervallic_difference(values):
         return 0
     
 
-def closure(values):
+def closure(values: list[float]) -> float:
     """Calculates the closure score based on the shape defined by the last three notes.
     
     Scores 1 point for a change of direction and 1 point for an interval that is more than a tone smaller than the preceding one.
@@ -1523,5 +1522,4 @@ def closure(values):
         score += 1
     
     return score
-
 
