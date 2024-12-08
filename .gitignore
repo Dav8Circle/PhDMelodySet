@@ -4,4 +4,7 @@ miq_trials.csv
 miq_trials.csv.zip
 venv/
 .venv/
+.idea/
+.DS_Store
+__pycache__/
 
