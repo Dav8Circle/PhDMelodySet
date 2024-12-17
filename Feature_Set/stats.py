@@ -1,3 +1,9 @@
+"""
+This module contains a series of algorithms that may be used on the different input types
+to aid in the calculation of features which use descriptive statistics.
+"""
+__author__ = "David Whyatt" 
+
 import numpy as np
 
 def range_func(values: list[float]) -> float:

@@ -1,3 +1,9 @@
+"""
+This module contains a series of algorithms that may be used on the different input types
+to aid in the calculation of features related to correlations.
+"""
+__author__ = "David Whyatt"
+
 import numpy as np
 from scipy import stats, signal
 
