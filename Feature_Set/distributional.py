@@ -9,21 +9,35 @@ from scipy import stats
 
 def histogram_bins(values: list[float], num_bins: int) -> dict[str, int]:
     """Places data into histogram bins and counts occurrences in each bin.
-    
-    Creates a histogram by dividing the range of values into equal-width bins
-    and counting how many values fall into each bin.
-    
-    Args:
-        values: List of numeric values to bin
-        num_bins: Integer specifying number of equal-width bins to create
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to bin
+    num_bins : int
+        Number of equal-width bins to create
+
+    Returns
+    -------
+    dict[str, int]
         Dictionary mapping bin range strings (e.g. '1.00-2.00') to counts.
         Returns empty dictionary for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
-        ValueError: If num_bins is less than 1
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+    ValueError
+        If num_bins is less than 1
+
+    Examples
+    --------
+    >>> histogram_bins([1, 2, 3, 4, 5], 2)
+    {'1.00-3.00': 2, '3.00-5.00': 3}
+    >>> histogram_bins([], 5)  # Empty list
+    {}
+    >>> histogram_bins([1, 1, 2, 2, 3], 3)
+    {'1.00-1.67': 2, '1.67-2.33': 2, '2.33-3.00': 1}
     """
     if not values:
         return {}
@@ -49,20 +63,33 @@ def histogram_bins(values: list[float], num_bins: int) -> dict[str, int]:
 
 def standardize_distribution(values: list[float]) -> list[float]:
     """Converts a list of numbers to a normal distribution with mean 0 and std dev 1.
-    
-    Applies z-score normalization (standardization) to transform the input values
-    into a standard normal distribution.
-    
-    Args:
-        values: List of numeric values to normalize
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to normalize
+
+    Returns
+    -------
+    list[float]
         List of normalized values with mean 0 and standard deviation 1.
         Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
-        ValueError: If input has zero standard deviation
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+    ValueError
+        If input has zero standard deviation
+
+    Examples
+    --------
+    >>> standardize_distribution([1, 2, 3])
+    [-1.224..., 0.0, 1.224...]
+    >>> standardize_distribution([]) # Empty list
+    []
+    >>> standardize_distribution([10, 20, 30])
+    [-1.224..., 0.0, 1.224...]
     """
     if not values:
         return []
@@ -81,22 +108,38 @@ def standardize_distribution(values: list[float]) -> list[float]:
     normalized = (values_array - mean_val) / std
     return [float(x) for x in normalized]
 
-def normalize_distribution(values: list[float]) -> tuple[list[float], float, float, float, float]:
+def normalize_distribution(values: list[float]) -> tuple[list[float], float, float]:
     """Normalizes a list of numbers to a range between 0 and 1 using min-max normalization.
-    
-    Args:
-        values: List of numeric values to normalize
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to normalize
+
+    Returns
+    -------
+    tuple[list[float], float, float]
         Tuple containing:
         - List of normalized values between 0 and 1
-        - Mean of original values
-        - Standard deviation of original values
-        Returns ([], 0, 0, 0, 0) for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
-        ValueError: If all input values are identical
+        - Mean of normalized values
+        - Standard deviation of normalized values
+        Returns ([], 0.0, 0.0) for empty input.
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+    ValueError
+        If all input values are identical
+
+    Examples
+    --------
+    >>> normalize_distribution([1, 2, 3])  # doctest: +ELLIPSIS
+    ([0.0, 0.5, 1.0], 0.5, 0.408...)
+    >>> normalize_distribution([])  # Empty list
+    ([], 0.0, 0.0)
+    >>> normalize_distribution([10, 20, 30])  # doctest: +ELLIPSIS
+    ([0.0, 0.5, 1.0], 0.5, 0.408...)
     """
     if not values:
         return [], 0.0, 0.0
@@ -120,18 +163,30 @@ def normalize_distribution(values: list[float]) -> tuple[list[float], float, flo
 
 def kurtosis(values: list[float]) -> float:
     """Calculates the kurtosis (peakedness) of a list of numbers.
-    
-    Kurtosis measures how heavy-tailed or light-tailed a distribution is
-    compared to a normal distribution. Higher kurtosis means more outliers.
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    float
         The kurtosis. Returns 0 for empty list or lists with less than 2 unique values.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> kurtosis([1, 2, 2, 3])
+    1.5
+    >>> kurtosis([]) # Empty list
+    0.0
+    >>> kurtosis([1, 1, 1]) # Less than 2 unique values
+    0.0
     """
     if not values:
         return 0.0
@@ -150,19 +205,30 @@ def kurtosis(values: list[float]) -> float:
 
 def skew(values: list[float]) -> float:
     """Calculates the skewness (asymmetry) of a list of numbers.
-    
-    Skewness measures the asymmetry of the probability distribution of a dataset
-    around its mean. Positive skew indicates a longer tail on the right,
-    negative skew indicates a longer tail on the left.
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    float
         The skewness. Returns 0 for empty list or lists with less than 2 unique values.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> skew([1, 2, 2, 3])  # doctest: +ELLIPSIS
+    0.0
+    >>> skew([])  # Empty list
+    0.0
+    >>> skew([1, 1, 1])  # Less than 2 unique values
+    0.0
     """
     if not values:
         return 0.0
@@ -179,18 +245,33 @@ def skew(values: list[float]) -> float:
     # Use bias=False to get the correct skewness for small sample sizes
     return float(stats.skew(values_array, bias=False))
 
-def distribution_proportions(values: list[float]) -> list[float]:
+def distribution_proportions(values: list[float]) -> dict[float, float]:
     """Calculates the proportion of each unique value in a list of numbers.
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
-        List of proportions for each unique value.
-        Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    dict[float, float]
+        Dictionary mapping unique values to their proportions.
+        Returns empty dict for empty input.
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> distribution_proportions([1, 2, 2, 3])
+    {1.0: 0.25, 2.0: 0.5, 3.0: 0.25}
+    >>> distribution_proportions([])  # Empty list
+    {}
+    >>> distribution_proportions([1.5, 1.5, 2.5])
+    {1.5: 0.6666666666666666, 2.5: 0.3333333333333333}
     """
     if not values:
         return {}
@@ -205,4 +286,3 @@ def distribution_proportions(values: list[float]) -> list[float]:
     # Calculate proportions
     proportions = counts * (1.0/len(values_array))
     return {float(u): float(p) for u, p in zip(unique, proportions)}
-

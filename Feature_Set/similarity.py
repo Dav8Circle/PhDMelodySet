@@ -12,17 +12,33 @@ def diffexp(melody1: list[float], melody2: list[float]) -> float:
     
     Implements σ(μ₁,μ₂) = e^(-Δp/(N-1)) where Δp is the L1 norm (Manhattan distance) 
     between the pitch interval vectors of the two melodies.
-    
-    Args:
-        melody1: First list of numeric pitch values
-        melody2: Second list of numeric pitch values
-        
-    Returns:
-        Float value representing the differential expression score.
+
+    Parameters
+    ----------
+    melody1 : list[float]
+        First list of numeric pitch values
+    melody2 : list[float]
+        Second list of numeric pitch values
+
+    Returns
+    -------
+    float
+        Value representing the differential expression score.
         Returns 0.0 if either melody has fewer than 2 notes (no intervals possible).
-        
-    Raises:
-        TypeError: If inputs contain non-numeric values
+
+    Raises
+    ------
+    TypeError
+        If inputs contain non-numeric values
+
+    Examples
+    --------
+    >>> diffexp([60, 62, 64], [60, 62, 64])  # Identical melodies
+    1.0
+    >>> diffexp([60, 62, 64], [60, 63, 65])  # Similar contour, different intervals
+    0.606...
+    >>> diffexp([60], [60, 62])  # Too short
+    0.0
     """
     # Need at least 2 notes to form intervals
     if len(melody1) < 2 or len(melody2) < 2:
@@ -63,18 +79,35 @@ def diff(melody1: list[float], melody2: list[float]) -> float:
     - Δp is the L1 norm (Manhattan distance) between the pitch interval vectors
     - Δp∞ is the maximum absolute interval difference across both melodies
     - N is the length of the longer melody
-    
-    Args:
-        melody1: First list of numeric pitch values
-        melody2: Second list of numeric pitch values
-        
-    Returns:
-        Float value representing the differential score.
+
+    Parameters
+    ----------
+    melody1 : list[float]
+        First list of numeric pitch values
+    melody2 : list[float]
+        Second list of numeric pitch values
+
+    Returns
+    -------
+    float
+        Value representing the differential score.
         Returns 0.0 if either melody has fewer than 2 notes (no intervals possible).
-        
-    Raises:
-        TypeError: If inputs contain non-numeric values
-        ValueError: If Δp∞ is zero (no pitch differences between melodies)
+
+    Raises
+    ------
+    TypeError
+        If inputs contain non-numeric values
+    ValueError
+        If Δp∞ is zero (no pitch differences between melodies)
+
+    Examples
+    --------
+    >>> diff([60, 62, 64], [60, 62, 64])  # Identical melodies
+    1.0
+    >>> diff([60, 62, 64], [60, 63, 65])  # Similar contour, different intervals
+    0.8333...
+    >>> diff([60], [60, 62])  # Too short
+    0.0
     """
     # Need at least 2 notes to form intervals
     if len(melody1) < 2 or len(melody2) < 2:
@@ -118,16 +151,33 @@ def diff(melody1: list[float], melody2: list[float]) -> float:
 def edit_distance(list1: list[float], list2: list[float], insertion_cost: float=1,
                 deletion_cost: float=1, substitution_cost: float=1) -> float:
     """Calculates the edit distance (Levenshtein distance) between two lists of numbers.
-    
-    Args:
-        list1: First list of numbers
-        list2: Second list of numbers
-        insertion_cost: Cost of inserting an element (default=1)
-        deletion_cost: Cost of deleting an element (default=1) 
-        substitution_cost: Cost of substituting an element (default=1)
-        
-    Returns:
-        Float representing the weighted edit distance between the two lists.
+
+    Parameters
+    ----------
+    list1 : list[float]
+        First list of numbers
+    list2 : list[float]
+        Second list of numbers
+    insertion_cost : float, optional
+        Cost of inserting an element, by default 1
+    deletion_cost : float, optional
+        Cost of deleting an element, by default 1
+    substitution_cost : float, optional
+        Cost of substituting an element, by default 1
+
+    Returns
+    -------
+    float
+        Weighted edit distance between the two lists
+
+    Examples
+    --------
+    >>> edit_distance([1, 2, 3], [1, 2, 3])  # Identical lists
+    0.0
+    >>> edit_distance([1, 2], [1, 2, 3])  # One insertion
+    1.0
+    >>> edit_distance([1, 2, 3], [1, 4, 3])  # One substitution
+    1.0
     """
     len1, len2 = len(list1), len(list2)
 
@@ -150,4 +200,4 @@ def edit_distance(list1: list[float], list2: list[float], insertion_cost: float=
                               dp[i][j - 1] + insertion_cost,      # Insertion
                               dp[i - 1][j - 1] + substitution_cost) # Substitution
 
-    return dp[len1][len2]
+    return float(dp[len1][len2])

@@ -1,5 +1,10 @@
 import pytest
 from algorithms import *
+from stats import *
+from distributional import *
+from correlations import *
+from similarity import *
+from complexity import *
 
 
 def test_range():

@@ -10,18 +10,34 @@ import numpy as np
 
 def ratio(x: list[float], y: list[float]) -> list[float]:
     """Calculates the ratio between corresponding elements in two lists.
-    
-    Args:
-        x: First list of numeric values
-        y: Second list of numeric values. Must have same length as x.
-        
-    Returns:
+
+    Parameters
+    ----------
+    x : list[float]
+        First list of numeric values
+    y : list[float]
+        Second list of numeric values. Must have same length as x.
+
+    Returns
+    -------
+    list[float]
         List containing ratios of corresponding elements (x[i]/y[i]).
         Returns empty list if input lists are empty or have different lengths.
         Returns None for any division by zero.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> ratio([2, 4, 6], [1, 2, 3])  # Simple ratios
+    [2.0, 2.0, 2.0]
+    >>> ratio([1, 2], [0, 2])  # Division by zero
+    [None, 1.0]
+    >>> ratio([], [1, 2])  # Empty/unequal lists
+    []
     """
     if not x or not y or len(x) != len(y):
         return []
@@ -46,17 +62,33 @@ def ratio(x: list[float], y: list[float]) -> list[float]:
 def rank_values(values: list[float], descending: bool = False) -> list[float]:
     """Ranks the input values from 1 to n. Ties get the same rank.
 
-    Args:
-        values: List of numeric values to rank
-        descending: If True, highest value gets rank 1.
-                   If False, lowest value gets rank 1.
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to rank
+    descending : bool, optional
+        If True, highest value gets rank 1.
+        If False, lowest value gets rank 1.
 
-    Returns:
+    Returns
+    -------
+    list[float]
         List of ranks corresponding to the input values.
         Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> rank_values([3, 1, 4, 1, 5])  # Ascending order
+    [2.0, 1.0, 3.0, 1.0, 4.0]
+    >>> rank_values([3, 1, 4, 1, 5], descending=True)  # Descending order
+    [3.0, 4.0, 2.0, 4.0, 1.0]
+    >>> rank_values([])  # Empty input
+    []
     """
     if not values:
         return []
@@ -84,15 +116,30 @@ def rank_values(values: list[float], descending: bool = False) -> list[float]:
 
 def modulo_twelve(values: list[float]) -> list[float]:
     """Takes modulo 12 of each number in the input list.
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    list[float]
         List with modulo 12 of each value. Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> modulo_twelve([14, 25, 36])  # Values > 12
+    [2.0, 1.0, 0.0]
+    >>> modulo_twelve([5, 7, 11])  # Values < 12
+    [5.0, 7.0, 11.0]
+    >>> modulo_twelve([])  # Empty input
+    []
     """
     if not values:
         return []
@@ -106,15 +153,30 @@ def modulo_twelve(values: list[float]) -> list[float]:
 
 def absolute_values(values: list[float]) -> list[float]:
     """Returns a list with absolute values of all input numbers.
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    list[float]
         List containing absolute values of input numbers. Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> absolute_values([-1, 2, -3])  # Mixed signs
+    [1.0, 2.0, 3.0]
+    >>> absolute_values([0, -0.5, 1.5])  # Decimal values
+    [0.0, 0.5, 1.5]
+    >>> absolute_values([])  # Empty input
+    []
     """
     if not values:
         return []
@@ -128,17 +190,34 @@ def absolute_values(values: list[float]) -> list[float]:
 
 def limit(values: list[float], x: float = None, y: float = None) -> list[float]:
     """Removes values larger than x or smaller than y from the input list.
-    
-    Args:
-        values: List of numeric values
-        x: Upper limit (inclusive). If None, no upper limit is applied.
-        y: Lower limit (inclusive). If None, no lower limit is applied.
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+    x : float, optional
+        Upper limit (inclusive). If None, no upper limit is applied.
+    y : float, optional
+        Lower limit (inclusive). If None, no lower limit is applied.
+
+    Returns
+    -------
+    list[float]
         List containing only values within the specified limits. Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> limit([1, 2, 3, 4, 5], x=3)  # Upper limit only
+    [1.0, 2.0, 3.0]
+    >>> limit([1, 2, 3, 4, 5], y=3)  # Lower limit only
+    [3.0, 4.0, 5.0]
+    >>> limit([1, 2, 3, 4, 5], x=4, y=2)  # Both limits
+    [2.0, 3.0, 4.0]
     """
     if not values:
         return []
@@ -160,18 +239,34 @@ def limit(values: list[float], x: float = None, y: float = None) -> list[float]:
 
 def nine_percent_significant_values(values: list[float], threshold: float = 0.09) -> list[float]:
     """Returns values that appear more than a given proportion of times in the input list.
-    
-    Args:
-        values: List of numeric values to analyze
-        threshold: Minimum proportion (between 0 and 1) required for a value to be 
-        considered significant. Default is 0.09 (9%)
-                  
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to analyze
+    threshold : float, optional
+        Minimum proportion (between 0 and 1) required for a value to be considered significant.
+        Default is 0.09 (9%)
+
+    Returns
+    -------
+    list[float]
         List of values that appear more than the threshold proportion of times.
         Returns empty list for empty input.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> nine_percent_significant_values([1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  # >9% threshold
+    [1.0]
+    >>> nine_percent_significant_values([1, 1, 2, 2, 3, 3], threshold=0.3)  # 30% threshold
+    [1.0, 2.0, 3.0]
+    >>> nine_percent_significant_values([])  # Empty input
+    []
     """
     if not values:
         return []
@@ -194,18 +289,30 @@ def nine_percent_significant_values(values: list[float], threshold: float = 0.09
     return significant
 
 def circle_of_fifths(pitch_counts: dict[int, int]) -> dict[int, int]:
-    """Reorganizes a dictionary of pitch counts according to the circle of fifths pattern
-    (0,7,2,9,4,11,6,1,8,3,10,5).
-    
-    Args:
-        pitch_counts: Dictionary mapping pitch classes (0-12) to their counts
-        
-    Returns:
-        Dictionary with same counts but keys reordered according to circle of fifths.
-        Empty input returns empty dictionary.
-        
-    Raises:
-        ValueError: If any pitch class is not a number between 0 and 12
+    """Reorganizes a dictionary of pitch counts according to the circle of fifths pattern.
+
+    Parameters
+    ----------
+    pitch_counts : dict[int, int]
+        Dictionary mapping pitch classes (0-12) to their counts
+
+    Returns
+    -------
+    dict[int, int]
+        Dictionary with same counts but keys reordered according to circle of fifths pattern
+        (0,7,2,9,4,11,6,1,8,3,10,5). Empty input returns empty dictionary.
+
+    Raises
+    ------
+    ValueError
+        If any pitch class is not a number between 0 and 12
+
+    Examples
+    --------
+    >>> circle_of_fifths({0: 1, 4: 2, 7: 3, 9: 2})  # Subset of pitches
+    {0: 1, 7: 3, 9: 2, 4: 2}
+    >>> circle_of_fifths({})  # Empty input
+    {}
     """
     if not pitch_counts:
         return {}
@@ -228,22 +335,37 @@ def circle_of_fifths(pitch_counts: dict[int, int]) -> dict[int, int]:
 
 def contour_extrema(values: list[float]) -> list[tuple[int, float]]:
     """Finds all contour extremum notes in a sequence.
-    
+
     Identifies:
     - First and last notes
     - Local maxima where surrounding notes are lower
     - Local minima where surrounding notes are higher
     - Handles plateaus by looking at extended context
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    list[tuple[int, float]]
         List of tuples (index, value) for each extrema point.
         Returns empty list for empty input or lists shorter than 2 elements.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> contour_extrema([1, 3, 2, 4, 1])  # Simple peaks and valleys
+    [(0, 1.0), (1, 3.0), (2, 2.0), (3, 4.0), (4, 1.0)]
+    >>> contour_extrema([1, 2, 2, 2, 1])  # Plateau
+    [(0, 1.0), (4, 1.0)]
+    >>> contour_extrema([1])  # Too short
+    []
     """
     if not values or len(values) < 2:
         return []
@@ -291,19 +413,34 @@ def contour_extrema(values: list[float]) -> list[tuple[int, float]]:
 
 def contour_gradients(values: list[float]) -> list[float]:
     """Calculates gradients between consecutive contour extrema points.
-    
+
     For each pair of consecutive extrema points (ti,pi) and (tj,pj),
     calculates the gradient m = (pj-pi)/(tj-ti)
-    
-    Args:
-        values: List of numeric values
-        
-    Returns:
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values
+
+    Returns
+    -------
+    list[float]
         List of gradients between consecutive extrema points.
         Returns empty list for empty input or lists shorter than 2 elements.
-        
-    Raises:
-        TypeError: If any element cannot be converted to float
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> contour_gradients([1, 3, 2, 4, 1])  # Simple sequence
+    [2.0, -1.0, 2.0, -3.0]
+    >>> contour_gradients([1, 1, 1])  # Flat sequence
+    [0.0]
+    >>> contour_gradients([1])  # Too short
+    []
     """
     if not values or len(values) < 2:
         return []
@@ -329,21 +466,34 @@ def contour_gradients(values: list[float]) -> list[float]:
 
 def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     """Computes the Krumhansl-Schmuckler key-finding correlation vector.
-    
+
     Correlates the distribution of pitch classes in the input with the Krumhansl-Kessler
     key profiles for all 24 possible major and minor keys to determine key likelihood.
-    
-    Args:
-        pitch_classes: List of integers representing pitch classes (0-11)
-        
-    Returns:
-        List of 24 correlation coefficients where:
-        - Indices 0-11 correspond to major keys (C, C#, D, etc.)
-        - Indices 12-23 correspond to minor keys (c, c#, d, etc.)
-        Returns list of zeros if input is empty.
-        
-    Raises:
-        TypeError: If pitch classes cannot be converted to integers between 0-11
+
+    Parameters
+    ----------
+    pitch_classes : list[float]
+        List of integers representing pitch classes (0-11)
+
+    Returns
+    -------
+    tuple[str, float]
+        Tuple containing the most likely key and its correlation value.
+
+    Raises
+    ------
+    TypeError
+        If pitch classes cannot be converted to integers between 0-11
+
+    Examples
+    --------
+    >>> compute_tonality_vector([0, 4, 7])  # C major triad
+    ('C major', 0.833...)
+    >>> compute_tonality_vector([0, 4, 9])  # A minor triad
+    ('a minor', 0.888...)
+    >>> compute_tonality_vector([])  # Empty input
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     """
     # Krumhansl-Kessler key profiles
     maj_vector = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
@@ -379,16 +529,31 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
         shifted_maj = maj_vector[-i:] + maj_vector[:-i]
         shifted_min = min_vector[-i:] + min_vector[:-i]
 
-        # Calculate correlations
-        maj_corr = np.corrcoef(pc_dist, shifted_maj)
-        min_corr = np.corrcoef(pc_dist, shifted_min)
+        # Calculate correlations - get the off-diagonal element [0,1]
+        maj_corr = np.corrcoef(pc_dist, shifted_maj)[0,1]
+        min_corr = np.corrcoef(pc_dist, shifted_min)[0,1]
 
         correlations.append(float(maj_corr))
 
     # Add minor key correlations
     for i in range(12):
         shifted_min = min_vector[-i:] + min_vector[:-i]
-        min_corr = np.corrcoef(pc_dist, shifted_min)
-        correlations.append(min_corr if min_corr is not None else 0.0)
+        min_corr = np.corrcoef(pc_dist, shifted_min)[0,1]
+        correlations.append(float(min_corr))
 
-    return correlations
+    # Create dictionary mapping key names to correlation values
+    key_correlations = {}
+
+    # Add major keys (C through B)
+    major_keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    for i, key in enumerate(major_keys):
+        key_correlations[key + ' major'] = correlations[i]
+
+    # Add minor keys (c through b) 
+    minor_keys = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
+    for i, key in enumerate(minor_keys):
+        key_correlations[key + ' minor'] = correlations[i + 12]
+
+    # Find key with maximum correlation
+    max_key = max(key_correlations, key=key_correlations.get)
+    return max_key, key_correlations[max_key]
