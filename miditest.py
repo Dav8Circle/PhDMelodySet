@@ -110,7 +110,7 @@ with open("item-bank.csv", newline='', encoding='utf-8') as csvfile:
         #                      difficulty))
 
         output = str(create_sequence(file, in_key, contour_dif, change_note, displacement, oddity, discrimination,
-                                     difficulty))
+                                     difficulty))[1:-1]
 
         output_string = {"ID": count,
                          "Original Melody": name,

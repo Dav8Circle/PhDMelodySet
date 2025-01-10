@@ -791,4 +791,3 @@ def melodic_embellishment(pitch_values: list[float],
     if len(note_durations) > 2:  # Need at least 3 notes to have embellishment
         return float(embellished) / len(note_durations)
     return 0.0
-
