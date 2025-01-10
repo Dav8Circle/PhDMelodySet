@@ -1,6 +1,7 @@
-import pretty_midi
 import csv
 import json
+import pretty_midi
+
 
 
 class OriginalMelody:
@@ -88,9 +89,10 @@ def create_sequence(file, in_key, contour_dif, change_note, displacement, oddity
         return stimuli
 
 
-with open("item-bank.csv", newline='') as csvfile:
+with open("item-bank.csv", newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
-    output_file = open("mididata4.json", "a")
+    output_file = open("mididata5.json", "a", encoding='utf-8')
+    output_file.write("[\n")
     count = 1
 
     for row in reader:
@@ -123,9 +125,10 @@ with open("item-bank.csv", newline='') as csvfile:
                          }
         output_dict = json.dumps(output_string, indent=4)
         output_file.write(output_dict)
-        output_file.write("\n")
+        output_file.write(",\n")
         count += 1
 
         # json.dump(output_string, output_file, indent=4)
 
+    output_file.write("]")
     output_file.close()

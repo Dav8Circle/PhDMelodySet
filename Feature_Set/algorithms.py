@@ -557,3 +557,238 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     # Find key with maximum correlation
     max_key = max(key_correlations, key=key_correlations.get)
     return max_key, key_correlations[max_key]
+
+def amount_of_arpeggiation(pitch_values: list[float]) -> float:
+    """Calculates the proportion of notes in the melody that 
+    consitute a triadic movement.
+
+    Examines consecutive pitch intervals and counts what proportion match common
+    arpeggio intervals like thirds, fifths, octaves etc.
+
+    Parameters
+    ----------
+    pitch_values : list[float]
+        List of pitch values to analyze
+
+    Returns
+    -------
+    float
+        Proportion of intervals that match arpeggio patterns (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+
+    Examples
+    --------
+    >>> amount_of_arpeggiation([60, 64, 67])  # C major triad
+    1.0
+    >>> amount_of_arpeggiation([60, 62, 64])  # Stepwise motion
+    0.0
+    >>> amount_of_arpeggiation([60])  # Single note
+    0.0
+    >>> amount_of_arpeggiation(None)  # Invalid input
+    -1.0
+    """
+    if pitch_values is None:
+        return -1.0
+
+    # Calculate differences between consecutive pitches
+    intervals = []
+    for i in range(len(pitch_values)-1):
+        interval = abs(pitch_values[i+1] - pitch_values[i])
+        intervals.append(interval)
+
+    if not intervals:
+        return 0.0
+
+    # Count occurrences of specific intervals
+    target_intervals = [
+        0,  # repeated notes
+        3,  # minor thirds
+        4,  # major thirds
+        7,  # perfect fifths
+        10, # minor sevenths
+        11, # major sevenths
+        12, # octaves
+        15, # minor tenths
+        16  # major tenths
+    ]
+    # Count how many intervals match our target arpeggio intervals
+    matching_intervals = sum(1 for interval in intervals if interval in target_intervals)
+    return float(matching_intervals) / len(intervals)
+
+def chromatic_motion(pitch_values: list[float]) -> float:
+    """Calculates the proportion of notes in the melody that 
+    consitute a chromatic movement.
+
+    Parameters
+    ----------
+    pitch_values : list[float]
+        List of pitch values to analyze
+
+    Returns
+    -------
+    float
+        Proportion of notes that move by a chromatic interval (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+
+    Examples
+    --------
+    >>> chromatic_motion([60, 61, 62, 63, 64])  # All semitones
+    1.0
+    >>> chromatic_motion([60, 62, 64])  # Stepwise motion
+    0.0
+    >>> chromatic_motion([60, 61, 63, 64])  # Mix which includes chromatic motion
+    0.666...
+    >>> chromatic_motion([60])  # Single note
+    0.0
+    >>> chromatic_motion(None)  # Invalid input
+    -1.0
+    """
+    if pitch_values is None:
+        return -1.0
+
+    # Calculate differences between consecutive pitches
+    intervals = []
+    for i in range(len(pitch_values)-1):
+        interval = abs(pitch_values[i+1] - pitch_values[i])
+        intervals.append(interval)
+
+    if not intervals:
+        return 0.0
+
+    # Count how many intervals match our target chromatic intervals
+    chromatic = sum(1 for interval in intervals if interval == 1)
+    return float(chromatic) / len(intervals)
+
+def stepwise_motion(pitch_values: list[float]) -> float:
+    """Calculates the proportion of notes in the melody that 
+    constitute a stepwise movement.
+
+    Parameters
+    ----------
+    pitch_values : list[float]
+        List of pitch values to analyze
+
+    Returns
+    -------
+    float
+        Proportion of notes that move by stepwise intervals (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+
+    Examples
+    --------
+    >>> stepwise_motion([60, 61, 62, 63, 64])  # All stepwise
+    1.0
+    >>> stepwise_motion([60, 63, 66])  # No stepwise motion
+    0.0
+    >>> stepwise_motion([60, 61, 64, 65])  # Mix which includes stepwise motion
+    0.666...
+    >>> stepwise_motion([60])  # Single note
+    0.0
+    >>> stepwise_motion(None)  # Invalid input
+    -1.0
+    """
+
+    if pitch_values is None:
+        return -1.0
+
+    # Calculate differences between consecutive pitches
+    intervals = []
+    for i in range(len(pitch_values)-1):
+        interval = abs(pitch_values[i+1] - pitch_values[i])
+        intervals.append(interval)
+
+    if not intervals:
+        return 0.0
+
+    # Count how many intervals match our target stepwise intervals
+    stepwise = sum(1 for interval in intervals if interval in [1, 2])
+    return float(stepwise) / len(intervals)
+
+
+def repeated_notes(pitch_values: list[float]) -> float:
+    """Calculates the proportion of notes in the melody that 
+    are repeated.
+
+    Parameters
+    ----------
+    pitch_values : list[float]
+        List of pitch values to analyze
+
+    Returns
+    -------
+    float
+        Proportion of notes that are repeated (0.0-1.0).
+        Returns -1.0 if input is None.
+
+    Examples
+    --------
+    >>> repeated_notes([60, 60, 62, 64])  # One note repeated 
+    0.333...
+    >>> repeated_notes([60, 60, 60, 60])  # All notes repeated
+    1.0
+    >>> repeated_notes([60, 62, 64])  # No repeated notes
+    0.0
+    >>> repeated_notes([60])  # Single note
+    0.0
+    >>> repeated_notes(None)  # Invalid input
+    -1.0
+    """
+    value = -1.0
+    if pitch_values is not None:
+        intervals = [abs(pitch_values[i+1] - pitch_values[i]) 
+                    for i in range(len(pitch_values)-1)]
+        if intervals:
+            repeated = sum(1 for interval in intervals if interval == 0)
+            value = float(repeated) / len(intervals)
+        else:
+            value = 0.0
+
+    return value
+
+def melodic_embellishment(pitch_values: list[float], 
+                          note_starts: list[float], 
+                          note_ends: list[float]) -> float:
+    
+    """Calculates the proportion of notes in the melody that 
+    are embellished. This is done by checking if the note is surrounded by
+    notes which are at least a third the duration of the targetnote.
+
+    Parameters
+    ----------
+    pitch_values : list[float]
+        List of pitch values to analyze
+    note_starts : list[float]
+        List of note start times
+    note_ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    float
+        Proportion of notes that are embellished (0.0-1.0).
+        Returns -1.0 if input is None.
+
+    Examples
+    --------
+    >>> melodic_embellishment([60, 62, 64], [0, 1, 2], [1, 2, 3])  # No embellishment
+    0.0
+    >>> melodic_embellishment([60, 62, 64, 66], [0, 0.25, 2, 3], [0.25, 2, 2.25, 4])  # Some embellishment
+    0.25...
+    """
+    if any([pitch_values is None, note_starts is None, note_ends is None]):
+        return -1.0
+
+    # Calculate the duration of each note
+    note_durations = [note_ends[i] - note_starts[i] for i in range(len(note_starts))]
+    # Count embellished notes (notes surrounded by shorter notes)
+    embellished = 0
+    for i in range(1, len(note_durations)-1):
+        if (note_durations[i-1] < note_durations[i]/3 and
+            note_durations[i+1] < note_durations[i]/3):
+            embellished += 1
+
+    # Calculate proportion of embellished notes
+    if len(note_durations) > 2:  # Need at least 3 notes to have embellishment
+        return float(embellished) / len(note_durations)
+    return 0.0
+
