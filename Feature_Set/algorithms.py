@@ -7,6 +7,7 @@ since they do not group well with the others.
 __author__ = "David Whyatt"
 
 import numpy as np
+from collections import Counter
 
 def ratio(x: list[float], y: list[float]) -> list[float]:
     """Calculates the ratio between corresponding elements in two lists.
@@ -287,40 +288,48 @@ def nine_percent_significant_values(values: list[float], threshold: float = 0.09
                   if prop >= threshold]
 
     return significant
-
-def circle_of_fifths(pitch_counts: dict[int, int]) -> dict[int, int]:
-    """Reorganizes a dictionary of pitch counts according to the circle of fifths pattern.
+def circle_of_fifths(pitches: list[float], counts: list[float]) -> dict[int, float]:
+    """Reorganizes two lists of pitches and counts according to the circle of fifths pattern.
 
     Parameters
     ----------
-    pitch_counts : dict[int, int]
-        Dictionary mapping pitch classes (0-12) to their counts
+    pitches : list[float]
+        List of pitch classes (0-12)
+    counts : list[float] 
+        List of counts corresponding to each pitch class
 
     Returns
     -------
-    dict[int, int]
-        Dictionary with same counts but keys reordered according to circle of fifths pattern
+    dict[int, float]
+        Dictionary with counts mapped to pitches reordered according to circle of fifths pattern
         (0,7,2,9,4,11,6,1,8,3,10,5). Empty input returns empty dictionary.
 
     Raises
     ------
     ValueError
-        If any pitch class is not a number between 0 and 12
+        If any pitch class is not between 0 and 12
+        If input lists have different lengths
 
     Examples
     --------
-    >>> circle_of_fifths({0: 1, 4: 2, 7: 3, 9: 2})  # Subset of pitches
-    {0: 1, 7: 3, 9: 2, 4: 2}
-    >>> circle_of_fifths({})  # Empty input
+    >>> circle_of_fifths([0, 4, 7, 9], [1, 2, 3, 2])  # Subset of pitches
+    {0: 1.0, 7: 3.0, 9: 2.0, 4: 2.0}
+    >>> circle_of_fifths([], [])  # Empty input
     {}
     """
-    if not pitch_counts:
+    if not pitches or not counts:
         return {}
 
-    # Validate input values
-    for pitch in pitch_counts:
-        if not isinstance(pitch, int) or pitch < 0 or pitch > 12:
-            raise ValueError("Pitch classes must be integers between 0 and 12")
+    if len(pitches) != len(counts):
+        raise ValueError("Input lists must have same length")
+
+    # Validate pitch values
+    for pitch in pitches:
+        if pitch < 0 or pitch > 12:
+            raise ValueError("Pitch classes must be between 0 and 12")
+
+    # Create initial dictionary from inputs
+    pitch_counts = {int(p): float(c) for p, c in zip(pitches, counts)}
 
     # Define circle of fifths order
     fifths_order = [0,7,2,9,4,11,6,1,8,3,10,5]
@@ -549,7 +558,7 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     for i, key in enumerate(major_keys):
         key_correlations[key + ' major'] = correlations[i]
 
-    # Add minor keys (c through b) 
+    # Add minor keys (c through b)
     minor_keys = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
     for i, key in enumerate(minor_keys):
         key_correlations[key + ' minor'] = correlations[i + 12]
@@ -791,3 +800,37 @@ def melodic_embellishment(pitch_values: list[float],
     if len(note_durations) > 2:  # Need at least 3 notes to have embellishment
         return float(embellished) / len(note_durations)
     return 0.0
+
+def ukkonen_measure(pitches1: list[int], pitches2: list[int], n: int) -> int:
+    """
+    Calculates the Ukkonen Measure between two sequences of pitches based on n-grams.
+
+    Parameters
+    ----------
+    pitches1 : list[int]
+        First sequence of pitch values
+    pitches2 : list[int]
+        Second sequence of pitch values
+    n : int
+        Length of n-grams
+
+    Returns
+    -------
+    int
+        Ukkonen Measure value
+    """
+    # Generate n-grams for both pitch sequences
+    s_ngrams = [tuple(pitches1[i:i+n]) for i in range(len(pitches1) - n + 1)]
+    t_ngrams = [tuple(pitches2[i:i+n]) for i in range(len(pitches2) - n + 1)]
+
+    # Count frequencies of n-grams
+    s_count = Counter(s_ngrams)
+    t_count = Counter(t_ngrams)
+
+    # Get the union of n-grams
+    all_ngrams = set(s_ngrams) | set(t_ngrams)
+
+    # Calculate the Ukkonen Measure
+    um = sum(abs(s_count[ngram] - t_count[ngram]) for ngram in all_ngrams)
+
+    return um

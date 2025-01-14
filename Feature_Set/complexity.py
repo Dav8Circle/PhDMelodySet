@@ -223,9 +223,8 @@ def honores_h(values: list[float]) -> float:
 
     return float(h)
 
-
 def repetition_rate(values: list[float]) -> float:
-    """Finds the shortest distance between any repeated value in the list.
+    """Calculates the average distance between all repeated values in the list.
 
     Parameters
     ----------
@@ -235,7 +234,7 @@ def repetition_rate(values: list[float]) -> float:
     Returns
     -------
     float
-        Shortest distance between repeats.
+        Average distance between repeated values.
         Returns 0 if list is empty or has no repeats.
 
     Raises
@@ -245,8 +244,8 @@ def repetition_rate(values: list[float]) -> float:
 
     Examples
     --------
-    >>> repetition_rate([1, 2, 1, 3, 2])  # Multiple repeats
-    2.0
+    >>> repetition_rate([1, 2, 1, 3, 2])  # Multiple repeats with different distances
+    2.5
     >>> repetition_rate([1, 2, 3])  # No repeats
     0.0
     >>> repetition_rate([])  # Empty list
@@ -260,23 +259,19 @@ def repetition_rate(values: list[float]) -> float:
     except (TypeError, ValueError) as exc:
         raise TypeError("All elements must be numbers") from exc
 
-    # Track shortest distance found
-    min_distance = len(values)
-    # Track if we found any repeats
-    found_repeat = False
+    # Track all distances between repeats
+    distances = []
 
     # Check each value against subsequent values
     for i, _ in enumerate(values_array):
-        # Look ahead for first repeat
+        # Look ahead for all repeats
         for j, val in enumerate(values_array[i + 1:], start=i + 1):
             if values_array[i] == val:
-                found_repeat = True
                 distance = j - i
-                min_distance = min(distance, min_distance)
-                # Can break inner loop since we found closest repeat
-                break
+                distances.append(distance)
 
-    return float(min_distance) if found_repeat else 0.0
+    # Calculate average distance if we found any repeats
+    return float(np.mean(distances)) if distances else 0.0
 
 def repetition_count(values: list[float]) -> list[float]:
     """Counts the number of times each value repeats in the list.
@@ -379,3 +374,61 @@ def consecutive_repetition_count(values: list[float]) -> dict[float, float]:
         repetitions[float(current_value)] = float(current_count)
 
     return repetitions
+
+def consecutive_fifths(values: list[float]) -> dict[float, int]:
+    """Checks the input list for consecutive values separated by perfect fifths.
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numeric values to analyze
+
+    Returns
+    -------
+    dict[float, int]
+        Dictionary mapping starting values to their consecutive fifths counts.
+        Returns empty dictionary for empty input.
+
+    Raises
+    ------
+    TypeError
+        If any element cannot be converted to float
+
+    Examples
+    --------
+    >>> consecutive_fifths([1, 8, 15, 22])  # Consecutive fifths
+    {1.0: 3}
+    >>> consecutive_fifths([1, 2, 3, 4])  # No consecutive fifths
+    {}
+    >>> consecutive_fifths([])  # Empty list
+    {}
+    """
+    if not values:
+        return {}
+
+    try:
+        values_array = np.array(values, dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise TypeError("All elements must be numbers") from exc
+
+    fifths = {}
+    current_value = values_array[0]
+    current_count = 0
+
+    # Iterate through values starting from second element
+    for val in values_array[1:]:
+        if (val - current_value) % 12 == 7:
+            current_count += 1
+            current_value = val
+        else:
+            # When value changes, record count if > 0 and reset
+            if current_count > 0:
+                fifths[float(values_array[0])] = current_count
+            current_value = val
+            current_count = 0
+
+    # Check final run
+    if current_count > 0:
+        fifths[float(values_array[0])] = current_count
+
+    return fifths
