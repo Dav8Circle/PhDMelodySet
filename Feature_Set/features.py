@@ -349,6 +349,21 @@ def mean_absolute_interval(pitches: list[int]) -> float:
 # Alias for mean_absolute_interval / FANTASTIC vs jSymbolic
 mean_melodic_interval = mean_absolute_interval
 
+def standard_deviation_absolute_interval(pitches: list[int]) -> float:
+    """Calculate standard deviation of absolute interval sizes.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Standard deviation of absolute interval sizes in semitones
+    """
+    return np.std([abs(x) for x in pitch_interval(pitches)])
+
 def modal_interval(pitches: list[int]) -> int:
     """Find most common interval size.
 
@@ -826,3 +841,130 @@ def tonalness(pitches: list[int]) -> float:
     pitch_classes = [pitch % 12 for pitch in pitches]
     _, correlation = compute_tonality_vector(pitch_classes)
     return abs(correlation)
+
+def tonal_clarity(pitches: list[int]) -> float:
+    """Calculate ratio between top two key correlation values.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Ratio between highest and second highest key correlation values.
+        Returns 1.0 if fewer than 2 correlation values.
+    """
+    pitch_classes = [pitch % 12 for pitch in pitches]
+    correlations = compute_tonality_vector(pitch_classes)
+    
+    if len(correlations) < 2:
+        return -1.0
+        
+    # Get top 2 correlation values
+    top_corr = abs(correlations[0][1])
+    second_corr = abs(correlations[1][1])
+    
+    # Avoid division by zero
+    if second_corr == 0:
+        return 1.0
+        
+    return top_corr / second_corr
+
+def tonal_spike(pitches: list[int]) -> float:
+    """Calculate ratio between highest key correlation and sum of all others.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Ratio between highest correlation value and sum of all others.
+        Returns 1.0 if fewer than 2 correlation values or sum is zero.
+    """
+    pitch_classes = [pitch % 12 for pitch in pitches]
+    correlations = compute_tonality_vector(pitch_classes)
+    
+    if len(correlations) < 2:
+        return -1.0
+        
+    # Get highest correlation and sum of rest
+    top_corr = abs(correlations[0][1])
+    other_sum = sum(abs(corr[1]) for corr in correlations[1:])
+    
+    # Avoid division by zero
+    if other_sum == 0:
+        return 1.0
+        
+    return top_corr / other_sum
+
+def get_key_distances() -> dict[str, int]:
+    """Returns a dictionary mapping key names to their semitone distances from C.
+    
+    Returns
+    -------
+    dict[str, int]
+        Dictionary mapping key names (both major and minor) to semitone distances from C.
+    """
+    return {
+        'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+        'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11,
+        'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5,
+        'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11
+    }
+
+def referent(pitches: list[int]) -> int:
+    '''
+    Feature that describes the chromatic interval of the key centre from C.
+    '''
+    pitch_classes = [pitch % 12 for pitch in pitches]
+    correlations = compute_tonality_vector(pitch_classes)
+
+    if not correlations:
+        return -1
+
+    # Get the key name from the highest correlation
+    key_name = correlations[0][0].split()[0]  # Take first word (key name without major/minor)
+
+    # Map key names to semitone distances from C
+
+
+    key_distances = get_key_distances()
+
+    return key_distances[key_name]
+
+def inscale(pitches: list[int]) -> int:
+    '''
+    Captures whether the melody contains any notes which deviate from the estimated key.
+    '''
+    pitch_classes = [pitch % 12 for pitch in pitches]
+    correlations = compute_tonality_vector(pitch_classes)[0]
+    key_centre = correlations[0]
+    print(key_centre)
+
+    # Get major/minor scales based on key
+    if 'major' in key_centre:
+        # Major scale pattern: W-W-H-W-W-W-H (W=2 semitones, H=1 semitone)
+        scale = [0, 2, 4, 5, 7, 9, 11]
+    else:
+        # Natural minor scale pattern: W-H-W-W-H-W-W
+        scale = [0, 2, 3, 5, 7, 8, 10]
+
+    # Get key root pitch class
+    key_name = key_centre.split()[0]
+    key_distances = get_key_distances()
+    root = key_distances[key_name]
+
+    # Transpose scale to key
+    scale = [(note + root) % 12 for note in scale]
+
+    # Check if any pitch classes are outside the scale
+    for pc in pitch_classes:
+        if pc not in scale:
+            return 0
+
+    return 1

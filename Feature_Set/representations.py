@@ -19,7 +19,7 @@ class Melody:
         starts (list[float]): List of note start times in order of appearance
         ends (list[float]): List of note end times in order of appearance
     """
-    def __init__(self, midi_data: dict):
+    def __init__(self, midi_data: dict, tempo: float):
         """Initialize a Melody object from MIDI sequence data.
         
         Args:
@@ -27,6 +27,7 @@ class Melody:
         """
         self._midi_data = midi_data
         self._midi_sequence = midi_data['MIDI Sequence'].split('), ')
+        self._tempo = tempo
 
     @property
     def pitches(self) -> list[int]:
@@ -74,6 +75,15 @@ class Melody:
             end = float(note[end_start:end_end])
             ends.append(end)
         return ends
+    
+    @property
+    def tempo(self) -> float:
+        """Extract tempo from Class input.
+        
+        Returns:
+            float: Tempo of the melody in beats per minute
+        """
+        return self._tempo
 
 def read_midijson(file_path: str) -> dict:
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -87,5 +97,5 @@ def read_midijson(file_path: str) -> dict:
 # could easily then compute all the features for the dataset, too.
 for i in range(0, 1920, 1):
     melody_data = read_midijson('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
-    melody = Melody(melody_data)
+    melody = Melody(melody_data, tempo=100)
     print(pitch_range(melody.pitches), pitch_standard_deviation(melody.pitches), pitch_entropy(melody.pitches))

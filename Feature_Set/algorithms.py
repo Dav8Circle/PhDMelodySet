@@ -486,8 +486,9 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
 
     Returns
     -------
-    tuple[str, float]
-        Tuple containing the most likely key and its correlation value.
+    list[tuple[str, float]]
+        List of tuples containing (key, correlation) pairs, sorted by correlation value.
+        Returns list of 24 (key, 0.0) tuples for empty input.
 
     Raises
     ------
@@ -497,19 +498,21 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     Examples
     --------
     >>> compute_tonality_vector([0, 4, 7])  # C major triad
-    ('C major', 0.833...)
-    >>> compute_tonality_vector([0, 4, 9])  # A minor triad
-    ('a minor', 0.888...)
+    [('C major', 0.833...), ('e minor', 0.760...), ...]
     >>> compute_tonality_vector([])  # Empty input
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    [('C major', 0.0), ('C# major', 0.0), ...]
     """
     # Krumhansl-Kessler key profiles
     maj_vector = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
     min_vector = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
 
+    # Create key name lists
+    major_keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    minor_keys = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
+
     if not pitch_classes:
-        return [0.0] * 24
+        return [(key + ' major', 0.0) for key in major_keys] + \
+               [(key + ' minor', 0.0) for key in minor_keys]
 
     # Validate and convert pitch classes to integers
     try:
@@ -529,43 +532,23 @@ def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
     if total > 0:  # Avoid division by zero
         pc_dist = [count / total for count in pc_dist]
 
-    # Initialize correlation vector
-    correlations = []
+    # Initialize results list
+    key_correlations = []
 
     # Compute correlations for all possible keys
     for i in range(12):  # For each possible root note
-        # Rotate profiles to current root
+        # Major keys
         shifted_maj = maj_vector[-i:] + maj_vector[:-i]
+        maj_corr = float(np.corrcoef(pc_dist, shifted_maj)[0,1])
+        key_correlations.append((major_keys[i] + ' major', maj_corr))
+
+        # Minor keys
         shifted_min = min_vector[-i:] + min_vector[:-i]
+        min_corr = float(np.corrcoef(pc_dist, shifted_min)[0,1])
+        key_correlations.append((minor_keys[i] + ' minor', min_corr))
 
-        # Calculate correlations - get the off-diagonal element [0,1]
-        maj_corr = np.corrcoef(pc_dist, shifted_maj)[0,1]
-        min_corr = np.corrcoef(pc_dist, shifted_min)[0,1]
-
-        correlations.append(float(maj_corr))
-
-    # Add minor key correlations
-    for i in range(12):
-        shifted_min = min_vector[-i:] + min_vector[:-i]
-        min_corr = np.corrcoef(pc_dist, shifted_min)[0,1]
-        correlations.append(float(min_corr))
-
-    # Create dictionary mapping key names to correlation values
-    key_correlations = {}
-
-    # Add major keys (C through B)
-    major_keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-    for i, key in enumerate(major_keys):
-        key_correlations[key + ' major'] = correlations[i]
-
-    # Add minor keys (c through b)
-    minor_keys = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
-    for i, key in enumerate(minor_keys):
-        key_correlations[key + ' minor'] = correlations[i + 12]
-
-    # Find key with maximum correlation
-    max_key = max(key_correlations, key=key_correlations.get)
-    return max_key, key_correlations[max_key]
+    # Sort by correlation value, descending
+    return sorted(key_correlations, key=lambda x: x[1], reverse=True)
 
 def amount_of_arpeggiation(pitch_values: list[float]) -> float:
     """Calculates the proportion of notes in the melody that 

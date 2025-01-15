@@ -403,6 +403,7 @@ def consecutive_fifths(values: list[float]) -> dict[float, int]:
     >>> consecutive_fifths([])  # Empty list
     {}
     """
+    # return sum([(j - i) % 12 == 7 for i, j in zip(values, values[1:])])
     if not values:
         return {}
 
