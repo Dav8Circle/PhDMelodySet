@@ -4,224 +4,336 @@ to aid in the calculation of features related to complexity.
 """
 __author__ = "David Whyatt"
 
+from collections import Counter
 import numpy as np
 
-def yules_k(values: list[float]) -> float:
-    """Calculates Yule's K statistic, a measure of lexical diversity.
-
-    Must be called multiple times and averaged over all m-types to match FANTASTIC.
+def yules_k(ngram_counts: Counter) -> float:
+    """Calculates mean Yule's K statistic over m-type n-grams.
     
-    Yule's K is calculated as: K = 1000 * (∑(vm * m²) - n) / n²
-    where:
-    - n is the total number of tokens
-    - m is the frequency class
-    - vm is the number of types that occur m times
-
-    Therefore, K tends to be higher where there is less lexical diversity.
-
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    ngram_counts : Counter
+        Counter object containing n-gram counts for each length n
+    
     Returns
     -------
     float
-        Value representing Yule's K statistic.
-        Returns 0 for empty list or lists with less than 2 elements.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-    ValueError
-        If calculation would result in division by zero
+        Mean Yule's K statistic across n-gram lengths.
+        Returns 0 for empty input.
 
     Examples
     --------
-    >>> yules_k([1, 2, 2, 3, 3, 3])  # Values with different frequencies
-    37.037...
-    >>> yules_k([1, 1, 1])  # All same value
-    222.22...
-    >>> yules_k([])  # Empty list
-    0
-    """
-    if not values or len(values) < 2:
-        return 0
-
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
-    # Count frequency of each unique value
-    _, counts = np.unique(values_array, return_counts=True)
-
-    # Create frequency spectrum (how many values appear 1 time, 2 times, etc)
-    freq_of_freqs = np.bincount(counts)
-
-    # Calculate N (total tokens)
-    n = len(values_array)
-
-    if n == 0:
-        raise ValueError("Cannot calculate Yule's K - no values provided")
-
-    # Calculate denominator sum (Vm * m²)
-    denom_k = 0
-    for m in range(1, len(freq_of_freqs)):
-        vm = freq_of_freqs[m]  # number of types occurring m times
-        denom_k += vm * (m * m)
-
-    # Calculate Yule's K with scaling factor of 1000 and normalization
-    k = (1.0 / abs(n)) * 1000 * ((denom_k - n) / (n * n))
-
-    return float(k)
-
-def simpsons_d(values: list[float]) -> float:
-    """Compute Simpson's D diversity index for a sequence of values.
-
-    Must be called multiple times and averaged over all m-types to match FANTASTIC.
-
-    Parameters
-    ----------
-    values : list[float]
-        List of numeric values to analyze
-
-    Returns
-    -------
-    float
-        Simpson's D value. Returns 0.0 for empty list or lists with less than 2 elements.
-
-    Examples
-    --------
-    >>> simpsons_d([1, 2, 2, 3, 3, 3])  # Values with different frequencies
-    0.733...
-    >>> simpsons_d([1, 1, 1])  # All same value
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations, with 1-grams, 2-grams, 3-grams, and 4-grams
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1, (('u2', 'e'), ('u2', 'e')): 1, (('u2', 'e'), ('d2', 'e')): 1, (('d2', 'e'), ('d2', None)): 1, (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1, (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1, (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1})]
+    >>> yules_k(counts)  # High K indicates more repetition
+    20.0
+    
+    >>> # Empty input
+    >>> yules_k([])
     0.0
-    >>> simpsons_d([])  # Empty list
+    
+    >>> # Counter with no tokens
+    >>> yules_k([Counter()])
     0.0
     """
-    if not values or len(values) < 2:
+    if not ngram_counts:
         return 0.0
+    
+    k_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+            
+        # Get frequency of frequencies
+        freq_spec = Counter(counts.values())
+        
+        # Calculate N (total tokens)
+        N = sum(counts.values())
+        
+        if N == 0:
+            continue
+            
+        # Calculate sum(vm * m²)
+        vm_m2_sum = sum(freq * (count * count) 
+                        for count, freq in freq_spec.items())
+        
+        # Calculate K with scaling factor of 1000
+        K = 1000 * (vm_m2_sum - N) / (N * N)
+        k_values.append(K)
+    
+    return float(np.mean(k_values)) if k_values else 0.0
 
-    # Get frequency spectrum using numpy
-    unique, counts = np.unique(values, return_counts=True)
-    freq_spec = dict(zip(unique, counts))
-
-    # Calculate n (total tokens)
-    n = sum(freq_spec.values())
-
-    if n == 1:
-        return 0.0
-
-    # Calculate sum of d components
-    d = 0
-    for m, vm in freq_spec.items():
-        # Formula: d = sum(vm * (m/n) * ((m-1)/(n-1)))
-        d += vm * (m/n) * ((m-1)/(n-1))
-
-    return float(d)
-
-def sichels_s(values: list[float]) -> float:
-    """Computes Sichel's S statistic from a list of values.
-
-    S is the proportion of types that occur exactly twice in the sample.
-    Must be called multiple times and averaged over all m-types to match FANTASTIC.
-
+def simpsons_d(ngram_counts: Counter) -> float:
+    """Compute mean Simpson's D diversity index over m-type n-grams.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    ngram_counts : Counter
+        List of Counter objects containing n-gram counts for each n
+    
     Returns
     -------
     float
-        Sichel's S value. Returns 0.0 for empty list or single-element list.
+        Mean Simpson's D value across n-gram lengths.
+        Returns 0.0 for empty input.
 
     Examples
     --------
-    >>> sichels_s([1, 2, 2, 3, 3, 3])  # One type occurs twice
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> simpsons_d(counts)  # Higher D indicates less diversity
+    0.1666...
+    
+    >>> # Empty input
+    >>> simpsons_d([])
+    0.0
+    
+    >>> # Counter with no tokens
+    >>> simpsons_d([Counter()])
+    0.0
+    """
+    if not ngram_counts:
+        return 0.0
+    
+    d_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+        
+        # Get counts
+        count_values = list(counts.values())
+        N = sum(count_values)  # total tokens
+        
+        if N <= 1:
+            continue
+            
+        # Calculate D using the formula: sum(n_i * (n_i - 1)) / (N * (N - 1))
+        d = sum(n * (n - 1) for n in count_values) / (N * (N - 1))
+        d_values.append(d)
+    
+    return float(np.mean(d_values)) if d_values else 0.0
+
+def sichels_s(ngram_counts: Counter) -> float:
+    """Compute mean Sichel's S statistic over m-type n-grams.
+    
+    Parameters
+    ----------
+    ngram_counts : Counter
+        List of Counter objects containing n-gram counts for each n
+    
+    Returns
+    -------
+    float
+        Mean Sichel's S value across n-gram lengths.
+        Returns 0.0 for empty input.
+
+    Examples
+    --------
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> sichels_s(counts)  # Higher S indicates more doubles
     0.333...
-    >>> sichels_s([1, 1, 2, 2, 3, 3])  # All types occur twice
-    1.0
-    >>> sichels_s([])  # Empty list
+    
+    >>> # Empty input
+    >>> sichels_s([])
+    0.0
+    
+    >>> # Counter with no tokens
+    >>> sichels_s([Counter()])
     0.0
     """
-    if not values:
+    if not ngram_counts:
         return 0.0
+    
+    s_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+            
+        # Count how many n-grams occur exactly twice
+        doubles = sum(1 for count in counts.values() if count == 2)
+        
+        # Total number of unique n-grams
+        V = len(counts)
+        
+        if V == 0:
+            continue
+            
+        # Calculate S value
+        s = float(doubles) / V
+        s_values.append(s)
+    
+    return float(np.mean(s_values)) if s_values else 0.0
 
-    if len(values) == 1:
-        return 0.0
-
-    # Get frequency spectrum using numpy
-    unique, counts = np.unique(values, return_counts=True)
-
-    # Find number of types that occur exactly twice
-    doubles = np.sum(counts == 2)
-
-    # Total number of types
-    v = len(unique)
-
-    # S = V2/V where V2 is number of types occurring twice
-    if v == 0:
-        return 0.0
-
-    return float(doubles) / v
-
-def honores_h(values: list[float]) -> float:
-    """Compute Honore's H statistic for a sequence of values.
-
-    Must be called multiple times and averaged over all m-types to match FANTASTIC.
-    H = 100 * (log(n) / (1 - (v1/v)))
-    where:
-    - n = total tokens
-    - v1 = number of types occurring exactly once (hapax legomena)
-    - v = total number of unique types
-
+def honores_h(ngram_counts: Counter) -> float:
+    """Compute mean Honore's H statistic over m-type n-grams.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    ngram_counts : Counter
+        List of Counter objects containing n-gram counts for each n
+    
     Returns
     -------
     float
-        Honore's H value. Returns 0.0 for empty list or single-element list.
+        Mean Honore's H value across n-gram lengths.
+        Returns 0.0 for empty input.
 
     Examples
     --------
-    >>> honores_h([1, 2, 2, 3, 3, 3])  # One hapax legomenon
-    268.763...
-    >>> honores_h([1, 1, 1])  # No hapax legomena
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> honores_h(counts)  # Higher H indicates more unique words
+    "TODO" 
+    
+    >>> # Empty input
+    >>> honores_h([])
     0.0
-    >>> honores_h([])  # Empty list
+    
+    >>> # Counter with no tokens
+    >>> honores_h([Counter()])
     0.0
     """
-    if not values:
+    if not ngram_counts:
         return 0.0
+    
+    h_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+            
+        # Get total tokens (N)
+        N = sum(counts.values())
+        
+        # Get number of hapax legomena (V1)
+        V1 = sum(1 for count in counts.values() if count == 1)
+        
+        # Get total types (V)
+        V = len(counts)
+        
+        # Handle edge cases
+        if V == 0 or V1 == 0 or V1 == V:
+            continue
+            
+        # Calculate H value
+        H = 100.0 * (np.log(N) / (1.0 - (float(V1)/V)))
+        h_values.append(H)
+    
+    return float(np.mean(h_values)) if h_values else 0.0
 
-    if len(values) == 1:
+def mean_entropy(ngram_counts: Counter) -> float:
+    """Compute mean entropy of m-type n-gram distribution.
+    
+    Parameters
+    ----------
+    ngram_counts : Counter
+        List of Counter objects containing n-gram counts for each n
+    
+    Returns
+    -------
+    float
+        Mean normalized entropy value across n-gram lengths.
+        Returns 0.0 for empty input.
+
+    Examples
+    --------
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> mean_entropy(counts)  # Higher entropy indicates more randomness
+    "TODO"
+    
+    >>> # Empty input
+    >>> mean_entropy([])
+    0.0
+    
+    >>> # Counter with no tokens
+    >>> mean_entropy([Counter()])
+    0.0
+    """
+    if not ngram_counts:
         return 0.0
+    
+    entropy_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+            
+        # Get total tokens
+        N = sum(counts.values())
+        
+        if N <= 1:
+            continue
+            
+        # Calculate probabilities
+        probs = [count/N for count in counts.values()]
+        
+        # Calculate entropy
+        H = -np.sum(probs * np.log2(probs))
+        
+        # Normalize by log(N)
+        H_norm = H / np.log2(N)
+        entropy_values.append(H_norm)
+    
+    return float(np.mean(entropy_values)) if entropy_values else 0.0
 
-    # Get frequency spectrum using numpy
-    unique, counts = np.unique(values, return_counts=True)
+def mean_productivity(ngram_counts: Counter) -> float:
+    """Compute mean productivity of m-type n-gram distribution.
+    
+    Parameters
+    ----------
+    ngram_counts : Counter
+        List of Counter objects containing n-gram counts for each n
+    
+    Returns
+    -------
+    float
+        Mean productivity value across n-gram lengths.
+        Returns 0.0 for empty input.
 
-    # Calculate components
-    v1 = np.sum(counts == 1)  # Number of types occurring once
-    v = len(unique)  # Total unique types
-    n = len(values)  # Total tokens
-
-    # Handle edge cases
-    if v1 == 0 or v == 0:
+    Examples
+    --------
+    >>> from collections import Counter
+    >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
+    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> mean_productivity(counts)  # Higher productivity indicates more hapax legomena
+    0.5
+    
+    >>> # Empty input
+    >>> mean_productivity([])
+    0.0
+    
+    >>> # Counter with no tokens
+    >>> mean_productivity([Counter()])
+    0.0
+    """
+    if not ngram_counts:
         return 0.0
+    
+    productivity_values = []
+    for counts in ngram_counts:
+        if not counts:
+            continue
+            
+        # Get total tokens
+        N = sum(counts.values())
+        
+        if N == 0:
+            continue
+            
+        # Count hapax legomena (types occurring once)
+        V1N = sum(1 for count in counts.values() if count == 1)
+        
+        # Calculate productivity
+        prod = V1N / N
+        productivity_values.append(prod)
+    
+    return float(np.mean(productivity_values)) if productivity_values else 0.0
 
-    if v1 == v:
-        return 0.0
-
-    # Calculate h
-    h = 100.0 * (np.log(n) / (1.0 - (float(v1)/v)))
-
-    return float(h)
 
 def repetition_rate(values: list[float]) -> float:
     """Calculates the average distance between all repeated values in the list.

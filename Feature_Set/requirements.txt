@@ -2,3 +2,4 @@ numpy
 pytest
 scipy
 pretty-midi
+pandas

@@ -4,10 +4,21 @@ Features are the product of an input list and at least one algorithm.
 """
 __author__ = "David Whyatt"
 
-from algorithms import rank_values, nine_percent_significant_values, circle_of_fifths, compute_tonality_vector
-from complexity import consecutive_fifths, repetition_rate
+from algorithms import (
+    rank_values, nine_percent_significant_values, circle_of_fifths, 
+    compute_tonality_vector, arpeggiation_proportion,
+    chromatic_motion_proportion, stepwise_motion_proportion,
+    repeated_notes_proportion, melodic_embellishment_proportion
+)
+# from correlations import kendall_tau
+from complexity import (
+    consecutive_fifths, repetition_rate, yules_k, simpsons_d, sichels_s, honores_h, mean_entropy,
+    mean_productivity
+)
 from distributional import distribution_proportions, histogram_bins, kurtosis, skew
 from interpolation_contour import InterpolationContour
+from mtypes import FantasticTokenizer
+from narmour import proximity, closure, registral_direction, registral_return, intervallic_difference
 from stats import range_func, standard_deviation, shannon_entropy, mode
 from step_contour import StepContour
 import numpy as np
@@ -858,18 +869,18 @@ def tonal_clarity(pitches: list[int]) -> float:
     """
     pitch_classes = [pitch % 12 for pitch in pitches]
     correlations = compute_tonality_vector(pitch_classes)
-    
+
     if len(correlations) < 2:
         return -1.0
-        
+
     # Get top 2 correlation values
     top_corr = abs(correlations[0][1])
     second_corr = abs(correlations[1][1])
-    
+
     # Avoid division by zero
     if second_corr == 0:
         return 1.0
-        
+
     return top_corr / second_corr
 
 def tonal_spike(pitches: list[int]) -> float:
@@ -888,18 +899,18 @@ def tonal_spike(pitches: list[int]) -> float:
     """
     pitch_classes = [pitch % 12 for pitch in pitches]
     correlations = compute_tonality_vector(pitch_classes)
-    
+
     if len(correlations) < 2:
         return -1.0
-        
+
     # Get highest correlation and sum of rest
     top_corr = abs(correlations[0][1])
     other_sum = sum(abs(corr[1]) for corr in correlations[1:])
-    
+
     # Avoid division by zero
     if other_sum == 0:
         return 1.0
-        
+
     return top_corr / other_sum
 
 def get_key_distances() -> dict[str, int]:
@@ -968,3 +979,154 @@ def inscale(pitches: list[int]) -> int:
             return 0
 
     return 1
+
+def get_narmour_features(pitches: list[int]) -> tuple[int, int, int, int, int]:
+    """Calculate Narmour's implication-realization features.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    tuple[int, int, int, int, int]
+        A tuple containing scores for:
+        - Registral direction (0 or 1)
+        - Proximity (0-6)
+        - Closure (0-2)
+        - Registral return (0-3)
+        - Intervallic difference (0 or 1)
+
+    Notes
+    -----
+    Returns in the following order:
+    - Registral direction: Large intervals followed by direction change
+    - Proximity: Closeness of consecutive pitches
+    - Closure: Direction changes and interval size changes
+    - Registral return: Return to previous pitch level
+    - Intervallic difference: Relationship between consecutive intervals
+    """
+    return (registral_direction(pitches), proximity(pitches), closure(pitches),
+            registral_return(pitches), intervallic_difference(pitches))
+
+def amount_of_arpeggiation(pitches: list[int]) -> float:
+    """Calculate the proportion of notes in the melody that constitute triadic movement.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of intervals that match arpeggio patterns (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+    """
+    return arpeggiation_proportion(pitches)
+
+
+def chromatic_motion(pitches: list[int]) -> float:
+    """Calculate the proportion of chromatic motion in the melody.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of intervals that are chromatic (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+    """
+    return chromatic_motion_proportion(pitches)
+
+def melodic_embellishment(pitches: list[int], starts: list[float], ends: list[float]) -> float:
+    """Calculate the proportion of melodic embellishments in the melody.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+    starts : list[float]
+        List of note start times
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    float
+        Proportion of intervals that are embellishments (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+    """
+    return melodic_embellishment_proportion(pitches, starts, ends)
+
+def repeated_notes(pitches: list[int]) -> float:
+    """Calculate the proportion of repeated notes in the melody.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of intervals that are repeated notes (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+    """
+    return repeated_notes_proportion(pitches)
+
+def stepwise_motion(pitches: list[int]) -> float:
+    """Calculate the proportion of stepwise motion in the melody.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of intervals that are stepwise (0.0-1.0).
+        Returns -1.0 if input is None, 0.0 if input is empty or has only one value.
+    """
+    return stepwise_motion_proportion(pitches)
+
+def get_mtype_features(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
+    """Calculate various n-gram statistics for the melody.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+    starts : list[float]
+        List of note start times
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    dict
+        Dictionary containing complexity measures averaged across n-gram lengths
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(pitches, starts, ends)  # This initializes self.phrases
+    
+    # Get counts for each n-gram length
+    ngram_counts = []
+    for n in range(1, 5):
+        counts = tokenizer.ngram_counts(n=n)
+        ngram_counts.append(counts)
+    
+    # Calculate complexity measures
+    return {
+        'yules_k': yules_k(ngram_counts),
+        'simpsons_d': simpsons_d(ngram_counts),
+        'sichels_s': sichels_s(ngram_counts),
+        'honores_h': honores_h(ngram_counts),
+        'mean_entropy': mean_entropy(ngram_counts),
+        'mean_productivity': mean_productivity(ngram_counts)
+    }

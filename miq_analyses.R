@@ -5,11 +5,11 @@ library(nlme)
 library(lmtest)
 
 item_bank <- 
-  read_csv("~/Downloads/PhD MELODY SET/item-bank.csv") |>
+  read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/item-bank.csv") |>
   rename(item_id = id)
 
 df <- 
-  read_csv("~/Downloads/PhD MELODY SET/miq_trials.csv", n_max = 1e6) |> 
+  read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", n_max = 1e6) |> 
   filter(test == "mdt") |> 
   left_join(item_bank |> select(- c("discrimination", "difficulty", "guessing", "inattention")), by = "item_id")
 
@@ -181,12 +181,11 @@ t.test(df |> filter(oddity == 1) |> pull(score), df |> filter(oddity == 3) |> pu
 # df$item_id
 # df$user_id
 
-# mod <-
-#   glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
-#         data = df,
-#         family = binomial(mafc.logit(3)), verbose = 100)
+mod <-
+  glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
+        data = df,
+        family = binomial(mafc.logit(3)), verbose = 100)
 
-# 
 # mod <- 
 #   glmer(score ~ difficulty + (1 | item_id) + (1|user_id),
 #         data = df,
