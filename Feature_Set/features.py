@@ -4,6 +4,11 @@ Features are the product of an input list and at least one algorithm.
 """
 __author__ = "David Whyatt"
 
+import json
+import math
+from collections import Counter
+
+import scipy
 from algorithms import (
     rank_values, nine_percent_significant_values, circle_of_fifths, 
     compute_tonality_vector, arpeggiation_proportion,
@@ -15,13 +20,16 @@ from complexity import (
     consecutive_fifths, repetition_rate, yules_k, simpsons_d, sichels_s, honores_h, mean_entropy,
     mean_productivity
 )
+from corpus import _convert_strings_to_tuples
 from distributional import distribution_proportions, histogram_bins, kurtosis, skew
 from interpolation_contour import InterpolationContour
 from mtypes import FantasticTokenizer
 from narmour import proximity, closure, registral_direction, registral_return, intervallic_difference
+from representations import Melody
 from stats import range_func, standard_deviation, shannon_entropy, mode
 from step_contour import StepContour
 import numpy as np
+from typing import Dict, Tuple
 
 # Pitch Features
 
@@ -942,8 +950,6 @@ def referent(pitches: list[int]) -> int:
     key_name = correlations[0][0].split()[0]  # Take first word (key name without major/minor)
 
     # Map key names to semitone distances from C
-
-
     key_distances = get_key_distances()
 
     return key_distances[key_name]
@@ -1113,14 +1119,15 @@ def get_mtype_features(pitches: list[int], starts: list[float], ends: list[float
         Dictionary containing complexity measures averaged across n-gram lengths
     """
     tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(pitches, starts, ends)  # This initializes self.phrases
-    
+    # We don't actually use tokens, but it initializes self.phrases
+    tokens = tokenizer.tokenize_melody(pitches, starts, ends)
+
     # Get counts for each n-gram length
     ngram_counts = []
     for n in range(1, 5):
         counts = tokenizer.ngram_counts(n=n)
         ngram_counts.append(counts)
-    
+    print(ngram_counts)
     # Calculate complexity measures
     return {
         'yules_k': yules_k(ngram_counts),
@@ -1130,3 +1137,818 @@ def get_mtype_features(pitches: list[int], starts: list[float], ends: list[float
         'mean_entropy': mean_entropy(ngram_counts),
         'mean_productivity': mean_productivity(ngram_counts)
     }
+
+def get_ngram_document_frequency(ngram: tuple, n: int, corpus_stats: dict) -> int:
+    """Retrieve the document frequency for a given n-gram and n-gram length from the corpus statistics."""
+    ngram_str = str(ngram)
+    return next((item['count'] for item in corpus_stats['document_frequencies']
+                 if item['ngram'] == ngram_str and item['n'] == n), 0)
+
+def compute_tfdf_spearman(melody: Melody) -> float:
+    """Compute Spearman correlation between term and document frequencies.
+    
+    This follows FANTASTIC's implementation where:
+    - TF is the frequency of an n-gram in the melody 
+    - DF is the number of melodies in the corpus containing the n-gram
+    - Spearman correlation is calculated between TF and DF values
+    - For ties in TF/DF values, the maximum rank is assigned
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    float
+        Spearman correlation coefficient between -1 and 1, or 0.0 if insufficient n-grams
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    tf_values = []
+    df_values = []
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    # Get TF and DF values for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram, tf in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                tf_values.append(tf)
+                df_values.append(df)
+
+    # Need at least 2 points for correlation
+    if len(tf_values) < 2:
+        return 0.0
+
+    # Calculate Spearman correlation with maximum rank for ties
+    if len(tf_values) > 0 and len(df_values) > 0:
+        correlation = scipy.stats.spearmanr(tf_values, df_values)[0]
+        return float(correlation) if not math.isnan(correlation) else 0.0
+    else:
+        return 0.0
+
+def compute_tfdf_kendall(melody: Melody) -> float:
+    """Compute Kendall correlation between term and document frequencies.
+    
+    This follows FANTASTIC's implementation where:
+    - TF is the frequency of an n-gram in the melody 
+    - DF is the number of melodies in the corpus containing the n-gram
+    - Kendall correlation is calculated between TF and DF values
+    - For ties in TF/DF values, the minimum rank is assigned
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    float
+        Kendall correlation coefficient between -1 and 1, or 0.0 if insufficient n-grams
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    tf_values = []
+    df_values = []
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    # Get TF and DF values for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram, tf in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                tf_values.append(tf)
+                df_values.append(df)
+
+    # Need at least 2 points for correlation
+    if len(tf_values) < 2:
+        return 0.0
+
+    # Calculate Kendall correlation with minimum rank for ties
+    if len(tf_values) > 0 and len(df_values) > 0:
+        correlation = scipy.stats.kendalltau(tf_values, df_values)[0]
+        return float(correlation) if not math.isnan(correlation) else 0.0
+    else:
+        return 0.0
+
+def compute_tfdf(melody: Melody) -> float:
+    """Compute mean log TFDF (Term Frequency-Document Frequency) for a melody.
+    
+    This follows FANTASTIC's implementation where:
+    - TF is the frequency of an n-gram in the melody
+    - DF is the number of melodies in the corpus containing the n-gram
+    - TFDF is calculated for each n-gram and averaged
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean log TFDF score, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    tfdf_values = []
+    # Load corpus statistics from JSON file
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    # Calculate TFDF for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram, tf in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                tfdf = math.log(tf * df + 1)
+                tfdf_values.append(tfdf)
+
+    # Calculate mean log TFDF
+    if tfdf_values:
+        mean_log_tfdf = sum(tfdf_values) / len(tfdf_values)
+    else:
+        mean_log_tfdf = 0.0
+
+    return mean_log_tfdf
+
+def compute_norm_log_dist(melody: Melody) -> float:
+    """Compute normalized distance between term and document frequencies.
+    
+    This follows FANTASTIC's implementation where:
+    - TF is the frequency of an n-gram in the melody
+    - DF is the number of melodies in the corpus containing the n-gram
+    - Instead of multiplying TF*DF, takes difference between normalized vectors
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Normalized log distance score, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    distances = []
+    # Calculate distances for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram, tf in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                # Normalize and take log of frequencies
+                norm_tf = math.log(tf + 1)
+                norm_df = math.log(df + 1)
+                # Calculate distance between normalized frequencies
+                dist = abs(norm_tf - norm_df)
+                distances.append(dist)
+
+    # Calculate mean distance
+    if distances:
+        mean_dist = sum(distances) / len(distances)
+    else:
+        mean_dist = 0.0
+
+    return mean_dist
+
+def compute_max_log_df(melody: Melody) -> float:
+    """Compute maximum document frequency feature (mtcf.max.log.DF).
+    
+    This is the logarithm of the m-type contained in the analysis that occurs 
+    in the maximum number of melodies in the corpus.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Maximum log document frequency, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    max_df = 0
+    # Find maximum document frequency across all n-gram lengths
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            max_df = max(max_df, df)
+
+    # Take log of maximum document frequency
+    if max_df > 0:
+        return math.log(max_df)
+    return 0.0
+
+def compute_min_log_df(melody: Melody) -> float:
+    """Compute minimum document frequency feature (mtcf.min.log.DF).
+    
+    This is the logarithm of the m-type contained in the analysis that occurs 
+    in the minimum number of melodies in the corpus.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Minimum log document frequency, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    min_df = float('inf')  # Initialize to infinity
+    # Find minimum document frequency across all n-gram lengths
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:  # Only consider non-zero frequencies
+                min_df = min(min_df, df)
+
+    # Take log of minimum document frequency
+    if min_df < float('inf'):
+        return math.log(min_df)
+    return 0.0
+
+def compute_mean_log_df(melody: Melody) -> float:
+    """Compute mean document frequency feature (mtcf.mean.log.DF).
+    
+    This is the mean logarithm of the document frequencies of all m-types
+    contained in the analysis.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean log document frequency, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    total_log_df = 0.0
+    count = 0
+    # Calculate sum of log document frequencies across all n-gram lengths
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:  # Only consider non-zero frequencies
+                total_log_df += math.log(df)
+                count += 1
+
+    # Calculate mean log document frequency
+    if count > 0:
+        return total_log_df / count
+    return 0.0
+
+def compute_mean_df_entropy(melody: Melody) -> float:
+    """Compute mean document frequency entropy feature (mtcf.mean.entropy).
+    
+    This is similar to mean.entropy but uses document frequencies from the corpus
+    instead of frequencies within the analysis melody. The entropy values are
+    averaged over the various m-type lengths.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency entropy, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    total_entropy = 0.0
+    n_lengths = 0
+    
+    # Calculate entropy for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        dfs = []
+        total_df = 0
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                dfs.append(df)
+                total_df += df
+                
+        if dfs and total_df > 0:
+            # Calculate probabilities
+            probs = [df/total_df for df in dfs]
+            # Use shannon_entropy function
+            entropy = shannon_entropy(probs)
+            total_entropy += entropy
+            n_lengths += 1
+    
+    # Return average entropy across n-gram lengths
+    if n_lengths > 0:
+        return total_entropy / n_lengths
+    return 0.0
+
+def compute_mean_df_productivity(melody: Melody) -> float:
+    """Compute mean document frequency productivity for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency productivity, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    ngram_dfs = []
+    # Calculate document frequencies for each n-gram length
+    for n in range(1, 5):
+        df_counts = Counter()
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                df_counts[df] += 1
+                
+        if df_counts:
+            ngram_dfs.append(df_counts)
+    
+    # Use mean_productivity function to calculate result
+    return mean_productivity(ngram_dfs)
+
+def compute_mean_df_yules_k(melody: Melody) -> float:
+    """Compute mean document frequency Yule's K for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency Yule's K, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    ngram_dfs = []
+    # Calculate document frequencies for each n-gram length
+    for n in range(1, 5):
+        df_counts = Counter()
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                df_counts[df] += 1
+                
+        if df_counts:
+            ngram_dfs.append(df_counts)
+    
+    # Use yules_k function to calculate result
+    return yules_k(ngram_dfs)
+
+def compute_mean_df_simpsons_d(melody: Melody) -> float:
+    """Compute mean document frequency Simpson's D for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency Simpson's D, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    ngram_dfs = []
+    # Calculate document frequencies for each n-gram length
+    for n in range(1, 5):
+        df_counts = Counter()
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                df_counts[df] += 1
+                
+        if df_counts:
+            ngram_dfs.append(df_counts)
+    
+    # Use simpsons_d function to calculate result
+    return simpsons_d(ngram_dfs)
+
+def compute_mean_df_sichels_s(melody: Melody) -> float:
+    """Compute mean document frequency Sichel's S for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency Sichel's S, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    ngram_dfs = []
+    # Calculate document frequencies for each n-gram length
+    for n in range(1, 5):
+        df_counts = Counter()
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                df_counts[df] += 1
+                
+        if df_counts:
+            ngram_dfs.append(df_counts)
+    
+    # Use sichels_s function to calculate result
+    return sichels_s(ngram_dfs)
+
+def compute_mean_df_honores_h(melody: Melody) -> float:
+    """Compute mean document frequency Honoré's H for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean document frequency Honoré's H, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    ngram_dfs = []
+    # Calculate document frequencies for each n-gram length
+    for n in range(1, 5):
+        df_counts = Counter()
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get document frequencies for this n-gram length
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            if df > 0:
+                df_counts[df] += 1
+                
+        if df_counts:
+            ngram_dfs.append(df_counts)
+    
+    # Use honores_h function to calculate result
+    return honores_h(ngram_dfs)
+
+def compute_mean_global_weight(melody: Melody) -> float:
+    """Compute mean global weight (glob.w) for a melody.
+    
+    This follows Quesada (2007) where:
+    - Local weight loc.w(τ) = log₂(f(τ) + 1) 
+    - P_c(τ) = ratio of local frequency to corpus frequency
+    - Global weight glob.w = 1 + (sum(P_c(τ) * -log₂(P_c(τ)))) / log₂(|C|)
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+    
+    Returns
+    -------
+    float
+        Mean global weight across all m-types, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    global_weights = []
+    
+    # Calculate for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get total corpus count for normalization
+        corpus_total = sum(item['count'] for item in corpus_stats['document_frequencies'] 
+                         if item['n'] == n)
+        
+        if corpus_total == 0:
+            continue
+            
+        # Calculate P_c for each n-gram
+        pc_values = []
+        for ngram, local_freq in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            
+            if df > 0:
+                pc = local_freq / df
+                pc_values.append((pc, local_freq))
+        
+        if pc_values:
+            # Calculate global weight
+            entropy_sum = sum(pc * -np.log2(pc) for pc, _ in pc_values)
+            glob_w = 1 + (entropy_sum / np.log2(corpus_total))
+            
+            # Calculate weighted average using local frequencies
+            total_freq = sum(freq for _, freq in pc_values)
+            weighted_glob_w = glob_w * total_freq
+            global_weights.append(weighted_glob_w)
+    
+    return float(np.mean(global_weights)) if global_weights else 0.0
+
+def compute_mtcf_std_g_weight(melody: Melody) -> float:
+    """Calculate standard deviation of global weights across m-types.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    float
+        Standard deviation of global weights, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    global_weights = []
+    
+    # Calculate for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get total corpus count for normalization
+        corpus_total = sum(item['count'] for item in corpus_stats['document_frequencies'] 
+                         if item['n'] == n)
+        
+        if corpus_total == 0:
+            continue
+            
+        # Calculate P_c for each n-gram
+        for ngram, local_freq in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            
+            if df > 0:
+                pc = local_freq / df
+                # Calculate global weight for this n-gram
+                entropy = -np.log2(pc)
+                glob_w = 1 + (entropy / np.log2(corpus_total))
+                global_weights.append(glob_w)
+    
+    return float(np.std(global_weights)) if global_weights else 0.0
+
+def compute_mtcf_mean_gl_weight(melody: Melody) -> float:
+    """Calculate mean global-local weight across m-types.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    float
+        Mean global-local weight, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    gl_weights = []
+    
+    # Calculate for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get total corpus count for normalization
+        corpus_total = sum(item['count'] for item in corpus_stats['document_frequencies'] 
+                         if item['n'] == n)
+        
+        if corpus_total == 0:
+            continue
+            
+        # Calculate global-local weight for each n-gram
+        for ngram, local_freq in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            
+            if df > 0:
+                pc = local_freq / df
+                # Calculate global weight
+                entropy = -np.log2(pc)
+                glob_w = 1 + (entropy / np.log2(corpus_total))
+                # Multiply by local weight (frequency)
+                gl_weight = glob_w * local_freq
+                gl_weights.append(gl_weight)
+    
+    return float(np.mean(gl_weights)) if gl_weights else 0.0
+
+def compute_mtcf_std_gl_weight(melody: Melody) -> float:
+    """Calculate standard deviation of global-local weights across m-types.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    float
+        Standard deviation of global-local weights, or 0.0 if no n-grams found
+    """
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+
+    # Load corpus statistics
+    with open('corpus_stats.json', encoding='utf-8') as f:
+        corpus_stats = json.load(f)
+
+    gl_weights = []
+    
+    # Calculate for each n-gram length
+    for n in range(1, 5):
+        ngram_counts = tokenizer.ngram_counts(n=n)
+        
+        if not ngram_counts:
+            continue
+            
+        # Get total corpus count for normalization
+        corpus_total = sum(item['count'] for item in corpus_stats['document_frequencies'] 
+                         if item['n'] == n)
+        
+        if corpus_total == 0:
+            continue
+            
+        # Calculate global-local weight for each n-gram
+        for ngram, local_freq in ngram_counts.items():
+            df = get_ngram_document_frequency(ngram, n, corpus_stats)
+            
+            if df > 0:
+                pc = local_freq / df
+                # Calculate global weight
+                entropy = -np.log2(pc)
+                glob_w = 1 + (entropy / np.log2(corpus_total))
+                # Multiply by local weight (frequency)
+                gl_weight = glob_w * local_freq
+                gl_weights.append(gl_weight)
+    
+    return float(np.std(gl_weights)) if gl_weights else 0.0
+
+
+def get_corpus_features(melody: Melody) -> Dict:
+    """Compute all corpus-based features for a melody.
+    
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+        
+    Returns
+    -------
+    Dict
+        Dictionary of corpus-based feature values
+    """
+
+    return {
+        'tfdf_spearman': compute_tfdf_spearman(melody),
+        'tfdf_kendall': compute_tfdf_kendall(melody),
+        'mean_log_tfdf': compute_tfdf(melody),
+        'norm_log_dist': compute_norm_log_dist(melody),
+        'max_log_df': compute_max_log_df(melody),
+        'min_log_df': compute_min_log_df(melody),
+        'mean_log_df': compute_mean_log_df(melody),
+        'mean_df_entropy': compute_mean_df_entropy(melody),
+        'mean_df_productivity': compute_mean_df_productivity(melody),
+        'mean_df_yules_k': compute_mean_df_yules_k(melody),
+        'mean_df_simpsons_d': compute_mean_df_simpsons_d(melody),
+        'mean_df_sichels_s': compute_mean_df_sichels_s(melody),
+        'mean_df_honores_h': compute_mean_df_honores_h(melody)
+    }
+
+with open('mididata5.json', encoding='utf-8') as f:
+    melody_data_list = json.load(f)[:5]  # Load first 5 melodies from JSON file
+
+for melody_data in melody_data_list:
+    mel = Melody(melody_data, tempo=100)
+    print(get_corpus_features(mel))

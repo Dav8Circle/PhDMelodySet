@@ -23,8 +23,8 @@ tr.class.scheme <- list(class.symbols=c("q","e","l"), upper.limits=c(0.8118987,1
 n.limits <- c(1,5)
 
 
-source("Feature_Value_Summary_Statistics.R")
-source("M-Type_Summary_Statistics.R")
+source("Feature_Set/fantastic_stuff/Feature_Value_Summary_Statistics.R")
+source("Feature_Set/fantastic_stuff/M-Type_Summary_Statistics.R")
 
 compute.features <- function(melody.filenames=list.files(path=dir,pattern=".csv"),dir=".",output="melody.wise", use.segmentation=TRUE, write.out=FALSE) {
 	if(output!="melody.wise" & use.segmentation==FALSE) {
@@ -145,7 +145,7 @@ make.phrases.from.melody <- function(melody.filename,file.id) {
 	} 
 	
 compute.corpus.based.feature.frequencies <- function(analysis.melodies="analysis_dir",ana.dir="analysis_dir",corpus="corpus_dir",write.out.corp.freq=TRUE,comp.feat.use.seg=TRUE,comp.feat.output="phrase.wise") {
-	source("Frequencies_Summary_Statistics.R")
+	source("Feature_Set/fantastic_stuff/Frequencies_Summary_Statistics.R")
 	
 	if((substring(analysis.melodies[1],nchar(analysis.melodies[1])-3,nchar(analysis.melodies[1])-3)) == ".") {
 		if((substring(analysis.melodies[1],nchar(analysis.melodies[1])-2,nchar(analysis.melodies[1]))) == "txt") {
@@ -183,7 +183,7 @@ compute.corpus.based.feature.frequencies <- function(analysis.melodies="analysis
 
 	
 compute.m.type.corpus.based.features <- function(analysis.melodies,ana.dir=".",corpus,corpus.dir="."){
-	source("M-Type_Corpus_Features.R")
+	source("Feature_Set/fantastic_stuff/M-Type_Corpus_Features.R")
 	
 	#print(analysis.melodies)
 	if(ana.dir!=".") {
@@ -225,7 +225,7 @@ compute.m.type.corpus.based.features <- function(analysis.melodies,ana.dir=".",c
 
 feature.similarity <- function(mel.fns=list.files(path=dir,pattern=".csv"),dir=".",features=c("p.range","step.cont.glob.var","tonalness","d.eq.trans"),use.segmentation=FALSE,method="euclidean",eucl.stand=TRUE,corpus.dens.list.fn=NULL,average=TRUE){
 	
-	source("Feature_Similarity.R")
+	source("Feature_Set/fantastic_stuff/Feature_Similarity.R")
 	require(cluster)
 	mel.feat <- compute.features(melody.filenames=mel.fns,dir=dir,output="melody.wise",use.segmentation=use.segmentation)
 	mel.feat.new <- as.data.frame(mel.feat[,features])

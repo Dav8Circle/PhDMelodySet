@@ -4,12 +4,11 @@ from MIDI sequence data.
 """
 __author__ = "David Whyatt"
 import json
-from features import pitch_range, pitch_standard_deviation, pitch_entropy
 
 class Melody:
     """Class to represent a melody from a MIDI sequence. This class is used to extract
     information from a json file containing MIDI sequence data, formatted according to
-    pretty_midi conventions:
+
     A note is represented as a string in the format:
     'Note(start=0.0, end=0.25, pitch=60, velocity=100)'
     We don't need the velocity, so we can ignore it here.
@@ -93,9 +92,9 @@ def read_midijson(file_path: str) -> dict:
 # melody_data = read_midijson('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[0]
 # melody = Melody(melody_data)
 
-# This is how you'd get the pitches, starts, and ends for all melodies in the dataset, and
-# could easily then compute all the features for the dataset, too.
-for i in range(0, 1920, 1):
-    melody_data = read_midijson('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
-    melody = Melody(melody_data, tempo=100)
-    print(pitch_range(melody.pitches), pitch_standard_deviation(melody.pitches), pitch_entropy(melody.pitches))
+# # This is how you'd get the pitches, starts, and ends for all melodies in the dataset, and
+# # could easily then compute all the features for the dataset, too.
+# for i in range(0, 1920, 1):
+#     melody_data = read_midijson('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
+#     melody = Melody(melody_data, tempo=100)
+#     print(pitch_range(melody.pitches), pitch_standard_deviation(melody.pitches), pitch_entropy(melody.pitches))

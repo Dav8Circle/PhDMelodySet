@@ -7,13 +7,13 @@ __author__ = "David Whyatt"
 from collections import Counter
 import numpy as np
 
-def yules_k(ngram_counts: Counter) -> float:
+def yules_k(ngram_counts: list[Counter]) -> float:
     """Calculates mean Yule's K statistic over m-type n-grams.
     
     Parameters
     ----------
-    ngram_counts : Counter
-        Counter object containing n-gram counts for each length n
+    ngram_counts : list[Counter]
+        List of Counter objects containing n-gram counts for each length n
     
     Returns
     -------
@@ -25,7 +25,17 @@ def yules_k(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations, with 1-grams, 2-grams, 3-grams, and 4-grams
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1, (('u2', 'e'), ('u2', 'e')): 1, (('u2', 'e'), ('d2', 'e')): 1, (('d2', 'e'), ('d2', None)): 1, (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1, (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1, (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1})]
+    >>> counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> yules_k(counts)  # High K indicates more repetition
     20.0
     
@@ -50,26 +60,25 @@ def yules_k(ngram_counts: Counter) -> float:
         
         # Calculate N (total tokens)
         N = sum(counts.values())
-        
         if N == 0:
             continue
             
-        # Calculate sum(vm * m²)
+        # Calculate sum(vm * m²) where vm is frequency of value m
         vm_m2_sum = sum(freq * (count * count) 
-                        for count, freq in freq_spec.items())
+                       for count, freq in freq_spec.items())
         
         # Calculate K with scaling factor of 1000
         K = 1000 * (vm_m2_sum - N) / (N * N)
         k_values.append(K)
-    
+
     return float(np.mean(k_values)) if k_values else 0.0
 
-def simpsons_d(ngram_counts: Counter) -> float:
+def simpsons_d(ngram_counts: list[Counter]) -> float:
     """Compute mean Simpson's D diversity index over m-type n-grams.
     
     Parameters
     ----------
-    ngram_counts : Counter
+    ngram_counts : list[Counter]
         List of Counter objects containing n-gram counts for each n
     
     Returns
@@ -82,9 +91,19 @@ def simpsons_d(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> counts = counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> simpsons_d(counts)  # Higher D indicates less diversity
-    0.1666...
+    0.022...
     
     >>> # Empty input
     >>> simpsons_d([])
@@ -94,6 +113,7 @@ def simpsons_d(ngram_counts: Counter) -> float:
     >>> simpsons_d([Counter()])
     0.0
     """
+
     if not ngram_counts:
         return 0.0
     
@@ -115,14 +135,14 @@ def simpsons_d(ngram_counts: Counter) -> float:
     
     return float(np.mean(d_values)) if d_values else 0.0
 
-def sichels_s(ngram_counts: Counter) -> float:
+def sichels_s(ngram_counts: list[Counter]) -> float:
     """Compute mean Sichel's S statistic over m-type n-grams.
     
     Parameters
     ----------
-    ngram_counts : Counter
+    ngram_counts : list[Counter]
         List of Counter objects containing n-gram counts for each n
-    
+
     Returns
     -------
     float
@@ -133,9 +153,19 @@ def sichels_s(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> counts = counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> sichels_s(counts)  # Higher S indicates more doubles
-    0.333...
+    0.111...
     
     >>> # Empty input
     >>> sichels_s([])
@@ -168,12 +198,12 @@ def sichels_s(ngram_counts: Counter) -> float:
     
     return float(np.mean(s_values)) if s_values else 0.0
 
-def honores_h(ngram_counts: Counter) -> float:
+def honores_h(ngram_counts: list[Counter]) -> float:
     """Compute mean Honore's H statistic over m-type n-grams.
     
     Parameters
     ----------
-    ngram_counts : Counter
+    ngram_counts : list[Counter]
         List of Counter objects containing n-gram counts for each n
     
     Returns
@@ -186,9 +216,19 @@ def honores_h(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> counts = counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> honores_h(counts)  # Higher H indicates more unique words
-    "TODO" 
+    2072.326... 
     
     >>> # Empty input
     >>> honores_h([])
@@ -225,7 +265,7 @@ def honores_h(ngram_counts: Counter) -> float:
     
     return float(np.mean(h_values)) if h_values else 0.0
 
-def mean_entropy(ngram_counts: Counter) -> float:
+def mean_entropy(ngram_counts: list[Counter]) -> float:
     """Compute mean entropy of m-type n-gram distribution.
     
     Parameters
@@ -243,9 +283,19 @@ def mean_entropy(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> counts = counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> mean_entropy(counts)  # Higher entropy indicates more randomness
-    "TODO"
+    0.939...
     
     >>> # Empty input
     >>> mean_entropy([])
@@ -281,7 +331,7 @@ def mean_entropy(ngram_counts: Counter) -> float:
     
     return float(np.mean(entropy_values)) if entropy_values else 0.0
 
-def mean_productivity(ngram_counts: Counter) -> float:
+def mean_productivity(ngram_counts: list[Counter]) -> float:
     """Compute mean productivity of m-type n-gram distribution.
     
     Parameters
@@ -299,9 +349,19 @@ def mean_productivity(ngram_counts: Counter) -> float:
     --------
     >>> from collections import Counter
     >>> # Sample melody [60, 62, 64, 62, 60] with equal note durations
-    >>> counts = [Counter({(('u2', 'e'),): 2, (('d2', 'e'),): 1, (('d2', None),): 1})]
+    >>> counts = counts = [Counter({
+    ...     (('u2', 'e'),): 2,
+    ...     (('d2', 'e'),): 1,
+    ...     (('d2', None),): 1,
+    ...     (('u2', 'e'), ('u2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e')): 1,
+    ...     (('u2', 'e'), ('d2', 'e'), ('d2', None)): 1,
+    ...     (('u2', 'e'), ('u2', 'e'), ('d2', 'e'), ('d2', None)): 1
+    ... })]
     >>> mean_productivity(counts)  # Higher productivity indicates more hapax legomena
-    0.5
+    0.8
     
     >>> # Empty input
     >>> mean_productivity([])
