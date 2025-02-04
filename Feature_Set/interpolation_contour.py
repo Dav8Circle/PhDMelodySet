@@ -230,7 +230,7 @@ class InterpolationContour:
         gradients = np.diff(reversals_pitches) / np.diff(reversals_time)
 
         # Calculate durations
-        durations = np.diff(reversals_time)
+        durations = abs(np.diff(reversals_time))
 
         # Create weighted gradients vector
         samples_per_duration = np.round(durations * 10).astype(

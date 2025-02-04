@@ -34,31 +34,28 @@ def _convert_tuples_to_strings(data: Dict) -> Dict:
             converted[key] = value
     return converted
 
-def _convert_strings_to_tuples(data: Dict) -> Dict:
-    """Convert string keys back to tuples after JSON deserialization.
+def _convert_strings_to_tuples(key: str) -> Tuple:
+    """Convert a string-encoded tuple key back to a tuple.
     
     Parameters
     ----------
-    data : Dict
-        Dictionary with string-encoded tuple keys
+    key : str
+        String-encoded tuple key
         
     Returns
     -------
-    Dict
-        Dictionary with strings converted back to tuples
+    Tuple
+        Tuple converted from string
     """
-    converted = {}
-    for key, value in data.items():
-        try:
-            # Remove parentheses and split on comma
-            key_str = key.strip('()').split(',')
-            # Convert "None" strings back to None and strip quotes/spaces
-            tuple_key = tuple(None if x.strip().strip("'\"") == "None" else x.strip().strip("'\"") for x in key_str)
-            converted[tuple_key] = value
-        except (AttributeError, ValueError):
-            # If not a tuple string, keep original key
-            converted[key] = value
-    return converted
+    try:
+        # Remove parentheses and split on comma
+        key_str = key.strip('()').split(',')
+        # Convert "None" strings back to None and strip quotes/spaces
+        tuple_key = tuple(None if x.strip().strip("'\"") == "None" else x.strip().strip("'\"") for x in key_str)
+        return tuple_key
+    except (AttributeError, ValueError):
+        # If not a tuple string, return the original key
+        return key
 
 def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 4)) -> Dict:
     """Compute n-gram frequencies across the entire corpus.
@@ -90,14 +87,10 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
             corpus_counts[n].update(counts)
     
     # Convert defaultdict and Counter objects to regular dicts for JSON serialization
-    frequencies = {'document_frequencies': []}
+    frequencies = {'document_frequencies': {}}
     for n, counts in corpus_counts.items():
         for k, v in counts.items():
-            frequencies['document_frequencies'].append({
-                'n': n,
-                'ngram': str(k),
-                'count': v
-            })
+            frequencies['document_frequencies'][str(k)] = {'count': v}
     
     return {
         'document_frequencies': frequencies['document_frequencies'],
@@ -135,17 +128,16 @@ def load_corpus_stats(filename: str) -> Dict:
         stats = json.load(f)
     
     # Convert string keys back to tuples where needed
-    stats['document_frequencies'] = [
-        {'n': item['n'], 'ngram': _convert_strings_to_tuples({item['ngram']: item['count']})}
-        for item in stats['document_frequencies']
-    ]
+    stats['document_frequencies'] = {
+        _convert_strings_to_tuples(k): v for k, v in stats['document_frequencies'].items()
+    }
     
     return stats
 
 if __name__ == "__main__":
     # Example usage
     melodies = []
-    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats.json'
+    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json'
     for i in range(0, 1920, 1):
         melody_data = read_midijson(
             '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
@@ -154,10 +146,10 @@ if __name__ == "__main__":
     
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'corpus_stats.json')
+    save_corpus_stats(corpus_stats, 'corpus_stats2.json')
     
     # Load and verify
-    loaded_stats = load_corpus_stats('corpus_stats.json')
+    loaded_stats = load_corpus_stats('corpus_stats2.json')
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")

@@ -9,7 +9,7 @@ item_bank <-
   rename(item_id = id)
 
 df <- 
-  read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", n_max = 1e6) |> 
+  read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", n_max = 1e4) |> 
   filter(test == "mdt") |> 
   left_join(item_bank |> select(- c("discrimination", "difficulty", "guessing", "inattention")), by = "item_id")
 
@@ -218,3 +218,41 @@ tmp$file_name %>% last()
 
 # TODO - IDyOM features?
 # TODO - FANTASTIC features?
+
+# Read in item features
+item_features <- read.csv("item_features.csv", header=TRUE)
+names(item_features)
+
+# First join the data
+item_features <- item_features %>%
+  mutate(melody_id = as.double(melody_id))
+
+df3 <- left_join(item_features, df2, by = c("melody_id" = "item_id"))
+
+# Handle NA values before model fitting
+df3 <- na.omit(df3)
+
+# Set NA action for model fitting
+options(na.action = "na.fail")
+
+# Create model using proper column references
+full_mod <- lmer(score_item ~ pitch_features.pitch_range + 
+                pitch_features.pitch_standard_deviation + 
+                 pitch_features.pitch_entropy + 
+                 pitch_features.mean_pitch + 
+                 pitch_features.most_common_pitch + 
+                 pitch_features.number_of_pitches + 
+                 (1|user_id),
+                 data = df3,
+                 na.action = na.fail,
+                 verbose = 100)
+
+# Run dredge with trace to see progress
+dredge_results <- dredge(full_mod, trace = TRUE)
+
+# View best models
+head(dredge_results)
+
+# Get best model
+best_mod <- get.models(dredge_results, 1)[[1]]
+summary(best_mod)
