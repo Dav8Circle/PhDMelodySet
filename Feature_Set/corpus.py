@@ -74,24 +74,24 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
     """
     tokenizer = FantasticTokenizer()
     corpus_counts = defaultdict(Counter)
-    
+
     for melody in melodies:
         # Tokenize melody
         tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-        
+
         # Get n-grams for each length
         for n in range(n_range[0], n_range[1] + 1):
             counts = tokenizer.ngram_counts(n)
-            
+
             # Update corpus-wide counts
             corpus_counts[n].update(counts)
-    
+
     # Convert defaultdict and Counter objects to regular dicts for JSON serialization
     frequencies = {'document_frequencies': {}}
     for n, counts in corpus_counts.items():
         for k, v in counts.items():
             frequencies['document_frequencies'][str(k)] = {'count': v}
-    
+
     return {
         'document_frequencies': frequencies['document_frequencies'],
         'corpus_size': len(melodies),
@@ -126,12 +126,12 @@ def load_corpus_stats(filename: str) -> Dict:
     """
     with open(filename, encoding='utf-8') as f:
         stats = json.load(f)
-    
+
     # Convert string keys back to tuples where needed
     stats['document_frequencies'] = {
         _convert_strings_to_tuples(k): v for k, v in stats['document_frequencies'].items()
     }
-    
+
     return stats
 
 if __name__ == "__main__":
@@ -143,11 +143,11 @@ if __name__ == "__main__":
             '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
         melody = Melody(melody_data, tempo=100)
         melodies.append(melody)
-    
+
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
     save_corpus_stats(corpus_stats, 'corpus_stats2.json')
-    
+
     # Load and verify
     loaded_stats = load_corpus_stats('corpus_stats2.json')
     print("Corpus statistics saved and loaded successfully.")

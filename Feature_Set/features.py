@@ -8,6 +8,7 @@ import json
 import math
 import csv
 from collections import Counter
+import time
 from typing import Dict
 from algorithms import (
     rank_values, nine_percent_significant_values, circle_of_fifths,
@@ -224,7 +225,7 @@ def number_of_common_pitches(pitches: list[int]) -> int:
     return len(significant_pcs)
 
 def number_of_pitches(pitches: list[int]) -> int:
-    """Count total number of pitches.
+    """Count number of unique pitches.
 
     Parameters
     ----------
@@ -234,9 +235,9 @@ def number_of_pitches(pitches: list[int]) -> int:
     Returns
     -------
     int
-        Total number of pitches
+        Number of unique pitches
     """
-    return len(pitches)
+    return len(set(pitches))
 
 def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:
     """Create histogram of pitch classes arranged in circle of fifths.
@@ -416,7 +417,7 @@ def interval_entropy(pitches: list[int]) -> float:
     """
     return shannon_entropy(pitch_interval(pitches))
 
-def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:
+def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
     """Calculate duration-weighted distribution of intervals.
 
     Parameters
@@ -624,7 +625,7 @@ def number_of_common_melodic_intervals(pitches: list[int]) -> int:
     return len(significant_intervals)
 
 def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
-    """Count occurrences of most common interval.
+    """Calculate proportion of most common interval.
 
     Parameters
     ----------
@@ -634,7 +635,7 @@ def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
     Returns
     -------
     float
-        Count of most common interval, or 0 if no intervals
+        Proportion of most common interval, or 0 if no intervals
     """
     intervals = pitch_interval(pitches)
     if not intervals:
@@ -644,7 +645,7 @@ def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
     for interval in intervals:
         interval_counts[interval] = interval_counts.get(interval, 0) + 1
         
-    return max(interval_counts.values())
+    return max(interval_counts.values()) / len(intervals)
 
 # Contour Features
 def get_step_contour_features(pitches: list[int], starts: list[float], ends: list[float]) -> StepContour:
@@ -1056,7 +1057,12 @@ def chromatic_motion(pitches: list[int]) -> float:
     return chromatic_motion_proportion(pitches)
 
 def melodic_embellishment(pitches: list[int], starts: list[float], ends: list[float]) -> float:
-    """Calculate the proportion of melodic embellishments in the melody.
+    """Calculate proportion of melodic embellishments (e.g. trills, turns, neighbor tones).
+
+    Melodic embellishments are identified by looking for notes with a duration 1/3rd of the
+    adjacent note's duration that move away from and return to a pitch level, or oscillate
+    between two pitches.
+    
 
     Parameters
     ----------
@@ -1289,22 +1295,43 @@ def compute_tfdf(melody: Melody) -> float:
     with open('corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
-    # Calculate TFDF for each n-gram length
+    # Calculate TFDF using dot product for each n-gram length
     for n in range(1, 5):
         ngram_counts = tokenizer.ngram_counts(n=n)
+        if not ngram_counts:
+            continue
+            
+        # Get TF and DF vectors
+        tf_vector = []
+        df_vector = []
         for ngram, tf in ngram_counts.items():
             df = get_ngram_document_frequency(ngram, corpus_stats)
             if df > 0:
-                tfdf = math.log(tf * df + 1)
-                tfdf_values.append(tfdf)
+                # Log transform the frequencies
+                tf_vector.append(math.log(tf + 1))
+                df_vector.append(math.log(df + 1))
+        
+        # Calculate dot product if vectors are non-empty
+        if tf_vector and df_vector:
+            # Convert to numpy arrays for dot product
+            tf_array = np.array(tf_vector)
+            df_array = np.array(df_vector)
+            
+            # Normalize vectors
+            tf_norm = tf_array / np.sqrt(np.sum(tf_array**2))
+            df_norm = df_array / np.sqrt(np.sum(df_array**2))
+            
+            # Calculate dot product and append
+            tfdf = np.dot(tf_norm, df_norm)
+            tfdf_values.append(tfdf)
 
-    # Calculate mean log TFDF
+    # Calculate mean TFDF
     if tfdf_values:
-        mean_log_tfdf = sum(tfdf_values) / len(tfdf_values)
+        mean_tfdf = float(np.mean(tfdf_values))
     else:
-        mean_log_tfdf = 0.0
+        mean_tfdf = 0.0
 
-    return mean_log_tfdf
+    return mean_tfdf
 
 def compute_norm_log_dist(melody: Melody) -> float:
     """Compute normalized distance between term and document frequencies.
@@ -1335,19 +1362,26 @@ def compute_norm_log_dist(melody: Melody) -> float:
     # Calculate distances for each n-gram length
     for n in range(1, 5):
         ngram_counts = tokenizer.ngram_counts(n=n)
+        if not ngram_counts:
+            continue
+            
+        # Get total term frequency for normalization
+        total_tf = sum(ngram_counts.values())
+        
         for ngram, tf in ngram_counts.items():
             df = get_ngram_document_frequency(ngram, corpus_stats)
             if df > 0:
-                # Normalize and take log of frequencies
-                norm_tf = math.log(tf + 1)
-                norm_df = math.log(df + 1)
-                # Calculate distance between normalized frequencies
+                # Normalize frequencies by total counts
+                norm_tf = tf / total_tf
+                norm_df = df / len(corpus_stats['document_frequencies'])
+                
+                # Calculate absolute difference
                 dist = abs(norm_tf - norm_df)
                 distances.append(dist)
 
-    # Calculate mean distance
+    # Calculate mean normalized distance
     if distances:
-        mean_dist = sum(distances) / len(distances)
+        mean_dist = float(np.mean(distances))
     else:
         mean_dist = 0.0
 
@@ -2025,7 +2059,7 @@ def get_interval_features(melody: Melody) -> Dict:
     interval_features['distance_between_most_prevalent_melodic_intervals'] = distance_between_most_prevalent_melodic_intervals(melody.pitches)
     interval_features['melodic_interval_histogram'] = melodic_interval_histogram(melody.pitches)
     interval_features['melodic_large_intervals'] = melodic_large_intervals(melody.pitches)
-    interval_features['variable_melodic_intervals'] = variable_melodic_intervals(melody.pitches, 13)  # Example interval level
+    interval_features['variable_melodic_intervals'] = variable_melodic_intervals(melody.pitches, 13)  # TODO: Add more interval levels
     interval_features['number_of_common_melodic_intervals'] = number_of_common_melodic_intervals(melody.pitches)
     interval_features['prevalence_of_most_common_melodic_interval'] = prevalence_of_most_common_melodic_interval(melody.pitches)
     
@@ -2183,7 +2217,7 @@ def get_all_features_csv(filename) -> None:
     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
         melody_data_list = json.load(f)
         print(f"Processing {len(melody_data_list)} melodies")
-
+    start_time = time.time()
     # Initialize list to store all feature rows
     all_features = []
     
@@ -2227,7 +2261,7 @@ def get_all_features_csv(filename) -> None:
             row.extend(features.values())
             
         all_features.append(row)
-        print(f"Processed melody {i}/{len(melody_data_list)}")
+        print(f"Processed melody {i}/{len(melody_data_list)}", end='\r')
 
     # Write to CSV
     output_file = f'{filename}.csv'
@@ -2236,6 +2270,11 @@ def get_all_features_csv(filename) -> None:
         writer.writerow(headers)
         writer.writerows(all_features)
     print(f"Features saved to {output_file}")
+    end_time = time.time()
+    total_time = end_time - start_time
+    avg_time = total_time / len(melody_data_list)
+    print(f"\nGenerated in total time: {total_time:.2f} seconds")
+    print(f"Average time per melody: {avg_time:.3f} seconds")
 
 if __name__ == "__main__":
     # get_all_features_json('item_features')
