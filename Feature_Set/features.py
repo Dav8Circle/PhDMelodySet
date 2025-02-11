@@ -986,6 +986,46 @@ def inscale(pitches: list[int]) -> int:
 
     return 1
 
+def temperley_likelihood(pitches: list[int]) -> float:
+    '''
+    Calculates the likelihood of a melody using Bayesian reasoning,
+    according to David Temperley's model 
+    (http://davidtemperley.com/wp-content/uploads/2015/11/temperley-cs08.pdf).
+    '''
+    # represent all possible notes as int
+    notes_ints = np.arange(0, 84, 1)
+
+    # Calculate central pitch profile
+    central_pitch = np.mean(pitches)
+    range_profile = scipy.stats.norm.pdf(notes_ints, loc=central_pitch, scale=np.sqrt(23.0))
+
+    # Get key probabilities
+
+    rpk_major = [0.184, 0.001, 0.155, 0.003, 0.191, 0.109, 0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 7
+    rpk_minor = [0.192, 0.005, 0.149, 0.179, 0.002, 0.144, 0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 7
+
+    # Calculate total probability
+    total_prob = 1.0
+    for i in range(1, len(pitches)):
+        # Calculate proximity profile centered on previous note
+        prox_profile = scipy.stats.norm.pdf(notes_ints, loc=pitches[i-1], scale=np.sqrt(10))
+        rp = range_profile * prox_profile
+
+        # Apply key profile based on major/minor
+        if 'major' in compute_tonality_vector([p % 12 for p in pitches])[0][0]:
+            rpk = rp * rpk_major
+        else:
+            rpk = rp * rpk_minor
+
+        # Normalize probabilities
+        rpk_normed = rpk / np.sum(rpk)
+
+        # Get probability of current note
+        note_prob = rpk_normed[pitches[i]]
+        total_prob *= note_prob
+
+    return total_prob
+
 def get_narmour_features(melody: Melody) -> Dict:
     """Calculate Narmour's implication-realization features.
 
@@ -2146,7 +2186,7 @@ def get_tonality_features(melody: Melody) -> Dict:
     tonality_features['tonal_spike'] = tonal_spike(melody.pitches)
     tonality_features['referent'] = referent(melody.pitches)
     tonality_features['inscale'] = inscale(melody.pitches)
-    
+    tonality_features['temperley_likelihood'] = temperley_likelihood(melody.pitches)
     return tonality_features
 
 def get_melodic_movement_features(melody: Melody) -> Dict:
