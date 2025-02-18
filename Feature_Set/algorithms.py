@@ -812,3 +812,118 @@ def ukkonen_measure(pitches1: list[int], pitches2: list[int], n: int) -> int:
     um = sum(abs(s_count[ngram] - t_count[ngram]) for ngram in all_ngrams)
 
     return um
+
+def scalic_proportion(pitches: list[int]) -> float:
+    """Calculate proportion of notes that form scalic sequences.
+    
+    Considers repeated notes as extending duration of current note.
+    Only counts sequences longer than 2 notes moving in same direction.
+    Uses tonality identified by Krumhansl-Schmuckler algorithm.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of notes in scalic sequences (0.0-1.0)
+
+    Examples
+    --------
+    Twinkle Twinkle Little Star is in C major, with a total of 14 notes.
+    However, many are repeated notes, which are omitted from the calculation.
+    There are 8 notes once the repetitions are removed, 6 of which form a scalic sequence.
+    >>> scalic_proportion([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
+    0.75
+
+    The lick is in D minor, with 4 of 7 notes as conjunct motions
+    >>> scalic_proportion([62, 64, 65, 67, 64, 60, 62])
+    0.571...
+    
+    C major scale scores 1.0
+    >>> scalic_proportion([60, 62, 64, 65, 67, 69, 71, 72])
+    1.0
+    """
+    if len(pitches) < 3:
+        return 0.0
+
+    # Remove repeated notes
+    deduped = []
+    for pitch in pitches:
+        if not deduped or pitch != deduped[-1]:
+            deduped.append(pitch)
+
+    if len(deduped) < 3:
+        return 0.0
+
+    # Get key using KS algorithm
+    pitch_classes = [p % 12 for p in deduped]
+    key_correlations = compute_tonality_vector(pitch_classes)
+    key = key_correlations[0][0]
+
+    # Determine scale degrees for identified key
+    root = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+            'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11,
+            'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5,
+            'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}[key.split()[0]]
+    if 'minor' in key.lower():
+        scale = [(root + i) % 12 for i in [0, 2, 3, 5, 7, 8, 10]]
+    else:
+        scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
+    # Find scalic sequences
+    scalic_notes = 0
+    i = 0
+    while i < len(deduped) - 2:
+        sequence = deduped[i:]
+
+        # Determine if sequence is ascending or descending
+        if len(sequence) < 2:
+            i += 1
+            continue
+
+        direction = 1 if sequence[1] > sequence[0] else -1
+
+        # Get pitch classes for sequence
+        sequence_pcs = [p % 12 for p in sequence]
+        start_pc = sequence_pcs[0]
+
+        # Find starting position in scale
+        best_start_idx = -1
+        for start_scale_idx, scale_pc in enumerate(scale):
+            if start_pc == scale_pc:
+                best_start_idx = start_scale_idx
+                break
+
+        if best_start_idx == -1:
+            i += 1
+            continue
+        # Get scale pattern in correct direction
+        if direction == 1:
+            # For ascending, wrap around to create continuous pattern
+            scale_pattern = scale[best_start_idx:] + scale[:best_start_idx] + scale[best_start_idx:] + scale[:best_start_idx]
+        else:
+            # For descending, reverse the scale and wrap around correctly
+            reversed_scale = scale[::-1]  # Reverse the full scale first
+            # Find the start index in reversed scale
+            start_idx = len(scale) - best_start_idx - 1
+            # Create continuous descending pattern by repeating the wrapped scale
+            scale_pattern = (reversed_scale[start_idx:] + reversed_scale[:start_idx]) * 2
+
+        # Check how many notes match scale pattern
+        seq_length = 0
+        for j, pc in enumerate(sequence_pcs):
+            if j >= len(scale_pattern):
+                break
+            if pc != scale_pattern[j]:
+                break
+            seq_length += 1
+
+        if seq_length >= 3:
+            scalic_notes += seq_length
+            i += seq_length
+        else:
+            i += 1
+
+    return scalic_notes / len(deduped)

@@ -8,13 +8,15 @@ import json
 import math
 import csv
 from collections import Counter
+from random import choices
 import time
 from typing import Dict
 from algorithms import (
-    rank_values, nine_percent_significant_values, circle_of_fifths,
+    rank_values, nine_percent_significant_values, circle_of_fifths, 
     compute_tonality_vector, arpeggiation_proportion,
     chromatic_motion_proportion, stepwise_motion_proportion,
-    repeated_notes_proportion, melodic_embellishment_proportion
+    repeated_notes_proportion, melodic_embellishment_proportion,
+    scalic_proportion
 )
 # from correlations import kendall_tau
 from complexity import (
@@ -31,6 +33,8 @@ from stats import range_func, standard_deviation, shannon_entropy, mode
 from step_contour import StepContour
 import numpy as np
 import scipy
+from multiprocessing import Pool, cpu_count
+import itertools
 
 # Pitch Features
 
@@ -444,8 +448,8 @@ def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
 
     return distribution_proportions(weighted_intervals)
 
-def interval_direction(pitches: list[int]) -> list[str]:
-    """Determine direction of each interval.
+def interval_direction(pitches: list[int]) -> tuple[float, float]:
+    """Determine direction of each interval and calculate mean and standard deviation.
 
     Parameters
     ----------
@@ -454,13 +458,25 @@ def interval_direction(pitches: list[int]) -> list[str]:
 
     Returns
     -------
-    list[str]
-        List of interval directions ("up", "same", or "down")
+    tuple[float, float]
+        Mean and standard deviation of interval directions, where:
+        1 represents upward motion
+        0 represents same pitch
+        -1 represents downward motion
     """
-    return ["up" if pitches[i + 1] > pitches[i]
-            else "same" if pitches[i + 1] == pitches[i]
-            else "down"
+    directions = [1 if pitches[i + 1] > pitches[i]
+                 else 0 if pitches[i + 1] == pitches[i]
+                 else -1
             for i in range(len(pitches) - 1)]
+    
+    if not directions:
+        return 0.0, 0.0
+        
+    mean = sum(directions) / len(directions)
+    variance = sum((x - mean) ** 2 for x in directions) / len(directions)
+    std_dev = math.sqrt(variance)
+    
+    return mean, std_dev
 
 def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:
     """Calculate average interval span of melodic arcs.
@@ -690,6 +706,22 @@ def get_interpolation_contour_features(pitches: list[int], starts: list[float]) 
 
 # Duration Features
 
+def get_tempo(melody: Melody) -> float:
+    """Access tempo of melody.
+
+    Parameters
+    ----------
+    melody : Melody
+        The melody to analyze
+
+    Returns
+    -------
+    float
+        Tempo of melody in bpm
+    
+    """
+    return melody.tempo
+
 def duration_range(starts: list[float], ends: list[float]) -> float:
     """Calculate range between longest and shortest note duration.
 
@@ -791,24 +823,8 @@ def note_density(starts: list[float], ends: list[float]) -> float:
         Note density (notes per unit time)
     """
     return len(starts) / global_duration(starts, ends)
-
-def ioi(starts: list[float]) -> list[float]:
-    """Calculate inter-onset intervals between consecutive notes.
-
-    Parameters
-    ----------
-    starts : list[float]
-        List of note start times
-
-    Returns
-    -------
-    list[float]
-        List of inter-onset intervals
-    """
-    return [starts[i+1] - starts[i] for i in range(len(starts)-1)]
-
-def ioi_ratio(starts: list[float]) -> list[float]:
-    """Calculate ratios between consecutive inter-onset intervals.
+def ioi(starts: list[float]) -> tuple[float, float]:
+    """Calculate mean and standard deviation of inter-onset intervals.
 
     Parameters
     ----------
@@ -817,14 +833,16 @@ def ioi_ratio(starts: list[float]) -> list[float]:
 
     Returns
     -------
-    list[float]
-        List of IOI ratios
+    tuple[float, float]
+        Mean and standard deviation of inter-onset intervals
     """
-    ioi_list = ioi(starts)
-    return [ioi_list[i+1]/ioi_list[i] for i in range(len(ioi_list)-1)]
+    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    if not intervals:
+        return 0.0, 0.0
+    return float(np.mean(intervals)), float(np.std(intervals))
 
-def ioi_contour(starts: list[float]) -> list[int]:
-    """Calculate contour of inter-onset intervals.
+def ioi_ratio(starts: list[float]) -> tuple[float, float]:
+    """Calculate mean and standard deviation of IOI ratios.
 
     Parameters
     ----------
@@ -833,16 +851,35 @@ def ioi_contour(starts: list[float]) -> list[int]:
 
     Returns
     -------
-    list[int]
-        List of contour values (-1: shorter, 0: same, 1: longer)
+    tuple[float, float]
+        Mean and standard deviation of IOI ratios
     """
-    ioi_list = ioi(starts)
-    if len(ioi_list) < 2:
-        return []
+    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    if len(intervals) < 2:
+        return 0.0, 0.0
+    ratios = [intervals[i+1]/intervals[i] for i in range(len(intervals)-1)]
+    return float(np.mean(ratios)), float(np.std(ratios))
 
-    ratios = [ioi_list[i+1]/ioi_list[i] for i in range(len(ioi_list)-1)]
+def ioi_contour(starts: list[float]) -> tuple[float, float]:
+    """Calculate mean and standard deviation of IOI contour.
 
-    return [int(np.sign(ratio - 1)) for ratio in ratios]
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+
+    Returns
+    -------
+    tuple[float, float]
+        Mean and standard deviation of contour values (-1: shorter, 0: same, 1: longer)
+    """
+    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    if len(intervals) < 2:
+        return 0.0, 0.0
+        
+    ratios = [intervals[i+1]/intervals[i] for i in range(len(intervals)-1)]
+    contour = [int(np.sign(ratio - 1)) for ratio in ratios]
+    return float(np.mean(contour)), float(np.std(contour))
 
 # Tonality Features
 def tonalness(pitches: list[int]) -> float:
@@ -993,16 +1030,17 @@ def temperley_likelihood(pitches: list[int]) -> float:
     (http://davidtemperley.com/wp-content/uploads/2015/11/temperley-cs08.pdf).
     '''
     # represent all possible notes as int
-    notes_ints = np.arange(0, 84, 1)
+    notes_ints = np.arange(0, 120, 1)
 
     # Calculate central pitch profile
-    central_pitch = np.mean(pitches)
+    central_pitch_profile = scipy.stats.norm.pdf(notes_ints, loc=68, scale=np.sqrt(5.0))
+    central_pitch = choices(notes_ints, central_pitch_profile)
     range_profile = scipy.stats.norm.pdf(notes_ints, loc=central_pitch, scale=np.sqrt(23.0))
 
     # Get key probabilities
 
-    rpk_major = [0.184, 0.001, 0.155, 0.003, 0.191, 0.109, 0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 7
-    rpk_minor = [0.192, 0.005, 0.149, 0.179, 0.002, 0.144, 0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 7
+    rpk_major = [0.184, 0.001, 0.155, 0.003, 0.191, 0.109, 0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 10
+    rpk_minor = [0.192, 0.005, 0.149, 0.179, 0.002, 0.144, 0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 10
 
     # Calculate total probability
     total_prob = 1.0
@@ -2060,6 +2098,8 @@ def get_pitch_features(melody: Melody) -> Dict:
     pitch_features['pitch_range'] = pitch_range(melody.pitches)
     pitch_features['pitch_standard_deviation'] = pitch_standard_deviation(melody.pitches)
     pitch_features['pitch_entropy'] = pitch_entropy(melody.pitches)
+    pitch_features['pcdist1'] = pcdist1(melody.pitches, melody.starts, melody.ends)
+    pitch_features['basic_pitch_histogram'] = basic_pitch_histogram(melody.pitches)
     pitch_features['mean_pitch'] = mean_pitch(melody.pitches)
     pitch_features['most_common_pitch'] = most_common_pitch(melody.pitches)
     pitch_features['number_of_pitches'] = number_of_pitches(melody.pitches)
@@ -2094,7 +2134,9 @@ def get_interval_features(melody: Melody) -> Dict:
     interval_features['modal_interval'] = modal_interval(melody.pitches)
     interval_features['interval_entropy'] = interval_entropy(melody.pitches)
     interval_features['ivdist1'] = ivdist1(melody.pitches, melody.starts, melody.ends)
-    interval_features['interval_direction'] = interval_direction(melody.pitches)
+    direction_mean, direction_sd = interval_direction(melody.pitches)
+    interval_features['interval_direction_mean'] = direction_mean
+    interval_features['interval_direction_sd'] = direction_sd
     interval_features['average_interval_span_by_melodic_arcs'] = average_interval_span_by_melodic_arcs(melody.pitches)
     interval_features['distance_between_most_prevalent_melodic_intervals'] = distance_between_most_prevalent_melodic_intervals(melody.pitches)
     interval_features['melodic_interval_histogram'] = melodic_interval_histogram(melody.pitches)
@@ -2152,15 +2194,19 @@ def get_duration_features(melody: Melody) -> Dict:
     
     """
     duration_features = {}
-    
+    duration_features['tempo'] = get_tempo(melody)
     duration_features['duration_range'] = duration_range(melody.starts, melody.ends)
     duration_features['modal_duration'] = modal_duration(melody.starts, melody.ends)
     duration_features['duration_entropy'] = duration_entropy(melody.starts, melody.ends)
     duration_features['length'] = length(melody.starts)
     duration_features['global_duration'] = global_duration(melody.starts, melody.ends)
     duration_features['note_density'] = note_density(melody.starts, melody.ends)
-    duration_features['ioi'] = ioi(melody.starts)
-    duration_features['ioi_ratio'] = ioi_ratio(melody.starts)
+    ioi_mean, ioi_std = ioi(melody.starts)
+    duration_features['ioi_mean'] = ioi_mean
+    duration_features['ioi_std'] = ioi_std
+    ioi_ratio_mean, ioi_ratio_std = ioi_ratio(melody.starts)
+    duration_features['ioi_ratio_mean'] = ioi_ratio_mean 
+    duration_features['ioi_ratio_std'] = ioi_ratio_std
     duration_features['ioi_contour'] = ioi_contour(melody.starts)
     
     return duration_features
@@ -2187,6 +2233,7 @@ def get_tonality_features(melody: Melody) -> Dict:
     tonality_features['referent'] = referent(melody.pitches)
     tonality_features['inscale'] = inscale(melody.pitches)
     tonality_features['temperley_likelihood'] = temperley_likelihood(melody.pitches)
+    tonality_features['scalic_proportion'] = scalic_proportion(melody.pitches)
     return tonality_features
 
 def get_melodic_movement_features(melody: Melody) -> Dict:
@@ -2240,8 +2287,38 @@ def get_all_features_json(filename) -> Dict:
         json.dump(features_by_melody, f, indent=2)
     print(f"Features saved to {output_file}")
 
+def process_melody(args):
+    """Process a single melody and return its features.
+    
+    Parameters
+    ----------
+    args : tuple
+        Tuple containing (melody_id, melody_data)
+    
+    Returns
+    -------
+    tuple
+        Tuple containing (melody_id, feature_dict)
+    """
+    melody_id, melody_data = args
+    mel = Melody(melody_data, tempo=100)
+    
+    melody_features = {
+        'pitch_features': get_pitch_features(mel),
+        'interval_features': get_interval_features(mel),
+        'contour_features': get_contour_features(mel),
+        'duration_features': get_duration_features(mel),
+        'tonality_features': get_tonality_features(mel),
+        'narmour_features': get_narmour_features(mel),
+        'melodic_movement_features': get_melodic_movement_features(mel),
+        'mtype_features': get_mtype_features(mel),
+        'corpus_features': get_corpus_features(mel)
+    }
+    
+    return melody_id, melody_features
+
 def get_all_features_csv(filename) -> None:
-    """Generate CSV file with features for all melodies.
+    """Generate CSV file with features for all melodies using multiprocessing.
     
     Parameters
     ----------
@@ -2253,15 +2330,13 @@ def get_all_features_csv(filename) -> None:
     None
         Writes features to CSV file with each melody as a row
     """
-
     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
         melody_data_list = json.load(f)
         print(f"Processing {len(melody_data_list)} melodies")
-    start_time = time.time()
-    # Initialize list to store all feature rows
-    all_features = []
     
-    # Process first melody to get header names
+    start_time = time.time()
+    
+    # Process first melody to get header structure
     mel = Melody(melody_data_list[0], tempo=100)
     first_features = {
         'pitch_features': get_pitch_features(mel),
@@ -2280,40 +2355,47 @@ def get_all_features_csv(filename) -> None:
     for category, features in first_features.items():
         headers.extend(f"{category}.{feature}" for feature in features.keys())
     
-    # Process all melodies
-    for i, melody_data in enumerate(melody_data_list, 1):
-        mel = Melody(melody_data, tempo=100)
-        melody_features = {
-            'pitch_features': get_pitch_features(mel),
-            'interval_features': get_interval_features(mel),
-            'contour_features': get_contour_features(mel),
-            'duration_features': get_duration_features(mel),
-            'tonality_features': get_tonality_features(mel),
-            'narmour_features': get_narmour_features(mel),
-            'melodic_movement_features': get_melodic_movement_features(mel),
-            'mtype_features': get_mtype_features(mel),
-            'corpus_features': get_corpus_features(mel)
-        }
-        
-        # Flatten feature values into a single row
-        row = [i]
-        for category, features in melody_features.items():
-            row.extend(features.values())
+    # Create pool of workers
+    n_cores = cpu_count()
+    print(f"Using {n_cores} CPU cores")
+    
+    # Prepare arguments for parallel processing
+    melody_args = list(enumerate(melody_data_list, 1))
+    
+    # Process melodies in parallel
+    all_features = []
+    processed_count = 0
+    
+    with Pool(n_cores) as pool:
+        # Use imap to get results as they complete
+        for melody_id, melody_features in pool.imap(process_melody, melody_args):
+            # Flatten feature values into a single row
+            row = [melody_id]
+            for category, features in melody_features.items():
+                row.extend(features.values())
             
-        all_features.append(row)
-        print(f"Processed melody {i}/{len(melody_data_list)}", end='\r')
-
+            all_features.append(row)
+            
+            # Update progress
+            processed_count += 1
+            print(f"Processed melody {processed_count}/{len(melody_data_list)}", end='\r')
+    
+    # Sort results by melody_id since they may complete in different order
+    all_features.sort(key=lambda x: x[0])
+    
     # Write to CSV
     output_file = f'{filename}.csv'
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(all_features)
-    print(f"Features saved to {output_file}")
+    
     end_time = time.time()
     total_time = end_time - start_time
     avg_time = total_time / len(melody_data_list)
-    print(f"\nGenerated in total time: {total_time:.2f} seconds")
+    
+    print(f"\nFeatures saved to {output_file}")
+    print(f"Generated in total time: {total_time:.2f} seconds")
     print(f"Average time per melody: {avg_time:.3f} seconds")
 
 if __name__ == "__main__":
