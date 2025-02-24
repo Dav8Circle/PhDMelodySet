@@ -11,14 +11,15 @@ from collections import Counter
 from random import choices
 import time
 from typing import Dict
+from multiprocessing import Pool, cpu_count
 from algorithms import (
-    rank_values, nine_percent_significant_values, circle_of_fifths, 
+    rank_values, nine_percent_significant_values, circle_of_fifths,
     compute_tonality_vector, arpeggiation_proportion,
     chromatic_motion_proportion, stepwise_motion_proportion,
     repeated_notes_proportion, melodic_embellishment_proportion,
-    scalic_proportion
+    longest_monotonic_conjunct_scalar_passage, longest_conjunct_scalar_passage,
+    proportion_conjunct_scalar, proportion_scalar
 )
-# from correlations import kendall_tau
 from complexity import (
     consecutive_fifths, repetition_rate, yules_k, simpsons_d, sichels_s, honores_h, mean_entropy,
     mean_productivity
@@ -33,8 +34,6 @@ from stats import range_func, standard_deviation, shannon_entropy, mode
 from step_contour import StepContour
 import numpy as np
 import scipy
-from multiprocessing import Pool, cpu_count
-import itertools
 
 # Pitch Features
 
@@ -739,6 +738,42 @@ def duration_range(starts: list[float], ends: list[float]) -> float:
     """
     return range_func([ends[i] - starts[i] for i in range(len(starts))])
 
+def mean_duration(starts: list[float], ends: list[float]) -> float:
+    """Calculate mean note duration.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    float
+        Mean note duration
+    """
+    durations = [ends[i] - starts[i] for i in range(len(starts))]
+    return float(np.mean(durations))
+
+def duration_standard_deviation(starts: list[float], ends: list[float]) -> float:
+    """Calculate standard deviation of note durations.
+
+    Parameters
+    ---------- 
+    starts : list[float]
+        List of note start times
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    float
+        Standard deviation of note durations
+    """
+    durations = [ends[i] - starts[i] for i in range(len(starts))]
+    return float(np.std(durations))
+
 def modal_duration(starts: list[float], ends: list[float]) -> float:
     """Find most common note duration.
 
@@ -790,6 +825,24 @@ def length(starts: list[float]) -> float:
     """
     return len(starts)
 
+def number_of_durations(starts: list[float], ends: list[float]) -> int:
+    """Count number of unique note durations.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times    
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    int
+        Number of unique note durations
+    """
+    durations = [ends[i] - starts[i] for i in range(len(starts))]
+    return len(set(durations))
+
 def global_duration(starts: list[float], ends: list[float]) -> float:
     """Calculate total duration from first note start to last note end.
 
@@ -823,6 +876,7 @@ def note_density(starts: list[float], ends: list[float]) -> float:
         Note density (notes per unit time)
     """
     return len(starts) / global_duration(starts, ends)
+
 def ioi(starts: list[float]) -> tuple[float, float]:
     """Calculate mean and standard deviation of inter-onset intervals.
 
@@ -836,7 +890,7 @@ def ioi(starts: list[float]) -> tuple[float, float]:
     tuple[float, float]
         Mean and standard deviation of inter-onset intervals
     """
-    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
     if not intervals:
         return 0.0, 0.0
     return float(np.mean(intervals)), float(np.std(intervals))
@@ -854,11 +908,59 @@ def ioi_ratio(starts: list[float]) -> tuple[float, float]:
     tuple[float, float]
         Mean and standard deviation of IOI ratios
     """
-    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
     if len(intervals) < 2:
         return 0.0, 0.0
-    ratios = [intervals[i+1]/intervals[i] for i in range(len(intervals)-1)]
+    ratios = [intervals[i]/intervals[i-1] for i in range(1, len(intervals))]
     return float(np.mean(ratios)), float(np.std(ratios))
+
+def ioi_range(starts: list[float]) -> float:
+    """Calculate range of inter-onset intervals.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+
+    Returns
+    -------
+    float
+        Range of inter-onset intervals
+    """
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
+    return max(intervals) - min(intervals)
+
+def ioi_mean(starts: list[float]) -> float:
+    """Calculate mean of inter-onset intervals.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+
+    Returns
+    -------
+    float
+        Mean of inter-onset intervals
+    """
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
+    return float(np.mean(intervals))
+
+def ioi_standard_deviation(starts: list[float]) -> float:
+    """Calculate standard deviation of inter-onset intervals.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+
+    Returns
+    -------
+    float
+        Standard deviation of inter-onset intervals
+    """
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
+    return float(np.std(intervals))
 
 def ioi_contour(starts: list[float]) -> tuple[float, float]:
     """Calculate mean and standard deviation of IOI contour.
@@ -873,13 +975,49 @@ def ioi_contour(starts: list[float]) -> tuple[float, float]:
     tuple[float, float]
         Mean and standard deviation of contour values (-1: shorter, 0: same, 1: longer)
     """
-    intervals = [starts[i+1] - starts[i] for i in range(len(starts)-1)]
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
     if len(intervals) < 2:
         return 0.0, 0.0
         
-    ratios = [intervals[i+1]/intervals[i] for i in range(len(intervals)-1)]
+    ratios = [intervals[i]/intervals[i-1] for i in range(1, len(intervals))]
     contour = [int(np.sign(ratio - 1)) for ratio in ratios]
     return float(np.mean(contour)), float(np.std(contour))
+
+def duration_histogram(starts: list[float], ends: list[float]) -> dict:
+    """Calculate histogram of note durations.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+    ends : list[float]
+        List of note end times
+
+    Returns
+    -------
+    dict
+        Histogram of note durations
+    """
+    durations = [ends[i] - starts[i] for i in range(len(starts))]
+    num_durations = len(set(durations))
+    return histogram_bins(durations, num_durations)
+
+def ioi_histogram(starts: list[float]) -> dict:
+    """Calculate histogram of inter-onset intervals.
+
+    Parameters
+    ----------
+    starts : list[float]
+        List of note start times
+
+    Returns
+    -------
+    dict
+        Histogram of inter-onset intervals
+    """
+    intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
+    num_intervals = len(set(intervals))
+    return histogram_bins(intervals, num_intervals)
 
 # Tonality Features
 def tonalness(pitches: list[int]) -> float:
@@ -958,6 +1096,31 @@ def tonal_spike(pitches: list[int]) -> float:
         return 1.0
 
     return top_corr / other_sum
+
+def tonal_entropy(pitches: list[int]) -> float:
+    """Calculate tonal entropy as the entropy across the key correlations.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Entropy of the tonality vector correlation distribution
+    """
+    pitch_classes = [pitch % 12 for pitch in pitches]
+    correlations = compute_tonality_vector(pitch_classes)
+    if not correlations:
+        return -1.0
+
+    # Calculate entropy of correlation distribution
+    # Extract just the correlation values and normalize them to positive values
+    corr_values = [abs(corr[1]) for corr in correlations]
+
+    # Calculate entropy of the correlation distribution
+    return shannon_entropy(corr_values)
 
 def get_key_distances() -> dict[str, int]:
     """Returns a dictionary mapping key names to their semitone distances from C.
@@ -1063,6 +1226,13 @@ def temperley_likelihood(pitches: list[int]) -> float:
         total_prob *= note_prob
 
     return total_prob
+
+def tonalness_histogram(pitches: list[int]) -> dict:
+    '''
+    Calculates the histogram of KS correlation values.
+    '''
+    p = [p % 12 for p in pitches]
+    return histogram_bins(compute_tonality_vector(p)[0][1], 24)
 
 def get_narmour_features(melody: Melody) -> Dict:
     """Calculate Narmour's implication-realization features.
@@ -2197,18 +2367,23 @@ def get_duration_features(melody: Melody) -> Dict:
     duration_features['tempo'] = get_tempo(melody)
     duration_features['duration_range'] = duration_range(melody.starts, melody.ends)
     duration_features['modal_duration'] = modal_duration(melody.starts, melody.ends)
-    duration_features['duration_entropy'] = duration_entropy(melody.starts, melody.ends)
-    duration_features['length'] = length(melody.starts)
+    duration_features['mean_duration'] = mean_duration(melody.starts, melody.ends)
+    duration_features['duration_standard_deviation'] = duration_standard_deviation(melody.starts, melody.ends)
+    duration_features['number_of_durations'] = number_of_durations(melody.starts, melody.ends)
     duration_features['global_duration'] = global_duration(melody.starts, melody.ends)
     duration_features['note_density'] = note_density(melody.starts, melody.ends)
-    ioi_mean, ioi_std = ioi(melody.starts)
-    duration_features['ioi_mean'] = ioi_mean
-    duration_features['ioi_std'] = ioi_std
+    duration_features['duration_entropy'] = duration_entropy(melody.starts, melody.ends)
+    duration_features['length'] = length(melody.starts)
+    duration_features['note_density'] = note_density(melody.starts, melody.ends)
+    duration_features['ioi_mean'] = ioi_mean(melody.starts)
+    duration_features['ioi_std'] = ioi_standard_deviation(melody.starts)
     ioi_ratio_mean, ioi_ratio_std = ioi_ratio(melody.starts)
-    duration_features['ioi_ratio_mean'] = ioi_ratio_mean 
+    duration_features['ioi_ratio_mean'] = ioi_ratio_mean
     duration_features['ioi_ratio_std'] = ioi_ratio_std
     duration_features['ioi_contour'] = ioi_contour(melody.starts)
-    
+    duration_features['ioi_range'] = ioi_range(melody.starts)
+    duration_features['ioi_histogram'] = ioi_histogram(melody.starts)
+    duration_features['duration_histogram'] = duration_histogram(melody.starts, melody.ends)
     return duration_features
 
 def get_tonality_features(melody: Melody) -> Dict:
@@ -2230,10 +2405,15 @@ def get_tonality_features(melody: Melody) -> Dict:
     tonality_features['tonalness'] = tonalness(melody.pitches)
     tonality_features['tonal_clarity'] = tonal_clarity(melody.pitches)
     tonality_features['tonal_spike'] = tonal_spike(melody.pitches)
+    tonality_features['tonal_entropy'] = tonal_entropy(melody.pitches)
     tonality_features['referent'] = referent(melody.pitches)
     tonality_features['inscale'] = inscale(melody.pitches)
     tonality_features['temperley_likelihood'] = temperley_likelihood(melody.pitches)
-    tonality_features['scalic_proportion'] = scalic_proportion(melody.pitches)
+    tonality_features['longest_monotonic_conjunct_scalar_passage'] = longest_monotonic_conjunct_scalar_passage(melody.pitches)
+    tonality_features['longest_conjunct_scalar_passage'] = longest_conjunct_scalar_passage(melody.pitches)
+    tonality_features['proportion_conjunct_scalar'] = proportion_conjunct_scalar(melody.pitches)
+    tonality_features['proportion_scalar'] = proportion_scalar(melody.pitches)
+    tonality_features['tonalness_histogram'] = tonalness_histogram(melody.pitches)
     return tonality_features
 
 def get_melodic_movement_features(melody: Melody) -> Dict:
@@ -2330,6 +2510,7 @@ def get_all_features_csv(filename) -> None:
     None
         Writes features to CSV file with each melody as a row
     """
+    print("Starting job...\n")
     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
         melody_data_list = json.load(f)
         print(f"Processing {len(melody_data_list)} melodies")
@@ -2354,7 +2535,7 @@ def get_all_features_csv(filename) -> None:
     headers = ['melody_id']
     for category, features in first_features.items():
         headers.extend(f"{category}.{feature}" for feature in features.keys())
-    
+    print("Starting parallel processing...\n")
     # Create pool of workers
     n_cores = cpu_count()
     print(f"Using {n_cores} CPU cores")

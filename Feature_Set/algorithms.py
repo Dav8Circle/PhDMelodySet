@@ -813,7 +813,7 @@ def ukkonen_measure(pitches1: list[int], pitches2: list[int], n: int) -> int:
 
     return um
 
-def scalic_proportion(pitches: list[int]) -> float:
+def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
     """Calculate proportion of notes that form scalic sequences.
     
     Considers repeated notes as extending duration of current note.
@@ -835,16 +835,16 @@ def scalic_proportion(pitches: list[int]) -> float:
     Twinkle Twinkle Little Star is in C major, with a total of 14 notes.
     However, many are repeated notes, which are omitted from the calculation.
     There are 8 notes once the repetitions are removed, 6 of which form a scalic sequence.
-    >>> scalic_proportion([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
-    0.75
+    >>> longest_monotonic_conjunct_scalar_passage([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
+    6
 
     The lick is in D minor, with 4 of 7 notes as conjunct motions
-    >>> scalic_proportion([62, 64, 65, 67, 64, 60, 62])
-    0.571...
-    
-    C major scale scores 1.0
-    >>> scalic_proportion([60, 62, 64, 65, 67, 69, 71, 72])
-    1.0
+    >>> longest_monotonic_conjunct_scalar_passage([62, 64, 65, 67, 64, 60, 62])
+    4
+
+    C major scale (one octave) scores 8
+    >>> longest_monotonic_conjunct_scalar_passage([60, 62, 64, 65, 67, 69, 71, 72])
+    8
     """
     if len(pitches) < 3:
         return 0.0
@@ -926,4 +926,177 @@ def scalic_proportion(pitches: list[int]) -> float:
         else:
             i += 1
 
-    return scalic_notes / len(deduped)
+    return scalic_notes
+
+def longest_conjunct_scalar_passage(pitches: list[int]) -> int:
+    """Find the longest sequence of consecutive notes that follow a scale pattern,
+    allowing for changes in direction.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    int
+        Length of longest scalar sequence found
+
+    Examples
+    --------
+    >>> longest_conjunct_scalar_passage([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
+    7
+
+    >>> longest_conjunct_scalar_passage([62, 64, 65, 67, 64, 60, 62])
+    4
+    """
+    if len(pitches) < 3:
+        return 0
+
+    # Remove repeated notes and convert to pitch classes
+    deduped = []
+    for pitch in pitches:
+        if not deduped or pitch != deduped[-1]:
+            deduped.append(pitch)
+
+    deduped = [p % 12 for p in deduped]
+
+    if len(deduped) < 3:
+        return 0
+
+    # Get key using KS algorithm
+    pitch_classes = [p % 12 for p in deduped]
+    key_correlations = compute_tonality_vector(pitch_classes)
+    key = key_correlations[0][0]
+    root = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+            'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11,
+            'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5,
+            'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}[key.split()[0]]
+    if 'minor' in key.lower():
+        scale = [(root + i) % 12 for i in [0, 2, 3, 5, 7, 8, 10]]
+    else:
+        scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
+
+    current_sequence = []
+    longest_sequence = []
+
+    for i, note in enumerate(deduped):
+        note = deduped[i]
+        if note not in scale:
+            if len(current_sequence) > len(longest_sequence):
+                longest_sequence = current_sequence.copy()
+            current_sequence = []
+            continue
+
+        if not current_sequence:
+            current_sequence = [note]
+            continue
+
+        # Get the position of the current note and previous note in the scale
+        prev_note = current_sequence[-1]
+        curr_pos = scale.index(note)
+        prev_pos = scale.index(prev_note)
+
+        # Check if they're adjacent in the scale (in either direction)
+        if abs((curr_pos - prev_pos) % len(scale)) == 1 or \
+           abs((curr_pos - prev_pos) % len(scale)) == len(scale) - 1:
+            current_sequence.append(note)
+        else:
+            if len(current_sequence) > len(longest_sequence):
+                longest_sequence = current_sequence.copy()
+            current_sequence = [note]
+
+    if len(current_sequence) > len(longest_sequence):
+        longest_sequence = current_sequence.copy()
+
+    return len(longest_sequence)
+
+def proportion_conjunct_scalar(pitches: list[int]) -> float:
+    """Calculate the proportion of notes that form conjunct scalar sequences.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+
+    Returns
+    -------
+    float
+        Proportion of notes in conjunct scalar sequences (0.0-1.0)
+
+    Examples
+    --------
+    >>> proportion_conjunct_scalar([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
+    0.875
+
+    >>> proportion_conjunct_scalar([62, 64, 65, 67, 64, 60, 62])
+    0.5714285714285714
+    """
+    if len(pitches) < 3:
+        return 0.0
+
+    pitches = [p % 12 for p in pitches]
+    deduped = []
+    for pitch in pitches:
+        if not deduped or pitch != deduped[-1]:
+            deduped.append(pitch)
+
+    return longest_conjunct_scalar_passage(deduped) / len(deduped)
+
+def proportion_scalar(pitches: list[int]) -> float:
+    """Calculate the proportion of notes that form scalar sequences.
+
+    Parameters
+    ----------
+    pitches : list[int]
+        List of MIDI pitch values
+    
+    Returns
+    -------
+    float
+        Proportion of notes in which are in the KS identified key (0.0-1.0)
+
+    Examples
+    --------
+    # C major scale will return 1.0
+    >>> proportion_scalar([60, 62, 64, 65, 67, 69, 71, 72])
+    1.0
+
+    The lick is fully diatonic, so it returns 1.0
+    >>> proportion_scalar([62, 64, 65, 67, 64, 60, 62])
+    1.0
+
+    This function is limited by the tonality identified by the KS algorithm.
+    With the opening phrase of the American National Anthem, in C major:
+    >>> mel = [67, 64, 60, 64, 67, 72, 76, 74, 72, 64, 66, 67]
+
+    The melody is in E minor according to the KS algorithm, so the proportion returns 1.0
+    ('e minor', 0.803560760795821)
+    >>> proportion_scalar(mel)
+    1.0
+
+    An example where 1.0 is not returned is given by altering the C major scale to contain an Ab:
+    >>> proportion_scalar([60, 62, 64, 65, 67, 68, 71, 72])
+    0.875
+    """
+    if len(pitches) < 3:
+        return 0.0
+    
+    pitches = [p % 12 for p in pitches]
+    deduped = []
+    for pitch in pitches:
+        if not deduped or pitch != deduped[-1]:
+            deduped.append(pitch)
+
+    key_correlations = compute_tonality_vector(deduped)
+    key = key_correlations[0][0]
+    root = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+            'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11,
+            'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5,
+            'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}[key.split()[0]]
+    if 'minor' in key.lower():
+        scale = [(root + i) % 12 for i in [0, 2, 3, 5, 7, 8, 10]]
+    else:
+        scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
+
+    return len([p for p in pitches if p % 12 in scale]) / len(pitches)
