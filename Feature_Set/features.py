@@ -34,6 +34,7 @@ from stats import range_func, standard_deviation, shannon_entropy, mode
 from step_contour import StepContour
 import numpy as np
 import scipy
+from tqdm import tqdm
 
 # Pitch Features
 
@@ -2538,6 +2539,7 @@ def get_all_features_csv(filename) -> None:
     headers = ['melody_id']
     for category, features in first_features.items():
         headers.extend(f"{category}.{feature}" for feature in features.keys())
+    
     print("Starting parallel processing...\n")
     # Create pool of workers
     n_cores = cpu_count()
@@ -2548,23 +2550,22 @@ def get_all_features_csv(filename) -> None:
     
     # Process melodies in parallel
     all_features = []
-    processed_count = 0
     
     with Pool(n_cores) as pool:
-        # Use imap to get results as they complete
-        for melody_id, melody_features in pool.imap(process_melody, melody_args):
+        # Use imap_unordered for better performance and wrap with tqdm
+        for melody_id, melody_features in tqdm(
+            pool.imap_unordered(process_melody, melody_args),
+            total=len(melody_args),
+            desc="Processing melodies",
+            mininterval=2
+        ):
             # Flatten feature values into a single row
             row = [melody_id]
             for category, features in melody_features.items():
                 row.extend(features.values())
-            
             all_features.append(row)
-            
-            # Update progress
-            processed_count += 1
-            print(f"Processed melody {processed_count}/{len(melody_data_list)}", end='\r')
     
-    # Sort results by melody_id since they may complete in different order
+    # Sort results by melody_id since they completed in different order
     all_features.sort(key=lambda x: x[0])
     
     # Write to CSV
@@ -2580,7 +2581,10 @@ def get_all_features_csv(filename) -> None:
     
     print(f"\nFeatures saved to {output_file}")
     print(f"Generated in total time: {total_time:.2f} seconds")
-    print(f"Average time per melody: {avg_time:.3f} seconds")
+    print(f"Average time per melody: {avg_time:.3f} seconds\n")
+
+    print("Job complete\n")
+
 
 if __name__ == "__main__":
     # get_all_features_json('item_features')
