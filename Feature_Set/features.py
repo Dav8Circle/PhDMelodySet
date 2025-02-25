@@ -896,13 +896,13 @@ def ioi(starts: list[float]) -> tuple[float, float]:
     return float(np.mean(intervals)), float(np.std(intervals))
 
 def ioi_ratio(starts: list[float]) -> tuple[float, float]:
-    """Calculate mean and standard deviation of IOI ratios.
-
+    """Calculate mean and standard deviation of inter-onset interval ratios.
+    
     Parameters
     ----------
     starts : list[float]
         List of note start times
-
+        
     Returns
     -------
     tuple[float, float]
@@ -911,6 +911,7 @@ def ioi_ratio(starts: list[float]) -> tuple[float, float]:
     intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
     if len(intervals) < 2:
         return 0.0, 0.0
+
     ratios = [intervals[i]/intervals[i-1] for i in range(1, len(intervals))]
     return float(np.mean(ratios)), float(np.std(ratios))
 
@@ -1413,10 +1414,12 @@ def get_ngram_document_frequency(ngram: tuple, corpus_stats: dict) -> int:
         Document frequency count for the n-gram
     """
     ngram_str = str(ngram)
-    # Search through the list of document frequencies
-    for item in corpus_stats['document_frequencies']:
-        if item.get('ngram') == ngram_str:  # Compare with the ngram field
-            return item.get('count', 0)
+    # Get document frequencies dictionary
+    doc_freqs = corpus_stats.get('document_frequencies', {})
+    
+    # Look up the count for this ngram
+    if ngram_str in doc_freqs:
+        return doc_freqs[ngram_str].get('count', 0)
     return 0
 
 def compute_tfdf_spearman(melody: Melody) -> float:
@@ -1445,7 +1448,7 @@ def compute_tfdf_spearman(melody: Melody) -> float:
     df_values = []
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Get TF and DF values for each n-gram length
@@ -1494,7 +1497,7 @@ def compute_tfdf_kendall(melody: Melody) -> float:
     df_values = []
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Get TF and DF values for each n-gram length
@@ -1540,7 +1543,7 @@ def compute_tfdf(melody: Melody) -> float:
 
     tfdf_values = []
     # Load corpus statistics from JSON file
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Calculate TFDF using dot product for each n-gram length
@@ -1603,7 +1606,7 @@ def compute_norm_log_dist(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     distances = []
@@ -1655,7 +1658,7 @@ def compute_max_log_df(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     max_df = 0
@@ -1690,7 +1693,7 @@ def compute_min_log_df(melody: Melody) -> float:
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     min_df = float('inf')  # Initialize to infinity
@@ -1726,7 +1729,7 @@ def compute_mean_log_df(melody: Melody) -> float:
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     total_log_df = 0.0
@@ -1766,7 +1769,7 @@ def compute_mean_df_entropy(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     total_entropy = 0.0
@@ -1817,7 +1820,7 @@ def compute_mean_df_productivity(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1858,7 +1861,7 @@ def compute_mean_df_yules_k(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1899,7 +1902,7 @@ def compute_mean_df_simpsons_d(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1940,7 +1943,7 @@ def compute_mean_df_sichels_s(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1981,7 +1984,7 @@ def compute_mean_df_honores_h(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -2027,7 +2030,7 @@ def compute_mean_global_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     global_weights = []
@@ -2084,7 +2087,7 @@ def compute_mtcf_std_g_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     global_weights = []
@@ -2133,7 +2136,7 @@ def compute_mtcf_mean_gl_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     gl_weights = []
@@ -2184,7 +2187,7 @@ def compute_mtcf_std_gl_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('corpus_stats.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     gl_weights = []
