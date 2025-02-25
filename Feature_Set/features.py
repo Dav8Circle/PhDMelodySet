@@ -2557,14 +2557,14 @@ def get_all_features_csv(filename) -> None:
             pool.imap_unordered(process_melody, melody_args),
             total=len(melody_args),
             desc="Processing melodies",
-            mininterval=2
+            mininterval=0.2
         ):
             # Flatten feature values into a single row
             row = [melody_id]
             for category, features in melody_features.items():
                 row.extend(features.values())
             all_features.append(row)
-    
+
     # Sort results by melody_id since they completed in different order
     all_features.sort(key=lambda x: x[0])
     
