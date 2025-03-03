@@ -51,7 +51,7 @@ def pitch_range(pitches: list[int]) -> int:
     int
         Range between highest and lowest pitch in semitones
     """
-    return range_func(pitches)
+    return int(range_func(pitches))
 
 def pitch_standard_deviation(pitches: list[int]) -> float:
     """Calculate the standard deviation of pitch values.
@@ -66,7 +66,7 @@ def pitch_standard_deviation(pitches: list[int]) -> float:
     float
         Standard deviation of pitches
     """
-    return standard_deviation(pitches)
+    return float(standard_deviation(pitches))
 
 def pitch_entropy(pitches: list[int]) -> float:
     """Calculate the Shannon entropy of pitch values.
@@ -81,7 +81,7 @@ def pitch_entropy(pitches: list[int]) -> float:
     float
         Shannon entropy of pitch distribution
     """
-    return shannon_entropy(pitches)
+    return float(shannon_entropy(pitches))
 
 def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:
     """Calculate duration-weighted distribution of pitches.
@@ -209,7 +209,7 @@ def most_common_pitch(pitches: list[int]) -> int:
     int
         Most common pitch value
     """
-    return mode(pitches)
+    return int(mode(pitches))
 
 def number_of_common_pitches(pitches: list[int]) -> int:
     """Count pitch classes that appear in at least 9% of notes.
@@ -226,7 +226,7 @@ def number_of_common_pitches(pitches: list[int]) -> int:
     """
     pcs = [pitch % 12 for pitch in pitches]
     significant_pcs = nine_percent_significant_values(pcs)
-    return len(significant_pcs)
+    return int(len(significant_pcs))
 
 def number_of_pitches(pitches: list[int]) -> int:
     """Count number of unique pitches.
@@ -241,7 +241,7 @@ def number_of_pitches(pitches: list[int]) -> int:
     int
         Number of unique pitches
     """
-    return len(set(pitches))
+    return int(len(set(pitches)))
 
 def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:
     """Create histogram of pitch classes arranged in circle of fifths.
@@ -283,7 +283,7 @@ def pitch_class_kurtosis_after_folding(pitches: list[int]) -> float:
     histogram = folded_fifths_pitch_class_histogram(pitches)
     if not histogram:
         return 0.0
-    return kurtosis(list(histogram.keys()))
+    return float(kurtosis(list(histogram.keys())))
 
 def pitch_class_skewness_after_folding(pitches: list[int]) -> float:
     """Calculate skewness of folded fifths pitch class histogram.
@@ -302,7 +302,7 @@ def pitch_class_skewness_after_folding(pitches: list[int]) -> float:
     histogram = folded_fifths_pitch_class_histogram(pitches)
     if not histogram:
         return 0.0
-    return skew(list(histogram.keys()))
+    return float(skew(list(histogram.keys())))
 
 def pitch_class_variability_after_folding(pitches: list[int]) -> float:
     """Calculate standard deviation of folded fifths pitch class histogram.
@@ -321,7 +321,7 @@ def pitch_class_variability_after_folding(pitches: list[int]) -> float:
     histogram = folded_fifths_pitch_class_histogram(pitches)
     if not histogram:
         return 0.0
-    return standard_deviation(list(histogram.keys()))
+    return float(standard_deviation(list(histogram.keys())))
 
 # Interval Features
 
@@ -353,7 +353,7 @@ def absolute_interval_range(pitches: list[int]) -> int:
     int
         Range between largest and smallest absolute interval in semitones
     """
-    return range_func([abs(x) for x in pitch_interval(pitches)])
+    return int(range_func([abs(x) for x in pitch_interval(pitches)]))
 
 def mean_absolute_interval(pitches: list[int]) -> float:
     """Calculate mean absolute interval size.
@@ -386,7 +386,7 @@ def standard_deviation_absolute_interval(pitches: list[int]) -> float:
     float
         Standard deviation of absolute interval sizes in semitones
     """
-    return np.std([abs(x) for x in pitch_interval(pitches)])
+    return float(np.std([abs(x) for x in pitch_interval(pitches)]))
 
 def modal_interval(pitches: list[int]) -> int:
     """Find most common interval size.
@@ -401,7 +401,7 @@ def modal_interval(pitches: list[int]) -> int:
     int
         Most frequent interval size in semitones
     """
-    return mode(pitch_interval(pitches))
+    return int(mode(pitch_interval(pitches)))
 
 # Alias for modal_interval / FANTASTIC vs jSymbolic
 most_common_interval = modal_interval
@@ -419,7 +419,7 @@ def interval_entropy(pitches: list[int]) -> float:
     float
         Shannon entropy of interval sizes
     """
-    return shannon_entropy(pitch_interval(pitches))
+    return float(shannon_entropy(pitch_interval(pitches)))
 
 def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
     """Calculate duration-weighted distribution of intervals.
@@ -440,7 +440,7 @@ def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
     """
     intervals = pitch_interval(pitches)
     durations = [ends[i] - starts[i] for i in range(len(starts))]
-    
+
     weighted_intervals = []
     for interval, duration in zip(intervals, durations[:-1]):
         repetitions = int(duration * 10)
@@ -475,8 +475,8 @@ def interval_direction(pitches: list[int]) -> tuple[float, float]:
     mean = sum(directions) / len(directions)
     variance = sum((x - mean) ** 2 for x in directions) / len(directions)
     std_dev = math.sqrt(variance)
-    
-    return mean, std_dev
+
+    return float(mean), float(std_dev)
 
 def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:
     """Calculate average interval span of melodic arcs.
@@ -530,7 +530,7 @@ def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:
     else:
         value = total_intervals / number_intervals
 
-    return value
+    return float(value)
 
 def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:
     """Calculate absolute difference between two most common interval sizes.
@@ -560,7 +560,7 @@ def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> flo
     sorted_intervals = sorted(interval_counts.items(), key=lambda x: x[1], reverse=True)
     most_common = sorted_intervals[0][0]
     second_most_common = sorted_intervals[1][0]
-    return abs(most_common - second_most_common)
+    return float(abs(most_common - second_most_common))
 
 def melodic_interval_histogram(pitches: list[int]) -> dict:
     """Create histogram of interval sizes.
@@ -596,7 +596,7 @@ def melodic_large_intervals(pitches: list[int]) -> float:
     if not intervals:
         return -1.0
     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)
-    return large_intervals / len(intervals) if intervals else 0.0
+    return float(large_intervals / len(intervals) if intervals else 0.0)
 
 def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:
     """Calculate proportion of intervals >= specified size.
@@ -617,7 +617,7 @@ def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float
     if not intervals:
         return -1.0
     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)
-    return large_intervals / len(intervals) if intervals else 0.0
+    return float(large_intervals / len(intervals) if intervals else 0.0)
 
 def number_of_common_melodic_intervals(pitches: list[int]) -> int:
     """Count intervals that appear in at least 9% of melodic transitions.
@@ -638,7 +638,7 @@ def number_of_common_melodic_intervals(pitches: list[int]) -> int:
     intervals = pitch_interval(pitches)
     significant_intervals = nine_percent_significant_values(intervals)
     
-    return len(significant_intervals)
+    return int(len(significant_intervals))
 
 def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
     """Calculate proportion of most common interval.
@@ -661,7 +661,7 @@ def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
     for interval in intervals:
         interval_counts[interval] = interval_counts.get(interval, 0) + 1
         
-    return max(interval_counts.values()) / len(intervals)
+    return float(max(interval_counts.values()) / len(intervals))
 
 # Contour Features
 def get_step_contour_features(pitches: list[int], starts: list[float], ends: list[float]) -> StepContour:
@@ -2501,13 +2501,15 @@ def process_melody(args):
     
     return melody_id, melody_features
 
-def get_all_features_csv(filename) -> None:
+def get_all_features_csv(input_path, output_path) -> None:
     """Generate CSV file with features for all melodies using multiprocessing.
     
     Parameters
     ----------
-    filename : str
-        Name of output CSV file (without extension)
+    input_path : str
+        Path to input JSON file
+    output_path : str
+        Path to output CSV file
         
     Returns
     -------
@@ -2515,12 +2517,12 @@ def get_all_features_csv(filename) -> None:
         Writes features to CSV file with each melody as a row
     """
     print("Starting job...\n")
-    with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
+    with open(input_path, encoding='utf-8') as f:
         melody_data_list = json.load(f)
         print(f"Processing {len(melody_data_list)} melodies")
-    
+
     start_time = time.time()
-    
+
     # Process first melody to get header structure
     mel = Melody(melody_data_list[0], tempo=100)
     first_features = {
@@ -2534,17 +2536,17 @@ def get_all_features_csv(filename) -> None:
         'mtype_features': get_mtype_features(mel),
         'corpus_features': get_corpus_features(mel)
     }
-    
+
     # Create header by flattening feature names
     headers = ['melody_id']
     for category, features in first_features.items():
         headers.extend(f"{category}.{feature}" for feature in features.keys())
-    
+
     print("Starting parallel processing...\n")
     # Create pool of workers
     n_cores = cpu_count()
     print(f"Using {n_cores} CPU cores")
-    
+
     # Prepare arguments for parallel processing
     melody_args = list(enumerate(melody_data_list, 1))
     
@@ -2569,7 +2571,7 @@ def get_all_features_csv(filename) -> None:
     all_features.sort(key=lambda x: x[0])
     
     # Write to CSV
-    output_file = f'{filename}.csv'
+    output_file = f'{output_path}.csv'
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
@@ -2585,7 +2587,8 @@ def get_all_features_csv(filename) -> None:
 
     print("Job complete\n")
 
-
 if __name__ == "__main__":
     # get_all_features_json('item_features')
-    get_all_features_csv('item_features2')
+    get_all_features_csv(
+        input_path='/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json',
+        output_path='item_features2')

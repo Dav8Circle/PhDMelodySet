@@ -779,40 +779,6 @@ def melodic_embellishment_proportion(pitch_values: list[float],
         return float(embellished) / len(note_durations)
     return 0.0
 
-def ukkonen_measure(pitches1: list[int], pitches2: list[int], n: int) -> int:
-    """
-    Calculates the Ukkonen Measure between two sequences of pitches based on n-grams.
-
-    Parameters
-    ----------
-    pitches1 : list[int]
-        First sequence of pitch values
-    pitches2 : list[int]
-        Second sequence of pitch values
-    n : int
-        Length of n-grams
-
-    Returns
-    -------
-    int
-        Ukkonen Measure value
-    """
-    # Generate n-grams for both pitch sequences
-    s_ngrams = [tuple(pitches1[i:i+n]) for i in range(len(pitches1) - n + 1)]
-    t_ngrams = [tuple(pitches2[i:i+n]) for i in range(len(pitches2) - n + 1)]
-
-    # Count frequencies of n-grams
-    s_count = Counter(s_ngrams)
-    t_count = Counter(t_ngrams)
-
-    # Get the union of n-grams
-    all_ngrams = set(s_ngrams) | set(t_ngrams)
-
-    # Calculate the Ukkonen Measure
-    um = sum(abs(s_count[ngram] - t_count[ngram]) for ngram in all_ngrams)
-
-    return um
-
 def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
     """Calculate proportion of notes that form scalic sequences.
     

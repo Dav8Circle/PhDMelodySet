@@ -7,8 +7,7 @@ import json
 
 class Melody:
     """Class to represent a melody from a MIDI sequence. This class is used to extract
-    information from a json file containing MIDI sequence data, formatted according to
-
+    information from a json file containing MIDI sequence data, formatted accordingly:
     A note is represented as a string in the format:
     'Note(start=0.0, end=0.25, pitch=60, velocity=100)'
     We don't need the velocity, so we can ignore it here.
@@ -18,7 +17,7 @@ class Melody:
         starts (list[float]): List of note start times in order of appearance
         ends (list[float]): List of note end times in order of appearance
     """
-    def __init__(self, midi_data: dict, tempo: float):
+    def __init__(self, midi_data: dict, tempo: float = 100.00):
         """Initialize a Melody object from MIDI sequence data.
         
         Args:

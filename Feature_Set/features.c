@@ -5,7 +5,7 @@
     "distutils": {
         "name": "features",
         "sources": [
-            "Feature_Set/features.py"
+            "features.py"
         ]
     },
     "module_name": "features"
@@ -1479,7 +1479,7 @@ static const char *__pyx_filename;
 /* #### Code section: filename_table ### */
 
 static const char *__pyx_f[] = {
-  "Feature_Set/features.py",
+  "features.py",
 };
 /* #### Code section: utility_code_proto_before_types ### */
 /* ForceInitThreads.proto */
@@ -1551,7 +1551,7 @@ struct __pyx_obj_8features___pyx_scope_struct_1_genexpr {
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
 struct __pyx_obj_8features___pyx_scope_struct_2_genexpr {
@@ -1565,7 +1565,7 @@ struct __pyx_obj_8features___pyx_scope_struct_2_genexpr {
 
 
 /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -1581,7 +1581,7 @@ struct __pyx_obj_8features___pyx_scope_struct_3_variable_melodic_intervals {
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
 struct __pyx_obj_8features___pyx_scope_struct_4_genexpr {
@@ -1773,7 +1773,7 @@ struct __pyx_obj_8features___pyx_scope_struct_15_genexpr {
 /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
@@ -1783,7 +1783,7 @@ struct __pyx_obj_8features___pyx_scope_struct_16_get_all_features_csv {
 };
 
 
-/* "features.py":2541
+/* "features.py":2543
  *     headers = ['melody_id']
  *     for category, features in first_features.items():
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())             # <<<<<<<<<<<<<<
@@ -2131,170 +2131,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_FastCallDict(PyObject *func, PyObj
 /* RaiseUnexpectedTypeError.proto */
 static int __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj);
 
-/* ListCompAppend.proto */
-#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
-static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
-    PyListObject* L = (PyListObject*) list;
-    Py_ssize_t len = Py_SIZE(list);
-    if (likely(L->allocated > len)) {
-        Py_INCREF(x);
-        #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030d0000
-        L->ob_item[len] = x;
-        #else
-        PyList_SET_ITEM(list, len, x);
-        #endif
-        __Pyx_SET_SIZE(list, len + 1);
-        return 0;
-    }
-    return PyList_Append(list, x);
-}
-#else
-#define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
-#endif
-
-/* GetItemInt.proto */
-#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
-    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
-               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
-#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
-                                                     int is_list, int wraparound, int boundscheck);
-
-/* RaiseTooManyValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
-
-/* RaiseNeedMoreValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
-
-/* IterFinish.proto */
-static CYTHON_INLINE int __Pyx_IterFinish(void);
-
-/* UnpackItemEndCheck.proto */
-static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
-
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_MultiplyObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_MultiplyObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceMultiply(op1, op2) : PyNumber_Multiply(op1, op2))
-#endif
-
-/* ListExtend.proto */
-static CYTHON_INLINE int __Pyx_PyList_Extend(PyObject* L, PyObject* v) {
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030d0000
-    PyObject* none = _PyList_Extend((PyListObject*)L, v);
-    if (unlikely(!none))
-        return -1;
-    Py_DECREF(none);
-    return 0;
-#else
-    return PyList_SetSlice(L, PY_SSIZE_T_MAX, PY_SSIZE_T_MAX, v);
-#endif
-}
-
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_RemainderObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_RemainderObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceRemainder(op1, op2) : PyNumber_Remainder(op1, op2))
-#endif
-
-/* PyIntBinop.proto */
-#if !CYTHON_COMPILING_IN_PYPY
-static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
-#else
-#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
-    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
-#endif
-
-/* PySequenceContains.proto */
-static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
-    int result = PySequence_Contains(seq, item);
-    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
-}
-
-/* SliceTupleAndList.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyList_GetSlice(PyObject* src, Py_ssize_t start, Py_ssize_t stop);
-static CYTHON_INLINE PyObject* __Pyx_PyTuple_GetSlice(PyObject* src, Py_ssize_t start, Py_ssize_t stop);
-#else
-#define __Pyx_PyList_GetSlice(seq, start, stop)   PySequence_GetSlice(seq, start, stop)
-#define __Pyx_PyTuple_GetSlice(seq, start, stop)  PySequence_GetSlice(seq, start, stop)
-#endif
-
-/* set_iter.proto */
-static CYTHON_INLINE PyObject* __Pyx_set_iterator(PyObject* iterable, int is_set,
-                                                  Py_ssize_t* p_orig_length, int* p_source_is_set);
-static CYTHON_INLINE int __Pyx_set_iter_next(
-        PyObject* iter_obj, Py_ssize_t orig_length,
-        Py_ssize_t* ppos, PyObject **value,
-        int source_is_set);
-
-/* ListAppend.proto */
-#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
-static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
-    PyListObject* L = (PyListObject*) list;
-    Py_ssize_t len = Py_SIZE(list);
-    if (likely(L->allocated > len) & likely(len > (L->allocated >> 1))) {
-        Py_INCREF(x);
-        #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030d0000
-        L->ob_item[len] = x;
-        #else
-        PyList_SET_ITEM(list, len, x);
-        #endif
-        __Pyx_SET_SIZE(list, len + 1);
-        return 0;
-    }
-    return PyList_Append(list, x);
-}
-#else
-#define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
-#endif
-
-/* UnpackUnboundCMethod.proto */
-typedef struct {
-    PyObject *type;
-    PyObject **method_name;
-    PyCFunction func;
-    PyObject *method;
-    int flag;
-} __Pyx_CachedCFunction;
-
-/* CallUnboundCMethod1.proto */
-static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
-#else
-#define __Pyx_CallUnboundCMethod1(cfunc, self, arg)  __Pyx__CallUnboundCMethod1(cfunc, self, arg)
-#endif
-
-/* py_abs.proto */
-#if CYTHON_USE_PYLONG_INTERNALS
-static PyObject *__Pyx_PyLong_AbsNeg(PyObject *num);
-#define __Pyx_PyNumber_Absolute(x)\
-    ((likely(PyLong_CheckExact(x))) ?\
-         (likely(__Pyx_PyLong_IsNonNeg(x)) ? (Py_INCREF(x), (x)) : __Pyx_PyLong_AbsNeg(x)) :\
-         PyNumber_Absolute(x))
-#else
-#define __Pyx_PyNumber_Absolute(x)  PyNumber_Absolute(x)
-#endif
-
 /* pybytes_as_double.proto */
 static double __Pyx_SlowPyString_AsDouble(PyObject *obj);
 static double __Pyx__PyBytes_AsDouble(PyObject *obj, const char* start, Py_ssize_t length);
@@ -2458,6 +2294,173 @@ static CYTHON_INLINE double __Pyx_PyUnicode_AsDouble(PyObject *obj) {
 static CYTHON_INLINE PyObject* __Pyx__PyNumber_Float(PyObject* obj);
 #define __Pyx_PyNumber_Float(x) (PyFloat_CheckExact(x) ? __Pyx_NewRef(x) : __Pyx__PyNumber_Float(x))
 
+/* ListCompAppend.proto */
+#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
+static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len)) {
+        Py_INCREF(x);
+        #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030d0000
+        L->ob_item[len] = x;
+        #else
+        PyList_SET_ITEM(list, len, x);
+        #endif
+        __Pyx_SET_SIZE(list, len + 1);
+        return 0;
+    }
+    return PyList_Append(list, x);
+}
+#else
+#define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
+#endif
+
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
+
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
+
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* IterFinish.proto */
+static CYTHON_INLINE int __Pyx_IterFinish(void);
+
+/* UnpackItemEndCheck.proto */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_MultiplyObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_MultiplyObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceMultiply(op1, op2) : PyNumber_Multiply(op1, op2))
+#endif
+
+/* ListExtend.proto */
+static CYTHON_INLINE int __Pyx_PyList_Extend(PyObject* L, PyObject* v) {
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX < 0x030d0000
+    PyObject* none = _PyList_Extend((PyListObject*)L, v);
+    if (unlikely(!none))
+        return -1;
+    Py_DECREF(none);
+    return 0;
+#else
+    return PyList_SetSlice(L, PY_SSIZE_T_MAX, PY_SSIZE_T_MAX, v);
+#endif
+}
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_RemainderObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_RemainderObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceRemainder(op1, op2) : PyNumber_Remainder(op1, op2))
+#endif
+
+/* PyIntBinop.proto */
+#if !CYTHON_COMPILING_IN_PYPY
+static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace, int zerodivision_check);
+#else
+#define __Pyx_PyInt_AddObjC(op1, op2, intval, inplace, zerodivision_check)\
+    (inplace ? PyNumber_InPlaceAdd(op1, op2) : PyNumber_Add(op1, op2))
+#endif
+
+/* PySequenceContains.proto */
+static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
+    int result = PySequence_Contains(seq, item);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
+
+/* SliceTupleAndList.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyList_GetSlice(PyObject* src, Py_ssize_t start, Py_ssize_t stop);
+static CYTHON_INLINE PyObject* __Pyx_PyTuple_GetSlice(PyObject* src, Py_ssize_t start, Py_ssize_t stop);
+#else
+#define __Pyx_PyList_GetSlice(seq, start, stop)   PySequence_GetSlice(seq, start, stop)
+#define __Pyx_PyTuple_GetSlice(seq, start, stop)  PySequence_GetSlice(seq, start, stop)
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
+/* set_iter.proto */
+static CYTHON_INLINE PyObject* __Pyx_set_iterator(PyObject* iterable, int is_set,
+                                                  Py_ssize_t* p_orig_length, int* p_source_is_set);
+static CYTHON_INLINE int __Pyx_set_iter_next(
+        PyObject* iter_obj, Py_ssize_t orig_length,
+        Py_ssize_t* ppos, PyObject **value,
+        int source_is_set);
+
+/* ListAppend.proto */
+#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
+static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len) & likely(len > (L->allocated >> 1))) {
+        Py_INCREF(x);
+        #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030d0000
+        L->ob_item[len] = x;
+        #else
+        PyList_SET_ITEM(list, len, x);
+        #endif
+        __Pyx_SET_SIZE(list, len + 1);
+        return 0;
+    }
+    return PyList_Append(list, x);
+}
+#else
+#define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
+#endif
+
+/* UnpackUnboundCMethod.proto */
+typedef struct {
+    PyObject *type;
+    PyObject **method_name;
+    PyCFunction func;
+    PyObject *method;
+    int flag;
+} __Pyx_CachedCFunction;
+
+/* CallUnboundCMethod1.proto */
+static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
+#else
+#define __Pyx_CallUnboundCMethod1(cfunc, self, arg)  __Pyx__CallUnboundCMethod1(cfunc, self, arg)
+#endif
+
+/* py_abs.proto */
+#if CYTHON_USE_PYLONG_INTERNALS
+static PyObject *__Pyx_PyLong_AbsNeg(PyObject *num);
+#define __Pyx_PyNumber_Absolute(x)\
+    ((likely(PyLong_CheckExact(x))) ?\
+         (likely(__Pyx_PyLong_IsNonNeg(x)) ? (Py_INCREF(x), (x)) : __Pyx_PyLong_AbsNeg(x)) :\
+         PyNumber_Absolute(x))
+#else
+#define __Pyx_PyNumber_Absolute(x)  PyNumber_Absolute(x)
+#endif
+
 /* RaiseUnboundLocalError.proto */
 static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname);
 
@@ -2474,9 +2477,6 @@ static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
 
 /* pep479.proto */
 static void __Pyx_Generator_Replace_StopIteration(int in_async_gen);
-
-/* PyObjectCallOneArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
 /* PyIntCompare.proto */
 static CYTHON_INLINE int __Pyx_PyInt_BoolEqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
@@ -3320,6 +3320,7 @@ static const char __pyx_k_complexity[] = "complexity";
 static const char __pyx_k_descending[] = "descending";
 static const char __pyx_k_directions[] = "directions";
 static const char __pyx_k_gl_weights[] = "gl_weights";
+static const char __pyx_k_input_path[] = "input_path";
 static const char __pyx_k_kendalltau[] = "kendalltau";
 static const char __pyx_k_key_centre[] = "key_centre";
 static const char __pyx_k_list_float[] = "list[float]";
@@ -3341,6 +3342,7 @@ static const char __pyx_k_collections[] = "collections";
 static const char __pyx_k_corr_values[] = "corr_values";
 static const char __pyx_k_correlation[] = "correlation";
 static const char __pyx_k_entropy_sum[] = "entropy_sum";
+static const char __pyx_k_features_py[] = "features.py";
 static const char __pyx_k_ioi_contour[] = "ioi_contour";
 static const char __pyx_k_mean_log_df[] = "mean_log_df";
 static const char __pyx_k_melody_args[] = "melody_args";
@@ -3348,6 +3350,7 @@ static const char __pyx_k_melody_data[] = "melody_data";
 static const char __pyx_k_mininterval[] = "mininterval";
 static const char __pyx_k_most_common[] = "most_common";
 static const char __pyx_k_output_file[] = "output_file";
+static const char __pyx_k_output_path[] = "output_path";
 static const char __pyx_k_pitch_range[] = "pitch_range";
 static const char __pyx_k_rank_values[] = "rank_values";
 static const char __pyx_k_repetitions[] = "repetitions";
@@ -3510,7 +3513,6 @@ static const char __pyx_k_intervallic_difference[] = "intervallic_difference";
 static const char __pyx_k_ioi_standard_deviation[] = "ioi_standard_deviation";
 static const char __pyx_k_mean_absolute_interval[] = "mean_absolute_interval";
 static const char __pyx_k_Average_time_per_melody[] = "Average time per melody: ";
-static const char __pyx_k_Feature_Set_features_py[] = "Feature_Set/features.py";
 static const char __pyx_k_Generated_in_total_time[] = "Generated in total time: ";
 static const char __pyx_k_absolute_interval_range[] = "absolute_interval_range";
 static const char __pyx_k_arpeggiation_proportion[] = "arpeggiation_proportion";
@@ -3687,7 +3689,7 @@ static PyObject *__pyx_pf_8features_184get_all_features_json(CYTHON_UNUSED PyObj
 static PyObject *__pyx_pf_8features_186process_melody(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_args); /* proto */
 static PyObject *__pyx_pf_8features_20get_all_features_csv_genexpr(PyObject *__pyx_self, PyObject *__pyx_genexpr_arg_0); /* proto */
 static PyObject *__pyx_lambda_funcdef_lambda12(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_x); /* proto */
-static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filename); /* proto */
+static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_input_path, PyObject *__pyx_v_output_path); /* proto */
 static PyObject *__pyx_tp_new_8features___pyx_scope_struct__interval_direction(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_8features___pyx_scope_struct_1_genexpr(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_8features___pyx_scope_struct_2_genexpr(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -3793,7 +3795,6 @@ typedef struct {
   PyObject *__pyx_n_s_F;
   PyObject *__pyx_kp_s_F_2;
   PyObject *__pyx_n_s_FantasticTokenizer;
-  PyObject *__pyx_kp_s_Feature_Set_features_py;
   PyObject *__pyx_kp_u_Features_saved_to;
   PyObject *__pyx_kp_u_Features_saved_to_2;
   PyObject *__pyx_n_s_G;
@@ -3940,6 +3941,7 @@ typedef struct {
   PyObject *__pyx_kp_s_f_2;
   PyObject *__pyx_n_s_features;
   PyObject *__pyx_n_s_features_by_melody;
+  PyObject *__pyx_kp_s_features_py;
   PyObject *__pyx_n_s_filename;
   PyObject *__pyx_n_s_first_features;
   PyObject *__pyx_n_s_float;
@@ -3987,6 +3989,7 @@ typedef struct {
   PyObject *__pyx_n_s_indent;
   PyObject *__pyx_n_s_inf;
   PyObject *__pyx_n_s_initializing;
+  PyObject *__pyx_n_s_input_path;
   PyObject *__pyx_n_s_inscale;
   PyObject *__pyx_n_s_int;
   PyObject *__pyx_n_s_interpolation_contour;
@@ -4132,6 +4135,7 @@ typedef struct {
   PyObject *__pyx_n_s_open;
   PyObject *__pyx_n_s_other_sum;
   PyObject *__pyx_n_s_output_file;
+  PyObject *__pyx_n_s_output_path;
   PyObject *__pyx_n_s_p;
   PyObject *__pyx_n_s_pc;
   PyObject *__pyx_n_s_pc_values;
@@ -4586,7 +4590,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_F);
   Py_CLEAR(clear_module_state->__pyx_kp_s_F_2);
   Py_CLEAR(clear_module_state->__pyx_n_s_FantasticTokenizer);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Feature_Set_features_py);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Features_saved_to);
   Py_CLEAR(clear_module_state->__pyx_kp_u_Features_saved_to_2);
   Py_CLEAR(clear_module_state->__pyx_n_s_G);
@@ -4733,6 +4736,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_kp_s_f_2);
   Py_CLEAR(clear_module_state->__pyx_n_s_features);
   Py_CLEAR(clear_module_state->__pyx_n_s_features_by_melody);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_features_py);
   Py_CLEAR(clear_module_state->__pyx_n_s_filename);
   Py_CLEAR(clear_module_state->__pyx_n_s_first_features);
   Py_CLEAR(clear_module_state->__pyx_n_s_float);
@@ -4780,6 +4784,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_indent);
   Py_CLEAR(clear_module_state->__pyx_n_s_inf);
   Py_CLEAR(clear_module_state->__pyx_n_s_initializing);
+  Py_CLEAR(clear_module_state->__pyx_n_s_input_path);
   Py_CLEAR(clear_module_state->__pyx_n_s_inscale);
   Py_CLEAR(clear_module_state->__pyx_n_s_int);
   Py_CLEAR(clear_module_state->__pyx_n_s_interpolation_contour);
@@ -4925,6 +4930,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_open);
   Py_CLEAR(clear_module_state->__pyx_n_s_other_sum);
   Py_CLEAR(clear_module_state->__pyx_n_s_output_file);
+  Py_CLEAR(clear_module_state->__pyx_n_s_output_path);
   Py_CLEAR(clear_module_state->__pyx_n_s_p);
   Py_CLEAR(clear_module_state->__pyx_n_s_pc);
   Py_CLEAR(clear_module_state->__pyx_n_s_pc_values);
@@ -5357,7 +5363,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_F);
   Py_VISIT(traverse_module_state->__pyx_kp_s_F_2);
   Py_VISIT(traverse_module_state->__pyx_n_s_FantasticTokenizer);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Feature_Set_features_py);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Features_saved_to);
   Py_VISIT(traverse_module_state->__pyx_kp_u_Features_saved_to_2);
   Py_VISIT(traverse_module_state->__pyx_n_s_G);
@@ -5504,6 +5509,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_kp_s_f_2);
   Py_VISIT(traverse_module_state->__pyx_n_s_features);
   Py_VISIT(traverse_module_state->__pyx_n_s_features_by_melody);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_features_py);
   Py_VISIT(traverse_module_state->__pyx_n_s_filename);
   Py_VISIT(traverse_module_state->__pyx_n_s_first_features);
   Py_VISIT(traverse_module_state->__pyx_n_s_float);
@@ -5551,6 +5557,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_indent);
   Py_VISIT(traverse_module_state->__pyx_n_s_inf);
   Py_VISIT(traverse_module_state->__pyx_n_s_initializing);
+  Py_VISIT(traverse_module_state->__pyx_n_s_input_path);
   Py_VISIT(traverse_module_state->__pyx_n_s_inscale);
   Py_VISIT(traverse_module_state->__pyx_n_s_int);
   Py_VISIT(traverse_module_state->__pyx_n_s_interpolation_contour);
@@ -5696,6 +5703,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_open);
   Py_VISIT(traverse_module_state->__pyx_n_s_other_sum);
   Py_VISIT(traverse_module_state->__pyx_n_s_output_file);
+  Py_VISIT(traverse_module_state->__pyx_n_s_output_path);
   Py_VISIT(traverse_module_state->__pyx_n_s_p);
   Py_VISIT(traverse_module_state->__pyx_n_s_pc);
   Py_VISIT(traverse_module_state->__pyx_n_s_pc_values);
@@ -6138,7 +6146,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_F __pyx_mstate_global->__pyx_n_s_F
 #define __pyx_kp_s_F_2 __pyx_mstate_global->__pyx_kp_s_F_2
 #define __pyx_n_s_FantasticTokenizer __pyx_mstate_global->__pyx_n_s_FantasticTokenizer
-#define __pyx_kp_s_Feature_Set_features_py __pyx_mstate_global->__pyx_kp_s_Feature_Set_features_py
 #define __pyx_kp_u_Features_saved_to __pyx_mstate_global->__pyx_kp_u_Features_saved_to
 #define __pyx_kp_u_Features_saved_to_2 __pyx_mstate_global->__pyx_kp_u_Features_saved_to_2
 #define __pyx_n_s_G __pyx_mstate_global->__pyx_n_s_G
@@ -6285,6 +6292,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_kp_s_f_2 __pyx_mstate_global->__pyx_kp_s_f_2
 #define __pyx_n_s_features __pyx_mstate_global->__pyx_n_s_features
 #define __pyx_n_s_features_by_melody __pyx_mstate_global->__pyx_n_s_features_by_melody
+#define __pyx_kp_s_features_py __pyx_mstate_global->__pyx_kp_s_features_py
 #define __pyx_n_s_filename __pyx_mstate_global->__pyx_n_s_filename
 #define __pyx_n_s_first_features __pyx_mstate_global->__pyx_n_s_first_features
 #define __pyx_n_s_float __pyx_mstate_global->__pyx_n_s_float
@@ -6332,6 +6340,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_indent __pyx_mstate_global->__pyx_n_s_indent
 #define __pyx_n_s_inf __pyx_mstate_global->__pyx_n_s_inf
 #define __pyx_n_s_initializing __pyx_mstate_global->__pyx_n_s_initializing
+#define __pyx_n_s_input_path __pyx_mstate_global->__pyx_n_s_input_path
 #define __pyx_n_s_inscale __pyx_mstate_global->__pyx_n_s_inscale
 #define __pyx_n_s_int __pyx_mstate_global->__pyx_n_s_int
 #define __pyx_n_s_interpolation_contour __pyx_mstate_global->__pyx_n_s_interpolation_contour
@@ -6477,6 +6486,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_open __pyx_mstate_global->__pyx_n_s_open
 #define __pyx_n_s_other_sum __pyx_mstate_global->__pyx_n_s_other_sum
 #define __pyx_n_s_output_file __pyx_mstate_global->__pyx_n_s_output_file
+#define __pyx_n_s_output_path __pyx_mstate_global->__pyx_n_s_output_path
 #define __pyx_n_s_p __pyx_mstate_global->__pyx_n_s_p
 #define __pyx_n_s_pc __pyx_mstate_global->__pyx_n_s_pc
 #define __pyx_n_s_pc_values __pyx_mstate_global->__pyx_n_s_pc_values
@@ -6962,7 +6972,7 @@ static PyObject *__pyx_pf_8features_pitch_range(CYTHON_UNUSED PyObject *__pyx_se
   /* "features.py":54
  *         Range between highest and lowest pitch in semitones
  *     """
- *     return range_func(pitches)             # <<<<<<<<<<<<<<
+ *     return int(range_func(pitches))             # <<<<<<<<<<<<<<
  * 
  * def pitch_standard_deviation(pitches: list[int]) -> float:
  */
@@ -6991,9 +7001,12 @@ static PyObject *__pyx_pf_8features_pitch_range(CYTHON_UNUSED PyObject *__pyx_se
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 54, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_2)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_2))) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":41
@@ -7018,7 +7031,7 @@ static PyObject *__pyx_pf_8features_pitch_range(CYTHON_UNUSED PyObject *__pyx_se
 }
 
 /* "features.py":56
- *     return range_func(pitches)
+ *     return int(range_func(pitches))
  * 
  * def pitch_standard_deviation(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the standard deviation of pitch values.
@@ -7142,7 +7155,7 @@ static PyObject *__pyx_pf_8features_2pitch_standard_deviation(CYTHON_UNUSED PyOb
   /* "features.py":69
  *         Standard deviation of pitches
  *     """
- *     return standard_deviation(pitches)             # <<<<<<<<<<<<<<
+ *     return float(standard_deviation(pitches))             # <<<<<<<<<<<<<<
  * 
  * def pitch_entropy(pitches: list[int]) -> float:
  */
@@ -7171,12 +7184,15 @@ static PyObject *__pyx_pf_8features_2pitch_standard_deviation(CYTHON_UNUSED PyOb
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":56
- *     return range_func(pitches)
+ *     return int(range_func(pitches))
  * 
  * def pitch_standard_deviation(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the standard deviation of pitch values.
@@ -7197,7 +7213,7 @@ static PyObject *__pyx_pf_8features_2pitch_standard_deviation(CYTHON_UNUSED PyOb
 }
 
 /* "features.py":71
- *     return standard_deviation(pitches)
+ *     return float(standard_deviation(pitches))
  * 
  * def pitch_entropy(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the Shannon entropy of pitch values.
@@ -7321,7 +7337,7 @@ static PyObject *__pyx_pf_8features_4pitch_entropy(CYTHON_UNUSED PyObject *__pyx
   /* "features.py":84
  *         Shannon entropy of pitch distribution
  *     """
- *     return shannon_entropy(pitches)             # <<<<<<<<<<<<<<
+ *     return float(shannon_entropy(pitches))             # <<<<<<<<<<<<<<
  * 
  * def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:
  */
@@ -7350,12 +7366,15 @@ static PyObject *__pyx_pf_8features_4pitch_entropy(CYTHON_UNUSED PyObject *__pyx
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":71
- *     return standard_deviation(pitches)
+ *     return float(standard_deviation(pitches))
  * 
  * def pitch_entropy(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the Shannon entropy of pitch values.
@@ -7376,7 +7395,7 @@ static PyObject *__pyx_pf_8features_4pitch_entropy(CYTHON_UNUSED PyObject *__pyx
 }
 
 /* "features.py":86
- *     return shannon_entropy(pitches)
+ *     return float(shannon_entropy(pitches))
  * 
  * def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of pitches.
@@ -7788,7 +7807,7 @@ static PyObject *__pyx_pf_8features_6pcdist1(CYTHON_UNUSED PyObject *__pyx_self,
   goto __pyx_L0;
 
   /* "features.py":86
- *     return shannon_entropy(pitches)
+ *     return float(shannon_entropy(pitches))
  * 
  * def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of pitches.
@@ -9106,7 +9125,7 @@ static PyObject *__pyx_pf_8features_18most_common_pitch(CYTHON_UNUSED PyObject *
   /* "features.py":212
  *         Most common pitch value
  *     """
- *     return mode(pitches)             # <<<<<<<<<<<<<<
+ *     return int(mode(pitches))             # <<<<<<<<<<<<<<
  * 
  * def number_of_common_pitches(pitches: list[int]) -> int:
  */
@@ -9135,9 +9154,12 @@ static PyObject *__pyx_pf_8features_18most_common_pitch(CYTHON_UNUSED PyObject *
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 212, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_2)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_2))) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":199
@@ -9162,7 +9184,7 @@ static PyObject *__pyx_pf_8features_18most_common_pitch(CYTHON_UNUSED PyObject *
 }
 
 /* "features.py":214
- *     return mode(pitches)
+ *     return int(mode(pitches))
  * 
  * def number_of_common_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count pitch classes that appear in at least 9% of notes.
@@ -9292,7 +9314,7 @@ static PyObject *__pyx_pf_8features_20number_of_common_pitches(CYTHON_UNUSED PyO
  *     """
  *     pcs = [pitch % 12 for pitch in pitches]             # <<<<<<<<<<<<<<
  *     significant_pcs = nine_percent_significant_values(pcs)
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  */
   { /* enter inner scope */
     __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L5_error)
@@ -9335,7 +9357,7 @@ static PyObject *__pyx_pf_8features_20number_of_common_pitches(CYTHON_UNUSED PyO
  *     """
  *     pcs = [pitch % 12 for pitch in pitches]
  *     significant_pcs = nine_percent_significant_values(pcs)             # <<<<<<<<<<<<<<
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  * 
  */
   __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_nine_percent_significant_values); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
@@ -9368,7 +9390,7 @@ static PyObject *__pyx_pf_8features_20number_of_common_pitches(CYTHON_UNUSED PyO
   /* "features.py":229
  *     pcs = [pitch % 12 for pitch in pitches]
  *     significant_pcs = nine_percent_significant_values(pcs)
- *     return len(significant_pcs)             # <<<<<<<<<<<<<<
+ *     return int(len(significant_pcs))             # <<<<<<<<<<<<<<
  * 
  * def number_of_pitches(pitches: list[int]) -> int:
  */
@@ -9376,13 +9398,16 @@ static PyObject *__pyx_pf_8features_20number_of_common_pitches(CYTHON_UNUSED PyO
   __pyx_t_3 = PyObject_Length(__pyx_v_significant_pcs); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 229, __pyx_L1_error)
   __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 229, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyInt_Type)), __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_2))) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":214
- *     return mode(pitches)
+ *     return int(mode(pitches))
  * 
  * def number_of_common_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count pitch classes that appear in at least 9% of notes.
@@ -9406,7 +9431,7 @@ static PyObject *__pyx_pf_8features_20number_of_common_pitches(CYTHON_UNUSED PyO
 }
 
 /* "features.py":231
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  * 
  * def number_of_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count number of unique pitches.
@@ -9520,6 +9545,7 @@ static PyObject *__pyx_pf_8features_22number_of_pitches(CYTHON_UNUSED PyObject *
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -9528,7 +9554,7 @@ static PyObject *__pyx_pf_8features_22number_of_pitches(CYTHON_UNUSED PyObject *
   /* "features.py":244
  *         Number of unique pitches
  *     """
- *     return len(set(pitches))             # <<<<<<<<<<<<<<
+ *     return int(len(set(pitches)))             # <<<<<<<<<<<<<<
  * 
  * def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:
  */
@@ -9539,13 +9565,16 @@ static PyObject *__pyx_pf_8features_22number_of_pitches(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 244, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyInt_Type)), __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_3))) __PYX_ERR(0, 244, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_3);
+  __pyx_t_3 = 0;
   goto __pyx_L0;
 
   /* "features.py":231
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  * 
  * def number_of_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count number of unique pitches.
@@ -9555,6 +9584,7 @@ static PyObject *__pyx_pf_8features_22number_of_pitches(CYTHON_UNUSED PyObject *
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_AddTraceback("features.number_of_pitches", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -9564,7 +9594,7 @@ static PyObject *__pyx_pf_8features_22number_of_pitches(CYTHON_UNUSED PyObject *
 }
 
 /* "features.py":246
- *     return len(set(pitches))
+ *     return int(len(set(pitches)))
  * 
  * def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of pitch classes arranged in circle of fifths.
@@ -9848,7 +9878,7 @@ static PyObject *__pyx_pf_8features_24folded_fifths_pitch_class_histogram(CYTHON
   goto __pyx_L0;
 
   /* "features.py":246
- *     return len(set(pitches))
+ *     return int(len(set(pitches)))
  * 
  * def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of pitch classes arranged in circle of fifths.
@@ -10086,7 +10116,7 @@ static PyObject *__pyx_pf_8features_26pitch_class_kurtosis_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  */
   __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_histogram); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 284, __pyx_L1_error)
   __pyx_t_7 = (!__pyx_t_6);
@@ -10096,7 +10126,7 @@ static PyObject *__pyx_pf_8features_26pitch_class_kurtosis_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:
  *         return 0.0             # <<<<<<<<<<<<<<
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  * 
  */
     __Pyx_XDECREF(__pyx_r);
@@ -10109,14 +10139,14 @@ static PyObject *__pyx_pf_8features_26pitch_class_kurtosis_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  */
   }
 
   /* "features.py":286
  *     if not histogram:
  *         return 0.0
- *     return kurtosis(list(histogram.keys()))             # <<<<<<<<<<<<<<
+ *     return float(kurtosis(list(histogram.keys())))             # <<<<<<<<<<<<<<
  * 
  * def pitch_class_skewness_after_folding(pitches: list[int]) -> float:
  */
@@ -10173,8 +10203,11 @@ static PyObject *__pyx_pf_8features_26pitch_class_kurtosis_after_folding(CYTHON_
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":269
@@ -10204,7 +10237,7 @@ static PyObject *__pyx_pf_8features_26pitch_class_kurtosis_after_folding(CYTHON_
 }
 
 /* "features.py":288
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  * 
  * def pitch_class_skewness_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate skewness of folded fifths pitch class histogram.
@@ -10416,7 +10449,7 @@ static PyObject *__pyx_pf_8features_28pitch_class_skewness_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  */
   __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_histogram); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 303, __pyx_L1_error)
   __pyx_t_7 = (!__pyx_t_6);
@@ -10426,7 +10459,7 @@ static PyObject *__pyx_pf_8features_28pitch_class_skewness_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:
  *         return 0.0             # <<<<<<<<<<<<<<
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  * 
  */
     __Pyx_XDECREF(__pyx_r);
@@ -10439,14 +10472,14 @@ static PyObject *__pyx_pf_8features_28pitch_class_skewness_after_folding(CYTHON_
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  */
   }
 
   /* "features.py":305
  *     if not histogram:
  *         return 0.0
- *     return skew(list(histogram.keys()))             # <<<<<<<<<<<<<<
+ *     return float(skew(list(histogram.keys())))             # <<<<<<<<<<<<<<
  * 
  * def pitch_class_variability_after_folding(pitches: list[int]) -> float:
  */
@@ -10503,12 +10536,15 @@ static PyObject *__pyx_pf_8features_28pitch_class_skewness_after_folding(CYTHON_
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":288
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  * 
  * def pitch_class_skewness_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate skewness of folded fifths pitch class histogram.
@@ -10534,7 +10570,7 @@ static PyObject *__pyx_pf_8features_28pitch_class_skewness_after_folding(CYTHON_
 }
 
 /* "features.py":307
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  * 
  * def pitch_class_variability_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate standard deviation of folded fifths pitch class histogram.
@@ -10746,7 +10782,7 @@ static PyObject *__pyx_pf_8features_30pitch_class_variability_after_folding(CYTH
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return standard_deviation(list(histogram.keys()))
+ *     return float(standard_deviation(list(histogram.keys())))
  */
   __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_histogram); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 322, __pyx_L1_error)
   __pyx_t_7 = (!__pyx_t_6);
@@ -10756,7 +10792,7 @@ static PyObject *__pyx_pf_8features_30pitch_class_variability_after_folding(CYTH
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:
  *         return 0.0             # <<<<<<<<<<<<<<
- *     return standard_deviation(list(histogram.keys()))
+ *     return float(standard_deviation(list(histogram.keys())))
  * 
  */
     __Pyx_XDECREF(__pyx_r);
@@ -10769,14 +10805,14 @@ static PyObject *__pyx_pf_8features_30pitch_class_variability_after_folding(CYTH
  *     histogram = folded_fifths_pitch_class_histogram(pitches)
  *     if not histogram:             # <<<<<<<<<<<<<<
  *         return 0.0
- *     return standard_deviation(list(histogram.keys()))
+ *     return float(standard_deviation(list(histogram.keys())))
  */
   }
 
   /* "features.py":324
  *     if not histogram:
  *         return 0.0
- *     return standard_deviation(list(histogram.keys()))             # <<<<<<<<<<<<<<
+ *     return float(standard_deviation(list(histogram.keys())))             # <<<<<<<<<<<<<<
  * 
  * # Interval Features
  */
@@ -10833,12 +10869,15 @@ static PyObject *__pyx_pf_8features_30pitch_class_variability_after_folding(CYTH
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":307
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  * 
  * def pitch_class_variability_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate standard deviation of folded fifths pitch class histogram.
@@ -11176,7 +11215,7 @@ static PyObject *__pyx_pf_8features_34absolute_interval_range(CYTHON_UNUSED PyOb
   /* "features.py":356
  *         Range between largest and smallest absolute interval in semitones
  *     """
- *     return range_func([abs(x) for x in pitch_interval(pitches)])             # <<<<<<<<<<<<<<
+ *     return int(range_func([abs(x) for x in pitch_interval(pitches)]))             # <<<<<<<<<<<<<<
  * 
  * def mean_absolute_interval(pitches: list[int]) -> float:
  */
@@ -11301,9 +11340,12 @@ static PyObject *__pyx_pf_8features_34absolute_interval_range(CYTHON_UNUSED PyOb
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 356, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_2)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_2))) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":343
@@ -11332,7 +11374,7 @@ static PyObject *__pyx_pf_8features_34absolute_interval_range(CYTHON_UNUSED PyOb
 }
 
 /* "features.py":358
- *     return range_func([abs(x) for x in pitch_interval(pitches)])
+ *     return int(range_func([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def mean_absolute_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate mean absolute interval size.
@@ -11598,7 +11640,7 @@ static PyObject *__pyx_pf_8features_36mean_absolute_interval(CYTHON_UNUSED PyObj
   goto __pyx_L0;
 
   /* "features.py":358
- *     return range_func([abs(x) for x in pitch_interval(pitches)])
+ *     return int(range_func([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def mean_absolute_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate mean absolute interval size.
@@ -11753,7 +11795,7 @@ static PyObject *__pyx_pf_8features_38standard_deviation_absolute_interval(CYTHO
   /* "features.py":389
  *         Standard deviation of absolute interval sizes in semitones
  *     """
- *     return np.std([abs(x) for x in pitch_interval(pitches)])             # <<<<<<<<<<<<<<
+ *     return float(np.std([abs(x) for x in pitch_interval(pitches)]))             # <<<<<<<<<<<<<<
  * 
  * def modal_interval(pitches: list[int]) -> int:
  */
@@ -11881,8 +11923,11 @@ static PyObject *__pyx_pf_8features_38standard_deviation_absolute_interval(CYTHO
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_3 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_3;
+  __pyx_t_3 = 0;
   goto __pyx_L0;
 
   /* "features.py":376
@@ -11911,7 +11956,7 @@ static PyObject *__pyx_pf_8features_38standard_deviation_absolute_interval(CYTHO
 }
 
 /* "features.py":391
- *     return np.std([abs(x) for x in pitch_interval(pitches)])
+ *     return float(np.std([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def modal_interval(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Find most common interval size.
@@ -12037,7 +12082,7 @@ static PyObject *__pyx_pf_8features_40modal_interval(CYTHON_UNUSED PyObject *__p
   /* "features.py":404
  *         Most frequent interval size in semitones
  *     """
- *     return mode(pitch_interval(pitches))             # <<<<<<<<<<<<<<
+ *     return int(mode(pitch_interval(pitches)))             # <<<<<<<<<<<<<<
  * 
  * # Alias for modal_interval / FANTASTIC vs jSymbolic
  */
@@ -12091,13 +12136,16 @@ static PyObject *__pyx_pf_8features_40modal_interval(CYTHON_UNUSED PyObject *__p
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_1))) __PYX_ERR(0, 404, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_2)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_2))) __PYX_ERR(0, 404, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":391
- *     return np.std([abs(x) for x in pitch_interval(pitches)])
+ *     return float(np.std([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def modal_interval(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Find most common interval size.
@@ -12246,7 +12294,7 @@ static PyObject *__pyx_pf_8features_42interval_entropy(CYTHON_UNUSED PyObject *_
   /* "features.py":422
  *         Shannon entropy of interval sizes
  *     """
- *     return shannon_entropy(pitch_interval(pitches))             # <<<<<<<<<<<<<<
+ *     return float(shannon_entropy(pitch_interval(pitches)))             # <<<<<<<<<<<<<<
  * 
  * def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:
  */
@@ -12300,8 +12348,11 @@ static PyObject *__pyx_pf_8features_42interval_entropy(CYTHON_UNUSED PyObject *_
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "features.py":409
@@ -12328,7 +12379,7 @@ static PyObject *__pyx_pf_8features_42interval_entropy(CYTHON_UNUSED PyObject *_
 }
 
 /* "features.py":424
- *     return shannon_entropy(pitch_interval(pitches))
+ *     return float(shannon_entropy(pitch_interval(pitches)))
  * 
  * def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of intervals.
@@ -12778,7 +12829,7 @@ static PyObject *__pyx_pf_8features_44ivdist1(CYTHON_UNUSED PyObject *__pyx_self
   goto __pyx_L0;
 
   /* "features.py":424
- *     return shannon_entropy(pitch_interval(pitches))
+ *     return float(shannon_entropy(pitch_interval(pitches)))
  * 
  * def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of intervals.
@@ -13256,7 +13307,7 @@ static PyObject *__pyx_pf_8features_46interval_direction(CYTHON_UNUSED PyObject 
  *     variance = sum((x - mean) ** 2 for x in directions) / len(directions)
  *     std_dev = math.sqrt(variance)             # <<<<<<<<<<<<<<
  * 
- *     return mean, std_dev
+ *     return float(mean), float(std_dev)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_math); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
@@ -13291,21 +13342,25 @@ static PyObject *__pyx_pf_8features_46interval_direction(CYTHON_UNUSED PyObject 
   /* "features.py":479
  *     std_dev = math.sqrt(variance)
  * 
- *     return mean, std_dev             # <<<<<<<<<<<<<<
+ *     return float(mean), float(std_dev)             # <<<<<<<<<<<<<<
  * 
  * def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 479, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyNumber_Float(__pyx_cur_scope->__pyx_v_mean); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 479, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_mean);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_mean);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_cur_scope->__pyx_v_mean)) __PYX_ERR(0, 479, __pyx_L1_error);
-  __Pyx_INCREF(__pyx_v_std_dev);
-  __Pyx_GIVEREF(__pyx_v_std_dev);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_std_dev)) __PYX_ERR(0, 479, __pyx_L1_error);
-  __pyx_r = __pyx_t_1;
+  __pyx_t_5 = __Pyx_PyNumber_Float(__pyx_v_std_dev); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 479, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 479, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GIVEREF(__pyx_t_1);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_1)) __PYX_ERR(0, 479, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_5)) __PYX_ERR(0, 479, __pyx_L1_error);
   __pyx_t_1 = 0;
+  __pyx_t_5 = 0;
+  __pyx_r = __pyx_t_9;
+  __pyx_t_9 = 0;
   goto __pyx_L0;
 
   /* "features.py":451
@@ -13338,7 +13393,7 @@ static PyObject *__pyx_pf_8features_46interval_direction(CYTHON_UNUSED PyObject 
 }
 
 /* "features.py":481
- *     return mean, std_dev
+ *     return float(mean), float(std_dev)
  * 
  * def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate average interval span of melodic arcs.
@@ -13990,7 +14045,7 @@ static PyObject *__pyx_pf_8features_48average_interval_span_by_melodic_arcs(CYTH
  *     else:
  *         value = total_intervals / number_intervals             # <<<<<<<<<<<<<<
  * 
- *     return value
+ *     return float(value)
  */
   /*else*/ {
     __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_v_total_intervals, __pyx_v_number_intervals); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
@@ -14003,17 +14058,19 @@ static PyObject *__pyx_pf_8features_48average_interval_span_by_melodic_arcs(CYTH
   /* "features.py":533
  *         value = total_intervals / number_intervals
  * 
- *     return value             # <<<<<<<<<<<<<<
+ *     return float(value)             # <<<<<<<<<<<<<<
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_v_value);
-  __pyx_r = __pyx_v_value;
+  __pyx_t_1 = __Pyx_PyNumber_Float(__pyx_v_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 533, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "features.py":481
- *     return mean, std_dev
+ *     return float(mean), float(std_dev)
  * 
  * def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate average interval span of melodic arcs.
@@ -14040,7 +14097,7 @@ static PyObject *__pyx_pf_8features_48average_interval_span_by_melodic_arcs(CYTH
 }
 
 /* "features.py":535
- *     return value
+ *     return float(value)
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate absolute difference between two most common interval sizes.
@@ -14280,7 +14337,7 @@ static PyObject *__pyx_lambda_funcdef_lambda1(CYTHON_UNUSED PyObject *__pyx_self
 }
 
 /* "features.py":535
- *     return value
+ *     return float(value)
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate absolute difference between two most common interval sizes.
@@ -14538,7 +14595,7 @@ static PyObject *__pyx_pf_8features_50distance_between_most_prevalent_melodic_in
  *     sorted_intervals = sorted(interval_counts.items(), key=lambda x: x[1], reverse=True)
  *     most_common = sorted_intervals[0][0]             # <<<<<<<<<<<<<<
  *     second_most_common = sorted_intervals[1][0]
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  */
   __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_sorted_intervals, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -14552,7 +14609,7 @@ static PyObject *__pyx_pf_8features_50distance_between_most_prevalent_melodic_in
  *     sorted_intervals = sorted(interval_counts.items(), key=lambda x: x[1], reverse=True)
  *     most_common = sorted_intervals[0][0]
  *     second_most_common = sorted_intervals[1][0]             # <<<<<<<<<<<<<<
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  * 
  */
   __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_sorted_intervals, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 562, __pyx_L1_error)
@@ -14566,7 +14623,7 @@ static PyObject *__pyx_pf_8features_50distance_between_most_prevalent_melodic_in
   /* "features.py":563
  *     most_common = sorted_intervals[0][0]
  *     second_most_common = sorted_intervals[1][0]
- *     return abs(most_common - second_most_common)             # <<<<<<<<<<<<<<
+ *     return float(abs(most_common - second_most_common))             # <<<<<<<<<<<<<<
  * 
  * def melodic_interval_histogram(pitches: list[int]) -> dict:
  */
@@ -14576,12 +14633,15 @@ static PyObject *__pyx_pf_8features_50distance_between_most_prevalent_melodic_in
   __pyx_t_3 = __Pyx_PyNumber_Absolute(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 563, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_r = __pyx_t_3;
-  __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyNumber_Float(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 563, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_r = __pyx_t_4;
+  __pyx_t_4 = 0;
   goto __pyx_L0;
 
   /* "features.py":535
- *     return value
+ *     return float(value)
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate absolute difference between two most common interval sizes.
@@ -14608,7 +14668,7 @@ static PyObject *__pyx_pf_8features_50distance_between_most_prevalent_melodic_in
 }
 
 /* "features.py":565
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  * 
  * def melodic_interval_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of interval sizes.
@@ -14840,7 +14900,7 @@ static PyObject *__pyx_pf_8features_52melodic_interval_histogram(CYTHON_UNUSED P
   goto __pyx_L0;
 
   /* "features.py":565
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  * 
  * def melodic_interval_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of interval sizes.
@@ -14977,7 +15037,7 @@ static PyObject *__pyx_gb_8features_23melodic_large_intervals_2generator1(__pyx_
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
 
@@ -15225,7 +15285,7 @@ static PyObject *__pyx_pf_8features_54melodic_large_intervals(CYTHON_UNUSED PyOb
  *     if not intervals:
  *         return -1.0             # <<<<<<<<<<<<<<
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_INCREF(__pyx_float_neg_1_0);
@@ -15245,7 +15305,7 @@ static PyObject *__pyx_pf_8features_54melodic_large_intervals(CYTHON_UNUSED PyOb
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
   __pyx_t_1 = __pyx_pf_8features_23melodic_large_intervals_genexpr(NULL, __pyx_v_intervals); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 598, __pyx_L1_error)
@@ -15259,7 +15319,7 @@ static PyObject *__pyx_pf_8features_54melodic_large_intervals(CYTHON_UNUSED PyOb
   /* "features.py":599
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= 13)
- *     return large_intervals / len(intervals) if intervals else 0.0             # <<<<<<<<<<<<<<
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)             # <<<<<<<<<<<<<<
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:
  */
@@ -15278,8 +15338,11 @@ static PyObject *__pyx_pf_8features_54melodic_large_intervals(CYTHON_UNUSED PyOb
     __Pyx_INCREF(__pyx_float_0_0);
     __pyx_t_2 = __pyx_float_0_0;
   }
-  __pyx_r = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyNumber_Float(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_3;
+  __pyx_t_3 = 0;
   goto __pyx_L0;
 
   /* "features.py":582
@@ -15307,7 +15370,7 @@ static PyObject *__pyx_pf_8features_54melodic_large_intervals(CYTHON_UNUSED PyOb
 }
 
 /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -15437,7 +15500,7 @@ static PyObject *__pyx_gb_8features_26variable_melodic_intervals_2generator2(__p
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
 
@@ -15614,7 +15677,7 @@ static PyObject *__pyx_gb_8features_26variable_melodic_intervals_2generator2(__p
 }
 
 /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -15701,7 +15764,7 @@ static PyObject *__pyx_pf_8features_56variable_melodic_intervals(CYTHON_UNUSED P
  *     if not intervals:
  *         return -1.0             # <<<<<<<<<<<<<<
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_INCREF(__pyx_float_neg_1_0);
@@ -15721,7 +15784,7 @@ static PyObject *__pyx_pf_8features_56variable_melodic_intervals(CYTHON_UNUSED P
  *     if not intervals:
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)             # <<<<<<<<<<<<<<
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  */
   __pyx_t_1 = __pyx_pf_8features_26variable_melodic_intervals_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_intervals); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 619, __pyx_L1_error)
@@ -15735,7 +15798,7 @@ static PyObject *__pyx_pf_8features_56variable_melodic_intervals(CYTHON_UNUSED P
   /* "features.py":620
  *         return -1.0
  *     large_intervals = sum(1 for interval in intervals if abs(interval) >= interval_level)
- *     return large_intervals / len(intervals) if intervals else 0.0             # <<<<<<<<<<<<<<
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)             # <<<<<<<<<<<<<<
  * 
  * def number_of_common_melodic_intervals(pitches: list[int]) -> int:
  */
@@ -15754,12 +15817,15 @@ static PyObject *__pyx_pf_8features_56variable_melodic_intervals(CYTHON_UNUSED P
     __Pyx_INCREF(__pyx_float_0_0);
     __pyx_t_2 = __pyx_float_0_0;
   }
-  __pyx_r = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyNumber_Float(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 620, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_3;
+  __pyx_t_3 = 0;
   goto __pyx_L0;
 
   /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -15784,7 +15850,7 @@ static PyObject *__pyx_pf_8features_56variable_melodic_intervals(CYTHON_UNUSED P
 }
 
 /* "features.py":622
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def number_of_common_melodic_intervals(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count intervals that appear in at least 9% of melodic transitions.
@@ -15981,7 +16047,7 @@ static PyObject *__pyx_pf_8features_58number_of_common_melodic_intervals(CYTHON_
  *     intervals = pitch_interval(pitches)
  *     significant_intervals = nine_percent_significant_values(intervals)             # <<<<<<<<<<<<<<
  * 
- *     return len(significant_intervals)
+ *     return int(len(significant_intervals))
  */
   __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_nine_percent_significant_values); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 639, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -16013,7 +16079,7 @@ static PyObject *__pyx_pf_8features_58number_of_common_melodic_intervals(CYTHON_
   /* "features.py":641
  *     significant_intervals = nine_percent_significant_values(intervals)
  * 
- *     return len(significant_intervals)             # <<<<<<<<<<<<<<
+ *     return int(len(significant_intervals))             # <<<<<<<<<<<<<<
  * 
  * def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:
  */
@@ -16021,13 +16087,16 @@ static PyObject *__pyx_pf_8features_58number_of_common_melodic_intervals(CYTHON_
   __pyx_t_1 = PyObject_Length(__pyx_v_significant_intervals); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 641, __pyx_L1_error)
   __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 641, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_3)) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_3))) __PYX_ERR(0, 641, __pyx_L1_error)
-  __pyx_r = ((PyObject*)__pyx_t_3);
-  __pyx_t_3 = 0;
+  __pyx_t_4 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyInt_Type)), __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 641, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (!(likely(__Pyx_Py3Int_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("int", __pyx_t_4))) __PYX_ERR(0, 641, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_4);
+  __pyx_t_4 = 0;
   goto __pyx_L0;
 
   /* "features.py":622
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def number_of_common_melodic_intervals(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count intervals that appear in at least 9% of melodic transitions.
@@ -16050,7 +16119,7 @@ static PyObject *__pyx_pf_8features_58number_of_common_melodic_intervals(CYTHON_
 }
 
 /* "features.py":643
- *     return len(significant_intervals)
+ *     return int(len(significant_intervals))
  * 
  * def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of most common interval.
@@ -16323,7 +16392,7 @@ static PyObject *__pyx_pf_8features_60prevalence_of_most_common_melodic_interval
  *     for interval in intervals:
  *         interval_counts[interval] = interval_counts.get(interval, 0) + 1             # <<<<<<<<<<<<<<
  * 
- *     return max(interval_counts.values()) / len(intervals)
+ *     return float(max(interval_counts.values()) / len(intervals))
  */
     __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_interval_counts, __pyx_v_interval, __pyx_int_0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
@@ -16346,7 +16415,7 @@ static PyObject *__pyx_pf_8features_60prevalence_of_most_common_melodic_interval
   /* "features.py":664
  *         interval_counts[interval] = interval_counts.get(interval, 0) + 1
  * 
- *     return max(interval_counts.values()) / len(intervals)             # <<<<<<<<<<<<<<
+ *     return float(max(interval_counts.values()) / len(intervals))             # <<<<<<<<<<<<<<
  * 
  * # Contour Features
  */
@@ -16363,12 +16432,15 @@ static PyObject *__pyx_pf_8features_60prevalence_of_most_common_melodic_interval
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_r = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_t_1 = __Pyx_PyNumber_Float(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 664, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "features.py":643
- *     return len(significant_intervals)
+ *     return int(len(significant_intervals))
  * 
  * def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of most common interval.
@@ -47427,7 +47499,7 @@ static PyObject *__pyx_pf_8features_186process_melody(CYTHON_UNUSED PyObject *__
  * 
  *     return melody_id, melody_features             # <<<<<<<<<<<<<<
  * 
- * def get_all_features_csv(filename) -> None:
+ * def get_all_features_csv(input_path, output_path) -> None:
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2502, __pyx_L1_error)
@@ -47471,7 +47543,7 @@ static PyObject *__pyx_pf_8features_186process_melody(CYTHON_UNUSED PyObject *__
 /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
@@ -47484,7 +47556,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_8features_188get_all_features_csv, "Generate CSV file with features for all melodies using multiprocessing.\n    \n    Parameters\n    ----------\n    filename : str\n        Name of output CSV file (without extension)\n        \n    Returns\n    -------\n    None\n        Writes features to CSV file with each melody as a row\n    ");
+PyDoc_STRVAR(__pyx_doc_8features_188get_all_features_csv, "Generate CSV file with features for all melodies using multiprocessing.\n    \n    Parameters\n    ----------\n    input_path : str\n        Path to input JSON file\n    output_path : str\n        Path to output CSV file\n        \n    Returns\n    -------\n    None\n        Writes features to CSV file with each melody as a row\n    ");
 static PyMethodDef __pyx_mdef_8features_189get_all_features_csv = {"get_all_features_csv", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_8features_189get_all_features_csv, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_8features_188get_all_features_csv};
 static PyObject *__pyx_pw_8features_189get_all_features_csv(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
@@ -47493,12 +47565,13 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ) {
-  PyObject *__pyx_v_filename = 0;
+  PyObject *__pyx_v_input_path = 0;
+  PyObject *__pyx_v_output_path = 0;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
+  PyObject* values[2] = {0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -47514,10 +47587,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_filename,0};
+    PyObject **__pyx_pyargnames[] = {&__pyx_n_s_input_path,&__pyx_n_s_output_path,0};
     if (__pyx_kwds) {
       Py_ssize_t kw_args;
       switch (__pyx_nargs) {
+        case  2: values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
         case  1: values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
         CYTHON_FALLTHROUGH;
         case  0: break;
@@ -47526,27 +47601,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       kw_args = __Pyx_NumKwargs_FASTCALL(__pyx_kwds);
       switch (__pyx_nargs) {
         case  0:
-        if (likely((values[0] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_filename)) != 0)) {
+        if (likely((values[0] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_input_path)) != 0)) {
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
         else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 2504, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_GetKwValue_FASTCALL(__pyx_kwds, __pyx_kwvalues, __pyx_n_s_output_path)) != 0)) {
+          (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
+          kw_args--;
+        }
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 2504, __pyx_L3_error)
+        else {
+          __Pyx_RaiseArgtupleInvalid("get_all_features_csv", 1, 2, 2, 1); __PYX_ERR(0, 2504, __pyx_L3_error)
+        }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "get_all_features_csv") < 0)) __PYX_ERR(0, 2504, __pyx_L3_error)
       }
-    } else if (unlikely(__pyx_nargs != 1)) {
+    } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_Arg_FASTCALL(__pyx_args, 0);
+      values[1] = __Pyx_Arg_FASTCALL(__pyx_args, 1);
     }
-    __pyx_v_filename = values[0];
+    __pyx_v_input_path = values[0];
+    __pyx_v_output_path = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_all_features_csv", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 2504, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_all_features_csv", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 2504, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -47560,7 +47647,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8features_188get_all_features_csv(__pyx_self, __pyx_v_filename);
+  __pyx_r = __pyx_pf_8features_188get_all_features_csv(__pyx_self, __pyx_v_input_path, __pyx_v_output_path);
 
   /* function exit code */
   {
@@ -47574,7 +47661,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 }
 static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "features.py":2541
+/* "features.py":2543
  *     headers = ['melody_id']
  *     for category, features in first_features.items():
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())             # <<<<<<<<<<<<<<
@@ -47594,7 +47681,7 @@ static PyObject *__pyx_pf_8features_20get_all_features_csv_genexpr(PyObject *__p
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_8features___pyx_scope_struct_17_genexpr *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 2541, __pyx_L1_error)
+    __PYX_ERR(0, 2543, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -47605,7 +47692,7 @@ static PyObject *__pyx_pf_8features_20get_all_features_csv_genexpr(PyObject *__p
   __Pyx_INCREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_genexpr_arg_0);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8features_20get_all_features_csv_2generator10, NULL, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_get_all_features_csv_locals_gene, __pyx_n_s_features); if (unlikely(!gen)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Generator_New((__pyx_coroutine_body_t) __pyx_gb_8features_20get_all_features_csv_2generator10, NULL, (PyObject *) __pyx_cur_scope, __pyx_n_s_genexpr, __pyx_n_s_get_all_features_csv_locals_gene, __pyx_n_s_features); if (unlikely(!gen)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -47647,14 +47734,14 @@ static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_Co
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 2541, __pyx_L1_error)
+  if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 2543, __pyx_L1_error)
   __pyx_t_2 = 0;
-  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 2541, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_genexpr_arg_0)) { __Pyx_RaiseUnboundLocalError(".0"); __PYX_ERR(0, 2543, __pyx_L1_error) }
   if (unlikely(__pyx_cur_scope->__pyx_genexpr_arg_0 == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 2541, __pyx_L1_error)
+    __PYX_ERR(0, 2543, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_cur_scope->__pyx_genexpr_arg_0, 0, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2541, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_cur_scope->__pyx_genexpr_arg_0, 0, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2543, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -47662,18 +47749,18 @@ static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_Co
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_feature);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_feature, __pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_7 = 0;
     __pyx_t_8 = 127;
-    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_category)) { __Pyx_RaiseClosureNameError("category"); __PYX_ERR(0, 2541, __pyx_L1_error) }
-    __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_category, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_outer_scope->__pyx_v_category)) { __Pyx_RaiseClosureNameError("category"); __PYX_ERR(0, 2543, __pyx_L1_error) }
+    __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_outer_scope->__pyx_v_category, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) : __pyx_t_8;
     __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9);
@@ -47684,14 +47771,14 @@ static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_Co
     __pyx_t_7 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__9);
     PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_kp_u__9);
-    __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_v_feature, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_v_feature, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) : __pyx_t_8;
     __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9);
     __Pyx_GIVEREF(__pyx_t_9);
     PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_t_9);
     __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_5, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_5, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_r = __pyx_t_9;
@@ -47714,7 +47801,7 @@ static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_Co
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
     __pyx_t_4 = __pyx_cur_scope->__pyx_t_3;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 2541, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 2543, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
@@ -47739,7 +47826,7 @@ static PyObject *__pyx_gb_8features_20get_all_features_csv_2generator10(__pyx_Co
   return __pyx_r;
 }
 
-/* "features.py":2569
+/* "features.py":2571
  * 
  *     # Sort results by melody_id since they completed in different order
  *     all_features.sort(key=lambda x: x[0])             # <<<<<<<<<<<<<<
@@ -47800,12 +47887,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 2569, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 2571, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "lambda12") < 0)) __PYX_ERR(0, 2569, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "lambda12") < 0)) __PYX_ERR(0, 2571, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
@@ -47816,7 +47903,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("lambda12", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 2569, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("lambda12", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 2571, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -47852,7 +47939,7 @@ static PyObject *__pyx_lambda_funcdef_lambda12(CYTHON_UNUSED PyObject *__pyx_sel
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("lambda12", 1);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_x, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2569, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_x, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2571, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -47872,12 +47959,12 @@ static PyObject *__pyx_lambda_funcdef_lambda12(CYTHON_UNUSED PyObject *__pyx_sel
 /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
 
-static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_filename) {
+static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_input_path, PyObject *__pyx_v_output_path) {
   struct __pyx_obj_8features___pyx_scope_struct_16_get_all_features_csv *__pyx_cur_scope;
   PyObject *__pyx_v_f = NULL;
   PyObject *__pyx_v_melody_data_list = NULL;
@@ -47936,60 +48023,66 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
 
-  /* "features.py":2517
+  /* "features.py":2519
  *         Writes features to CSV file with each melody as a row
  *     """
  *     print("Starting job...\n")             # <<<<<<<<<<<<<<
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
+ *     with open(input_path, encoding='utf-8') as f:
  *         melody_data_list = json.load(f)
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2517, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2518
+  /* "features.py":2520
  *     """
  *     print("Starting job...\n")
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:             # <<<<<<<<<<<<<<
+ *     with open(input_path, encoding='utf-8') as f:             # <<<<<<<<<<<<<<
  *         melody_data_list = json.load(f)
  *         print(f"Processing {len(melody_data_list)} melodies")
  */
   /*with:*/ {
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2518, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2520, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_encoding, __pyx_kp_s_utf_8) < 0) __PYX_ERR(0, 2518, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple__7, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2518, __pyx_L1_error)
+    __Pyx_INCREF(__pyx_v_input_path);
+    __Pyx_GIVEREF(__pyx_v_input_path);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_input_path)) __PYX_ERR(0, 2520, __pyx_L1_error);
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2520, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2518, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_encoding, __pyx_kp_s_utf_8) < 0) __PYX_ERR(0, 2520, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2520, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2518, __pyx_L3_error)
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_exit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2520, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_enter); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2520, __pyx_L3_error)
+    __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_5 = NULL;
     __pyx_t_6 = 0;
     #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_1);
       if (likely(__pyx_t_5)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
         __Pyx_INCREF(__pyx_t_5);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __Pyx_DECREF_SET(__pyx_t_1, function);
         __pyx_t_6 = 1;
       }
     }
     #endif
     {
       PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-      __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2518, __pyx_L3_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2520, __pyx_L3_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
-    __pyx_t_4 = __pyx_t_1;
-    __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     /*try:*/ {
       {
         __Pyx_PyThreadState_declare
@@ -47999,84 +48092,84 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __Pyx_XGOTREF(__pyx_t_8);
         __Pyx_XGOTREF(__pyx_t_9);
         /*try:*/ {
-          __pyx_v_f = __pyx_t_4;
-          __pyx_t_4 = 0;
+          __pyx_v_f = __pyx_t_1;
+          __pyx_t_1 = 0;
 
-          /* "features.py":2519
+          /* "features.py":2521
  *     print("Starting job...\n")
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
+ *     with open(input_path, encoding='utf-8') as f:
  *         melody_data_list = json.load(f)             # <<<<<<<<<<<<<<
  *         print(f"Processing {len(melody_data_list)} melodies")
  * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_json); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2519, __pyx_L7_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_json); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2521, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2521, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_load); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2519, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = NULL;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __pyx_t_3 = NULL;
           __pyx_t_6 = 0;
           #if CYTHON_UNPACK_METHODS
-          if (unlikely(PyMethod_Check(__pyx_t_1))) {
-            __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-            if (likely(__pyx_t_2)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-              __Pyx_INCREF(__pyx_t_2);
+          if (unlikely(PyMethod_Check(__pyx_t_2))) {
+            __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+            if (likely(__pyx_t_3)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+              __Pyx_INCREF(__pyx_t_3);
               __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_1, function);
+              __Pyx_DECREF_SET(__pyx_t_2, function);
               __pyx_t_6 = 1;
             }
           }
           #endif
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_f};
-            __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2519, __pyx_L7_error)
-            __Pyx_GOTREF(__pyx_t_4);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_f};
+            __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+            __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2521, __pyx_L7_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           }
-          __pyx_v_melody_data_list = __pyx_t_4;
-          __pyx_t_4 = 0;
+          __pyx_v_melody_data_list = __pyx_t_1;
+          __pyx_t_1 = 0;
 
-          /* "features.py":2520
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
+          /* "features.py":2522
+ *     with open(input_path, encoding='utf-8') as f:
  *         melody_data_list = json.load(f)
  *         print(f"Processing {len(melody_data_list)} melodies")             # <<<<<<<<<<<<<<
  * 
  *     start_time = time.time()
  */
-          __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2520, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_4);
+          __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2522, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_10 = 0;
           __pyx_t_11 = 127;
           __Pyx_INCREF(__pyx_kp_u_Processing);
           __pyx_t_10 += 11;
           __Pyx_GIVEREF(__pyx_kp_u_Processing);
-          PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_kp_u_Processing);
-          __pyx_t_12 = PyObject_Length(__pyx_v_melody_data_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2520, __pyx_L7_error)
-          __pyx_t_1 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_12, 0, ' ', 'd'); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2520, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1);
-          __Pyx_GIVEREF(__pyx_t_1);
-          PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_1);
-          __pyx_t_1 = 0;
+          PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_Processing);
+          __pyx_t_12 = PyObject_Length(__pyx_v_melody_data_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2522, __pyx_L7_error)
+          __pyx_t_2 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_12, 0, ' ', 'd'); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2522, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+          __Pyx_GIVEREF(__pyx_t_2);
+          PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+          __pyx_t_2 = 0;
           __Pyx_INCREF(__pyx_kp_u_melodies);
           __pyx_t_10 += 9;
           __Pyx_GIVEREF(__pyx_kp_u_melodies);
-          PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_kp_u_melodies);
-          __pyx_t_1 = __Pyx_PyUnicode_Join(__pyx_t_4, 3, __pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2520, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2520, __pyx_L7_error)
-          __Pyx_GOTREF(__pyx_t_4);
+          PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_melodies);
+          __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2522, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2522, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-          /* "features.py":2518
+          /* "features.py":2520
  *     """
  *     print("Starting job...\n")
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:             # <<<<<<<<<<<<<<
+ *     with open(input_path, encoding='utf-8') as f:             # <<<<<<<<<<<<<<
  *         melody_data_list = json.load(f)
  *         print(f"Processing {len(melody_data_list)} melodies")
  */
@@ -48088,36 +48181,36 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __pyx_L7_error:;
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("features.get_all_features_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_2) < 0) __PYX_ERR(0, 2518, __pyx_L9_except_error)
-          __Pyx_XGOTREF(__pyx_t_4);
+          if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_2, &__pyx_t_3) < 0) __PYX_ERR(0, 2520, __pyx_L9_except_error)
           __Pyx_XGOTREF(__pyx_t_1);
           __Pyx_XGOTREF(__pyx_t_2);
-          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2518, __pyx_L9_except_error)
+          __Pyx_XGOTREF(__pyx_t_3);
+          __pyx_t_5 = PyTuple_Pack(3, __pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2520, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL);
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2518, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2520, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = __Pyx_PyObject_IsTrue(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (__pyx_t_14 < 0) __PYX_ERR(0, 2518, __pyx_L9_except_error)
+          if (__pyx_t_14 < 0) __PYX_ERR(0, 2520, __pyx_L9_except_error)
           __pyx_t_15 = (!__pyx_t_14);
           if (unlikely(__pyx_t_15)) {
-            __Pyx_GIVEREF(__pyx_t_4);
             __Pyx_GIVEREF(__pyx_t_1);
-            __Pyx_XGIVEREF(__pyx_t_2);
-            __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_1, __pyx_t_2);
-            __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_2 = 0; 
-            __PYX_ERR(0, 2518, __pyx_L9_except_error)
+            __Pyx_GIVEREF(__pyx_t_2);
+            __Pyx_XGIVEREF(__pyx_t_3);
+            __Pyx_ErrRestoreWithState(__pyx_t_1, __pyx_t_2, __pyx_t_3);
+            __pyx_t_1 = 0; __pyx_t_2 = 0; __pyx_t_3 = 0; 
+            __PYX_ERR(0, 2520, __pyx_L9_except_error)
           }
-          __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           goto __pyx_L8_exception_handled;
         }
         __pyx_L9_except_error:;
@@ -48136,10 +48229,10 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     /*finally:*/ {
       /*normal exit:*/{
-        if (__pyx_t_3) {
-          __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__6, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2518, __pyx_L1_error)
+        if (__pyx_t_4) {
+          __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__6, NULL);
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2520, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -48149,402 +48242,402 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     goto __pyx_L16;
     __pyx_L3_error:;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L1_error;
     __pyx_L16:;
   }
 
-  /* "features.py":2522
+  /* "features.py":2524
  *         print(f"Processing {len(melody_data_list)} melodies")
  * 
  *     start_time = time.time()             # <<<<<<<<<<<<<<
  * 
  *     # Process first melody to get header structure
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2522, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2524, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_time); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2522, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = NULL;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
-    if (likely(__pyx_t_1)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-      __Pyx_INCREF(__pyx_t_1);
+  if (unlikely(PyMethod_Check(__pyx_t_1))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+      __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __Pyx_DECREF_SET(__pyx_t_1, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
-    __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2522, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
+    __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2524, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
-  __pyx_v_start_time = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_v_start_time = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "features.py":2525
+  /* "features.py":2527
  * 
  *     # Process first melody to get header structure
  *     mel = Melody(melody_data_list[0], tempo=100)             # <<<<<<<<<<<<<<
  *     first_features = {
  *         'pitch_features': get_pitch_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Melody); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2525, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2525, __pyx_L1_error) }
-  __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_melody_data_list, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2525, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2525, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Melody); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2527, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2527, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_melody_data_list, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_4);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4)) __PYX_ERR(0, 2525, __pyx_L1_error);
-  __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2525, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_tempo, __pyx_int_100) < 0) __PYX_ERR(0, 2525, __pyx_L1_error)
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2525, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2527, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_1);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1)) __PYX_ERR(0, 2527, __pyx_L1_error);
+  __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2527, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_tempo, __pyx_int_100) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_mel = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "features.py":2527
+  /* "features.py":2529
  *     mel = Melody(melody_data_list[0], tempo=100)
  *     first_features = {
  *         'pitch_features': get_pitch_features(mel),             # <<<<<<<<<<<<<<
  *         'interval_features': get_interval_features(mel),
  *         'contour_features': get_contour_features(mel),
  */
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2527, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_pitch_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_pitch_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2527, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2529, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_pitch_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_pitch_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2528
+  /* "features.py":2530
  *     first_features = {
  *         'pitch_features': get_pitch_features(mel),
  *         'interval_features': get_interval_features(mel),             # <<<<<<<<<<<<<<
  *         'contour_features': get_contour_features(mel),
  *         'duration_features': get_duration_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_interval_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2528, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_interval_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2530, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2528, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2530, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_interval_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_interval_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2529
+  /* "features.py":2531
  *         'pitch_features': get_pitch_features(mel),
  *         'interval_features': get_interval_features(mel),
  *         'contour_features': get_contour_features(mel),             # <<<<<<<<<<<<<<
  *         'duration_features': get_duration_features(mel),
  *         'tonality_features': get_tonality_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_contour_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2529, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_contour_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2531, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2529, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2531, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_contour_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_contour_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2530
+  /* "features.py":2532
  *         'interval_features': get_interval_features(mel),
  *         'contour_features': get_contour_features(mel),
  *         'duration_features': get_duration_features(mel),             # <<<<<<<<<<<<<<
  *         'tonality_features': get_tonality_features(mel),
  *         'narmour_features': get_narmour_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_duration_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2530, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_duration_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2532, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2530, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2532, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_duration_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_duration_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2531
+  /* "features.py":2533
  *         'contour_features': get_contour_features(mel),
  *         'duration_features': get_duration_features(mel),
  *         'tonality_features': get_tonality_features(mel),             # <<<<<<<<<<<<<<
  *         'narmour_features': get_narmour_features(mel),
  *         'melodic_movement_features': get_melodic_movement_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_tonality_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2531, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_tonality_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2533, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2531, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2533, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_tonality_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_tonality_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2532
+  /* "features.py":2534
  *         'duration_features': get_duration_features(mel),
  *         'tonality_features': get_tonality_features(mel),
  *         'narmour_features': get_narmour_features(mel),             # <<<<<<<<<<<<<<
  *         'melodic_movement_features': get_melodic_movement_features(mel),
  *         'mtype_features': get_mtype_features(mel),
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_narmour_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2532, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_narmour_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2534, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2532, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2534, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_narmour_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_narmour_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2533
+  /* "features.py":2535
  *         'tonality_features': get_tonality_features(mel),
  *         'narmour_features': get_narmour_features(mel),
  *         'melodic_movement_features': get_melodic_movement_features(mel),             # <<<<<<<<<<<<<<
  *         'mtype_features': get_mtype_features(mel),
  *         'corpus_features': get_corpus_features(mel)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_melodic_movement_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2533, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_melodic_movement_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2535, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2533, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2535, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_melodic_movement_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_melodic_movement_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2534
+  /* "features.py":2536
  *         'narmour_features': get_narmour_features(mel),
  *         'melodic_movement_features': get_melodic_movement_features(mel),
  *         'mtype_features': get_mtype_features(mel),             # <<<<<<<<<<<<<<
  *         'corpus_features': get_corpus_features(mel)
  *     }
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_mtype_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2534, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_mtype_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2536, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2534, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2536, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_mtype_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_mtype_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2535
+  /* "features.py":2537
  *         'melodic_movement_features': get_melodic_movement_features(mel),
  *         'mtype_features': get_mtype_features(mel),
  *         'corpus_features': get_corpus_features(mel)             # <<<<<<<<<<<<<<
  *     }
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_get_corpus_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2535, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_corpus_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2537, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_mel};
-    __pyx_t_4 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2535, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    PyObject *__pyx_callargs[2] = {__pyx_t_3, __pyx_v_mel};
+    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2537, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_corpus_features, __pyx_t_4) < 0) __PYX_ERR(0, 2527, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_corpus_features, __pyx_t_1) < 0) __PYX_ERR(0, 2529, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_first_features = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "features.py":2539
+  /* "features.py":2541
  * 
  *     # Create header by flattening feature names
  *     headers = ['melody_id']             # <<<<<<<<<<<<<<
  *     for category, features in first_features.items():
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())
  */
-  __pyx_t_5 = PyList_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2539, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2541, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_n_s_melody_id);
   __Pyx_GIVEREF(__pyx_n_s_melody_id);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 0, __pyx_n_s_melody_id)) __PYX_ERR(0, 2539, __pyx_L1_error);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 0, __pyx_n_s_melody_id)) __PYX_ERR(0, 2541, __pyx_L1_error);
   __pyx_v_headers = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "features.py":2540
+  /* "features.py":2542
  *     # Create header by flattening feature names
  *     headers = ['melody_id']
  *     for category, features in first_features.items():             # <<<<<<<<<<<<<<
@@ -48552,91 +48645,91 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
  * 
  */
   __pyx_t_10 = 0;
-  __pyx_t_4 = __Pyx_dict_iterator(__pyx_v_first_features, 1, __pyx_n_s_items, (&__pyx_t_12), (&__pyx_t_16)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2540, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_1 = __Pyx_dict_iterator(__pyx_v_first_features, 1, __pyx_n_s_items, (&__pyx_t_12), (&__pyx_t_16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2542, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_5);
-  __pyx_t_5 = __pyx_t_4;
-  __pyx_t_4 = 0;
+  __pyx_t_5 = __pyx_t_1;
+  __pyx_t_1 = 0;
   while (1) {
-    __pyx_t_17 = __Pyx_dict_iter_next(__pyx_t_5, __pyx_t_12, &__pyx_t_10, &__pyx_t_4, &__pyx_t_1, NULL, __pyx_t_16);
+    __pyx_t_17 = __Pyx_dict_iter_next(__pyx_t_5, __pyx_t_12, &__pyx_t_10, &__pyx_t_1, &__pyx_t_2, NULL, __pyx_t_16);
     if (unlikely(__pyx_t_17 == 0)) break;
-    if (unlikely(__pyx_t_17 == -1)) __PYX_ERR(0, 2540, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
+    if (unlikely(__pyx_t_17 == -1)) __PYX_ERR(0, 2542, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_category);
-    __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_category, __pyx_t_4);
-    __Pyx_GIVEREF(__pyx_t_4);
-    __pyx_t_4 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_features, __pyx_t_1);
+    __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_category, __pyx_t_1);
+    __Pyx_GIVEREF(__pyx_t_1);
     __pyx_t_1 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_features, __pyx_t_2);
+    __pyx_t_2 = 0;
 
-    /* "features.py":2541
+    /* "features.py":2543
  *     headers = ['melody_id']
  *     for category, features in first_features.items():
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())             # <<<<<<<<<<<<<<
  * 
  *     print("Starting parallel processing...\n")
  */
-    __pyx_t_1 = __pyx_pf_8features_20get_all_features_csv_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_features); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2541, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_18 = __Pyx_PyList_Extend(__pyx_v_headers, __pyx_t_1); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2541, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_2 = __pyx_pf_8features_20get_all_features_csv_genexpr(((PyObject*)__pyx_cur_scope), __pyx_v_features); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2543, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_18 = __Pyx_PyList_Extend(__pyx_v_headers, __pyx_t_2); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2543, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "features.py":2543
+  /* "features.py":2545
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())
  * 
  *     print("Starting parallel processing...\n")             # <<<<<<<<<<<<<<
  *     # Create pool of workers
  *     n_cores = cpu_count()
  */
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2543, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2545, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "features.py":2545
+  /* "features.py":2547
  *     print("Starting parallel processing...\n")
  *     # Create pool of workers
  *     n_cores = cpu_count()             # <<<<<<<<<<<<<<
  *     print(f"Using {n_cores} CPU cores")
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_cpu_count); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2545, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_cpu_count); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2547, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_4);
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_1)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_1, function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
-    PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
-    __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2545, __pyx_L1_error)
+    PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+    __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2547, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_v_n_cores = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "features.py":2546
+  /* "features.py":2548
  *     # Create pool of workers
  *     n_cores = cpu_count()
  *     print(f"Using {n_cores} CPU cores")             # <<<<<<<<<<<<<<
  * 
  *     # Prepare arguments for parallel processing
  */
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2546, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2548, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_12 = 0;
   __pyx_t_11 = 127;
@@ -48644,63 +48737,63 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
   __pyx_t_12 += 6;
   __Pyx_GIVEREF(__pyx_kp_u_Using);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_kp_u_Using);
-  __pyx_t_1 = __Pyx_PyObject_FormatSimple(__pyx_v_n_cores, __pyx_empty_unicode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2546, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_11;
-  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_1);
-  __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_n_cores, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2548, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_11;
+  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_2);
+  __pyx_t_2 = 0;
   __Pyx_INCREF(__pyx_kp_u_CPU_cores);
   __pyx_t_12 += 10;
   __Pyx_GIVEREF(__pyx_kp_u_CPU_cores);
   PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_kp_u_CPU_cores);
-  __pyx_t_1 = __Pyx_PyUnicode_Join(__pyx_t_5, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2546, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_5, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2548, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2546, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2548, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "features.py":2549
+  /* "features.py":2551
  * 
  *     # Prepare arguments for parallel processing
  *     melody_args = list(enumerate(melody_data_list, 1))             # <<<<<<<<<<<<<<
  * 
  *     # Process melodies in parallel
  */
-  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2549, __pyx_L1_error) }
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2549, __pyx_L1_error)
+  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2551, __pyx_L1_error) }
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_melody_data_list);
   __Pyx_GIVEREF(__pyx_v_melody_data_list);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_melody_data_list)) __PYX_ERR(0, 2549, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_melody_data_list)) __PYX_ERR(0, 2551, __pyx_L1_error);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_int_1)) __PYX_ERR(0, 2549, __pyx_L1_error);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_enumerate, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2549, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_int_1)) __PYX_ERR(0, 2551, __pyx_L1_error);
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_enumerate, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2551, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PySequence_ListKeepNew(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2549, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PySequence_ListKeepNew(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_melody_args = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "features.py":2552
+  /* "features.py":2554
  * 
  *     # Process melodies in parallel
  *     all_features = []             # <<<<<<<<<<<<<<
  * 
  *     with Pool(n_cores) as pool:
  */
-  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2552, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2554, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_v_all_features = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "features.py":2554
+  /* "features.py":2556
  *     all_features = []
  * 
  *     with Pool(n_cores) as pool:             # <<<<<<<<<<<<<<
@@ -48708,16 +48801,42 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
  *         for melody_id, melody_features in tqdm(
  */
   /*with:*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Pool); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2554, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = NULL;
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_Pool); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2556, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = NULL;
     __pyx_t_6 = 0;
     #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_1))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_1);
-      if (likely(__pyx_t_4)) {
+    if (unlikely(PyMethod_Check(__pyx_t_2))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __pyx_t_6 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_n_cores};
+      __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2556, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    }
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_exit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2556, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_enter); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2556, __pyx_L19_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = NULL;
+    __pyx_t_6 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (likely(PyMethod_Check(__pyx_t_1))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_1);
+      if (likely(__pyx_t_3)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_1, function);
         __pyx_t_6 = 1;
@@ -48725,41 +48844,15 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     #endif
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_v_n_cores};
-      __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2554, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
+      PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
+      __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2556, __pyx_L19_error)
+      __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2554, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_5, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2554, __pyx_L19_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = NULL;
-    __pyx_t_6 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_4))) {
-      __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-      if (likely(__pyx_t_2)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_2);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_4, function);
-        __pyx_t_6 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
-      __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2554, __pyx_L19_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    }
-    __pyx_t_4 = __pyx_t_1;
-    __pyx_t_1 = 0;
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     /*try:*/ {
       {
@@ -48770,185 +48863,185 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __Pyx_XGOTREF(__pyx_t_8);
         __Pyx_XGOTREF(__pyx_t_7);
         /*try:*/ {
-          __pyx_v_pool = __pyx_t_4;
-          __pyx_t_4 = 0;
+          __pyx_v_pool = __pyx_t_1;
+          __pyx_t_1 = 0;
 
-          /* "features.py":2556
+          /* "features.py":2558
  *     with Pool(n_cores) as pool:
  *         # Use imap_unordered for better performance and wrap with tqdm
  *         for melody_id, melody_features in tqdm(             # <<<<<<<<<<<<<<
  *             pool.imap_unordered(process_melody, melody_args),
  *             total=len(melody_args),
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2556, __pyx_L23_error)
-          __Pyx_GOTREF(__pyx_t_4);
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_tqdm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2558, __pyx_L23_error)
+          __Pyx_GOTREF(__pyx_t_1);
 
-          /* "features.py":2557
+          /* "features.py":2559
  *         # Use imap_unordered for better performance and wrap with tqdm
  *         for melody_id, melody_features in tqdm(
  *             pool.imap_unordered(process_melody, melody_args),             # <<<<<<<<<<<<<<
  *             total=len(melody_args),
  *             desc="Processing melodies",
  */
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_pool, __pyx_n_s_imap_unordered); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2557, __pyx_L23_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_process_melody); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2557, __pyx_L23_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_pool, __pyx_n_s_imap_unordered); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2559, __pyx_L23_error)
           __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_process_melody); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2559, __pyx_L23_error)
+          __Pyx_GOTREF(__pyx_t_3);
           __pyx_t_19 = NULL;
           __pyx_t_6 = 0;
           #if CYTHON_UNPACK_METHODS
-          if (likely(PyMethod_Check(__pyx_t_1))) {
-            __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_1);
+          if (likely(PyMethod_Check(__pyx_t_2))) {
+            __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_2);
             if (likely(__pyx_t_19)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
               __Pyx_INCREF(__pyx_t_19);
               __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_1, function);
+              __Pyx_DECREF_SET(__pyx_t_2, function);
               __pyx_t_6 = 1;
             }
           }
           #endif
           {
-            PyObject *__pyx_callargs[3] = {__pyx_t_19, __pyx_t_2, __pyx_v_melody_args};
-            __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
+            PyObject *__pyx_callargs[3] = {__pyx_t_19, __pyx_t_3, __pyx_v_melody_args};
+            __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 2+__pyx_t_6);
             __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2557, __pyx_L23_error)
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2559, __pyx_L23_error)
             __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           }
 
-          /* "features.py":2556
+          /* "features.py":2558
  *     with Pool(n_cores) as pool:
  *         # Use imap_unordered for better performance and wrap with tqdm
  *         for melody_id, melody_features in tqdm(             # <<<<<<<<<<<<<<
  *             pool.imap_unordered(process_melody, melody_args),
  *             total=len(melody_args),
  */
-          __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2556, __pyx_L23_error)
-          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2558, __pyx_L23_error)
+          __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GIVEREF(__pyx_t_5);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_5)) __PYX_ERR(0, 2556, __pyx_L23_error);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5)) __PYX_ERR(0, 2558, __pyx_L23_error);
           __pyx_t_5 = 0;
 
-          /* "features.py":2558
+          /* "features.py":2560
  *         for melody_id, melody_features in tqdm(
  *             pool.imap_unordered(process_melody, melody_args),
  *             total=len(melody_args),             # <<<<<<<<<<<<<<
  *             desc="Processing melodies",
  *             mininterval=0.2
  */
-          __pyx_t_5 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2558, __pyx_L23_error)
+          __pyx_t_5 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2560, __pyx_L23_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_12 = __Pyx_PyList_GET_SIZE(__pyx_v_melody_args); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2558, __pyx_L23_error)
-          __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2558, __pyx_L23_error)
-          __Pyx_GOTREF(__pyx_t_2);
-          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_total, __pyx_t_2) < 0) __PYX_ERR(0, 2558, __pyx_L23_error)
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_desc, __pyx_kp_s_Processing_melodies) < 0) __PYX_ERR(0, 2558, __pyx_L23_error)
-          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_mininterval, __pyx_float_0_2) < 0) __PYX_ERR(0, 2558, __pyx_L23_error)
+          __pyx_t_12 = __Pyx_PyList_GET_SIZE(__pyx_v_melody_args); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2560, __pyx_L23_error)
+          __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2560, __pyx_L23_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_total, __pyx_t_3) < 0) __PYX_ERR(0, 2560, __pyx_L23_error)
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_desc, __pyx_kp_s_Processing_melodies) < 0) __PYX_ERR(0, 2560, __pyx_L23_error)
+          if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_mininterval, __pyx_float_0_2) < 0) __PYX_ERR(0, 2560, __pyx_L23_error)
 
-          /* "features.py":2556
+          /* "features.py":2558
  *     with Pool(n_cores) as pool:
  *         # Use imap_unordered for better performance and wrap with tqdm
  *         for melody_id, melody_features in tqdm(             # <<<<<<<<<<<<<<
  *             pool.imap_unordered(process_melody, melody_args),
  *             total=len(melody_args),
  */
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2556, __pyx_L23_error)
-          __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2558, __pyx_L23_error)
+          __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
-            __pyx_t_5 = __pyx_t_2; __Pyx_INCREF(__pyx_t_5);
+          if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+            __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5);
             __pyx_t_12 = 0;
             __pyx_t_20 = NULL;
           } else {
-            __pyx_t_12 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2556, __pyx_L23_error)
+            __pyx_t_12 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2558, __pyx_L23_error)
             __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_20 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_5); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 2556, __pyx_L23_error)
+            __pyx_t_20 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_5); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 2558, __pyx_L23_error)
           }
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           for (;;) {
             if (likely(!__pyx_t_20)) {
               if (likely(PyList_CheckExact(__pyx_t_5))) {
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_5);
                   #if !CYTHON_ASSUME_SAFE_MACROS
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 2556, __pyx_L23_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 2558, __pyx_L23_error)
                   #endif
                   if (__pyx_t_12 >= __pyx_temp) break;
                 }
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_2 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_12); __Pyx_INCREF(__pyx_t_2); __pyx_t_12++; if (unlikely((0 < 0))) __PYX_ERR(0, 2556, __pyx_L23_error)
+                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_12); __Pyx_INCREF(__pyx_t_3); __pyx_t_12++; if (unlikely((0 < 0))) __PYX_ERR(0, 2558, __pyx_L23_error)
                 #else
-                __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_5, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2556, __pyx_L23_error)
-                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_5, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2558, __pyx_L23_error)
+                __Pyx_GOTREF(__pyx_t_3);
                 #endif
               } else {
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_5);
                   #if !CYTHON_ASSUME_SAFE_MACROS
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 2556, __pyx_L23_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 2558, __pyx_L23_error)
                   #endif
                   if (__pyx_t_12 >= __pyx_temp) break;
                 }
                 #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-                __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_12); __Pyx_INCREF(__pyx_t_2); __pyx_t_12++; if (unlikely((0 < 0))) __PYX_ERR(0, 2556, __pyx_L23_error)
+                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_12); __Pyx_INCREF(__pyx_t_3); __pyx_t_12++; if (unlikely((0 < 0))) __PYX_ERR(0, 2558, __pyx_L23_error)
                 #else
-                __pyx_t_2 = __Pyx_PySequence_ITEM(__pyx_t_5, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2556, __pyx_L23_error)
-                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_5, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2558, __pyx_L23_error)
+                __Pyx_GOTREF(__pyx_t_3);
                 #endif
               }
             } else {
-              __pyx_t_2 = __pyx_t_20(__pyx_t_5);
-              if (unlikely(!__pyx_t_2)) {
+              __pyx_t_3 = __pyx_t_20(__pyx_t_5);
+              if (unlikely(!__pyx_t_3)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
                   if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                  else __PYX_ERR(0, 2556, __pyx_L23_error)
+                  else __PYX_ERR(0, 2558, __pyx_L23_error)
                 }
                 break;
               }
-              __Pyx_GOTREF(__pyx_t_2);
+              __Pyx_GOTREF(__pyx_t_3);
             }
-            if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
-              PyObject* sequence = __pyx_t_2;
+            if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
+              PyObject* sequence = __pyx_t_3;
               Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
               if (unlikely(size != 2)) {
                 if (size > 2) __Pyx_RaiseTooManyValuesError(2);
                 else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-                __PYX_ERR(0, 2556, __pyx_L23_error)
+                __PYX_ERR(0, 2558, __pyx_L23_error)
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
               if (likely(PyTuple_CheckExact(sequence))) {
-                __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
-                __pyx_t_4 = PyTuple_GET_ITEM(sequence, 1); 
+                __pyx_t_2 = PyTuple_GET_ITEM(sequence, 0); 
+                __pyx_t_1 = PyTuple_GET_ITEM(sequence, 1); 
               } else {
-                __pyx_t_1 = PyList_GET_ITEM(sequence, 0); 
-                __pyx_t_4 = PyList_GET_ITEM(sequence, 1); 
+                __pyx_t_2 = PyList_GET_ITEM(sequence, 0); 
+                __pyx_t_1 = PyList_GET_ITEM(sequence, 1); 
               }
+              __Pyx_INCREF(__pyx_t_2);
               __Pyx_INCREF(__pyx_t_1);
-              __Pyx_INCREF(__pyx_t_4);
               #else
-              __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2556, __pyx_L23_error)
+              __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2558, __pyx_L23_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2558, __pyx_L23_error)
               __Pyx_GOTREF(__pyx_t_1);
-              __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2556, __pyx_L23_error)
-              __Pyx_GOTREF(__pyx_t_4);
               #endif
-              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             } else {
               Py_ssize_t index = -1;
-              __pyx_t_19 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 2556, __pyx_L23_error)
+              __pyx_t_19 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 2558, __pyx_L23_error)
               __Pyx_GOTREF(__pyx_t_19);
-              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __pyx_t_21 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_19);
-              index = 0; __pyx_t_1 = __pyx_t_21(__pyx_t_19); if (unlikely(!__pyx_t_1)) goto __pyx_L31_unpacking_failed;
+              index = 0; __pyx_t_2 = __pyx_t_21(__pyx_t_19); if (unlikely(!__pyx_t_2)) goto __pyx_L31_unpacking_failed;
+              __Pyx_GOTREF(__pyx_t_2);
+              index = 1; __pyx_t_1 = __pyx_t_21(__pyx_t_19); if (unlikely(!__pyx_t_1)) goto __pyx_L31_unpacking_failed;
               __Pyx_GOTREF(__pyx_t_1);
-              index = 1; __pyx_t_4 = __pyx_t_21(__pyx_t_19); if (unlikely(!__pyx_t_4)) goto __pyx_L31_unpacking_failed;
-              __Pyx_GOTREF(__pyx_t_4);
-              if (__Pyx_IternextUnpackEndCheck(__pyx_t_21(__pyx_t_19), 2) < 0) __PYX_ERR(0, 2556, __pyx_L23_error)
+              if (__Pyx_IternextUnpackEndCheck(__pyx_t_21(__pyx_t_19), 2) < 0) __PYX_ERR(0, 2558, __pyx_L23_error)
               __pyx_t_21 = NULL;
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
               goto __pyx_L32_unpacking_done;
@@ -48956,30 +49049,30 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
               __pyx_t_21 = NULL;
               if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-              __PYX_ERR(0, 2556, __pyx_L23_error)
+              __PYX_ERR(0, 2558, __pyx_L23_error)
               __pyx_L32_unpacking_done:;
             }
-            __Pyx_XDECREF_SET(__pyx_v_melody_id, __pyx_t_1);
+            __Pyx_XDECREF_SET(__pyx_v_melody_id, __pyx_t_2);
+            __pyx_t_2 = 0;
+            __Pyx_XDECREF_SET(__pyx_v_melody_features, __pyx_t_1);
             __pyx_t_1 = 0;
-            __Pyx_XDECREF_SET(__pyx_v_melody_features, __pyx_t_4);
-            __pyx_t_4 = 0;
 
-            /* "features.py":2563
+            /* "features.py":2565
  *         ):
  *             # Flatten feature values into a single row
  *             row = [melody_id]             # <<<<<<<<<<<<<<
  *             for category, features in melody_features.items():
  *                 row.extend(features.values())
  */
-            __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2563, __pyx_L23_error)
-            __Pyx_GOTREF(__pyx_t_2);
+            __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2565, __pyx_L23_error)
+            __Pyx_GOTREF(__pyx_t_3);
             __Pyx_INCREF(__pyx_v_melody_id);
             __Pyx_GIVEREF(__pyx_v_melody_id);
-            if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_v_melody_id)) __PYX_ERR(0, 2563, __pyx_L23_error);
-            __Pyx_XDECREF_SET(__pyx_v_row, ((PyObject*)__pyx_t_2));
-            __pyx_t_2 = 0;
+            if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_v_melody_id)) __PYX_ERR(0, 2565, __pyx_L23_error);
+            __Pyx_XDECREF_SET(__pyx_v_row, ((PyObject*)__pyx_t_3));
+            __pyx_t_3 = 0;
 
-            /* "features.py":2564
+            /* "features.py":2566
  *             # Flatten feature values into a single row
  *             row = [melody_id]
  *             for category, features in melody_features.items():             # <<<<<<<<<<<<<<
@@ -48989,72 +49082,72 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
             __pyx_t_10 = 0;
             if (unlikely(__pyx_v_melody_features == Py_None)) {
               PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "items");
-              __PYX_ERR(0, 2564, __pyx_L23_error)
+              __PYX_ERR(0, 2566, __pyx_L23_error)
             }
-            __pyx_t_4 = __Pyx_dict_iterator(__pyx_v_melody_features, 0, __pyx_n_s_items, (&__pyx_t_22), (&__pyx_t_16)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2564, __pyx_L23_error)
-            __Pyx_GOTREF(__pyx_t_4);
-            __Pyx_XDECREF(__pyx_t_2);
-            __pyx_t_2 = __pyx_t_4;
-            __pyx_t_4 = 0;
+            __pyx_t_1 = __Pyx_dict_iterator(__pyx_v_melody_features, 0, __pyx_n_s_items, (&__pyx_t_22), (&__pyx_t_16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2566, __pyx_L23_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_XDECREF(__pyx_t_3);
+            __pyx_t_3 = __pyx_t_1;
+            __pyx_t_1 = 0;
             while (1) {
-              __pyx_t_17 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_22, &__pyx_t_10, &__pyx_t_4, &__pyx_t_1, NULL, __pyx_t_16);
+              __pyx_t_17 = __Pyx_dict_iter_next(__pyx_t_3, __pyx_t_22, &__pyx_t_10, &__pyx_t_1, &__pyx_t_2, NULL, __pyx_t_16);
               if (unlikely(__pyx_t_17 == 0)) break;
-              if (unlikely(__pyx_t_17 == -1)) __PYX_ERR(0, 2564, __pyx_L23_error)
-              __Pyx_GOTREF(__pyx_t_4);
+              if (unlikely(__pyx_t_17 == -1)) __PYX_ERR(0, 2566, __pyx_L23_error)
               __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_GOTREF(__pyx_t_2);
               __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_category);
-              __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_category, __pyx_t_4);
-              __Pyx_GIVEREF(__pyx_t_4);
-              __pyx_t_4 = 0;
-              __Pyx_XDECREF_SET(__pyx_v_features, __pyx_t_1);
+              __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_category, __pyx_t_1);
+              __Pyx_GIVEREF(__pyx_t_1);
               __pyx_t_1 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_features, __pyx_t_2);
+              __pyx_t_2 = 0;
 
-              /* "features.py":2565
+              /* "features.py":2567
  *             row = [melody_id]
  *             for category, features in melody_features.items():
  *                 row.extend(features.values())             # <<<<<<<<<<<<<<
  *             all_features.append(row)
  * 
  */
-              __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_features, __pyx_n_s_values); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2565, __pyx_L23_error)
-              __Pyx_GOTREF(__pyx_t_4);
+              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_features, __pyx_n_s_values); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2567, __pyx_L23_error)
+              __Pyx_GOTREF(__pyx_t_1);
               __pyx_t_19 = NULL;
               __pyx_t_6 = 0;
               #if CYTHON_UNPACK_METHODS
-              if (likely(PyMethod_Check(__pyx_t_4))) {
-                __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_4);
+              if (likely(PyMethod_Check(__pyx_t_1))) {
+                __pyx_t_19 = PyMethod_GET_SELF(__pyx_t_1);
                 if (likely(__pyx_t_19)) {
-                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+                  PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
                   __Pyx_INCREF(__pyx_t_19);
                   __Pyx_INCREF(function);
-                  __Pyx_DECREF_SET(__pyx_t_4, function);
+                  __Pyx_DECREF_SET(__pyx_t_1, function);
                   __pyx_t_6 = 1;
                 }
               }
               #endif
               {
                 PyObject *__pyx_callargs[2] = {__pyx_t_19, NULL};
-                __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_4, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+                __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
                 __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-                if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2565, __pyx_L23_error)
-                __Pyx_GOTREF(__pyx_t_1);
-                __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+                if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2567, __pyx_L23_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
               }
-              __pyx_t_18 = __Pyx_PyList_Extend(__pyx_v_row, __pyx_t_1); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2565, __pyx_L23_error)
-              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_18 = __Pyx_PyList_Extend(__pyx_v_row, __pyx_t_2); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2567, __pyx_L23_error)
+              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             }
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-            /* "features.py":2566
+            /* "features.py":2568
  *             for category, features in melody_features.items():
  *                 row.extend(features.values())
  *             all_features.append(row)             # <<<<<<<<<<<<<<
  * 
  *     # Sort results by melody_id since they completed in different order
  */
-            __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_all_features, __pyx_v_row); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2566, __pyx_L23_error)
+            __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_all_features, __pyx_v_row); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 2568, __pyx_L23_error)
 
-            /* "features.py":2556
+            /* "features.py":2558
  *     with Pool(n_cores) as pool:
  *         # Use imap_unordered for better performance and wrap with tqdm
  *         for melody_id, melody_features in tqdm(             # <<<<<<<<<<<<<<
@@ -49064,7 +49157,7 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
           }
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "features.py":2554
+          /* "features.py":2556
  *     all_features = []
  * 
  *     with Pool(n_cores) as pool:             # <<<<<<<<<<<<<<
@@ -49080,36 +49173,36 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("features.get_all_features_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_2, &__pyx_t_1) < 0) __PYX_ERR(0, 2554, __pyx_L25_except_error)
+          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_2) < 0) __PYX_ERR(0, 2556, __pyx_L25_except_error)
           __Pyx_XGOTREF(__pyx_t_5);
+          __Pyx_XGOTREF(__pyx_t_3);
           __Pyx_XGOTREF(__pyx_t_2);
-          __Pyx_XGOTREF(__pyx_t_1);
-          __pyx_t_4 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2554, __pyx_L25_except_error)
-          __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __pyx_t_1 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2556, __pyx_L25_except_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, NULL);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2554, __pyx_L25_except_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2556, __pyx_L25_except_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (__pyx_t_15 < 0) __PYX_ERR(0, 2554, __pyx_L25_except_error)
+          if (__pyx_t_15 < 0) __PYX_ERR(0, 2556, __pyx_L25_except_error)
           __pyx_t_14 = (!__pyx_t_15);
           if (unlikely(__pyx_t_14)) {
             __Pyx_GIVEREF(__pyx_t_5);
-            __Pyx_GIVEREF(__pyx_t_2);
-            __Pyx_XGIVEREF(__pyx_t_1);
-            __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_2, __pyx_t_1);
-            __pyx_t_5 = 0; __pyx_t_2 = 0; __pyx_t_1 = 0; 
-            __PYX_ERR(0, 2554, __pyx_L25_except_error)
+            __Pyx_GIVEREF(__pyx_t_3);
+            __Pyx_XGIVEREF(__pyx_t_2);
+            __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_3, __pyx_t_2);
+            __pyx_t_5 = 0; __pyx_t_3 = 0; __pyx_t_2 = 0; 
+            __PYX_ERR(0, 2556, __pyx_L25_except_error)
           }
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           goto __pyx_L24_exception_handled;
         }
         __pyx_L25_except_error:;
@@ -49128,10 +49221,10 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     /*finally:*/ {
       /*normal exit:*/{
-        if (__pyx_t_3) {
-          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__6, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2554, __pyx_L1_error)
+        if (__pyx_t_4) {
+          __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__6, NULL);
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2556, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -49141,100 +49234,100 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     goto __pyx_L39;
     __pyx_L19_error:;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L1_error;
     __pyx_L39:;
   }
 
-  /* "features.py":2569
+  /* "features.py":2571
  * 
  *     # Sort results by melody_id since they completed in different order
  *     all_features.sort(key=lambda x: x[0])             # <<<<<<<<<<<<<<
  * 
  *     # Write to CSV
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_all_features, __pyx_n_s_sort); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2569, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2569, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_all_features, __pyx_n_s_sort); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2571, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_8features_20get_all_features_csv_3lambda12, 0, __pyx_n_s_get_all_features_csv_locals_lamb, NULL, __pyx_n_s_features, __pyx_d, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2569, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2571, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_8features_20get_all_features_csv_3lambda12, 0, __pyx_n_s_get_all_features_csv_locals_lamb, NULL, __pyx_n_s_features, __pyx_d, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2571, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_key, __pyx_t_5) < 0) __PYX_ERR(0, 2569, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_key, __pyx_t_5) < 0) __PYX_ERR(0, 2571, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2569, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2571, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "features.py":2572
+  /* "features.py":2574
  * 
  *     # Write to CSV
- *     output_file = f'{filename}.csv'             # <<<<<<<<<<<<<<
+ *     output_file = f'{output_path}.csv'             # <<<<<<<<<<<<<<
  *     with open(output_file, 'w', newline='', encoding='utf-8') as f:
  *         writer = csv.writer(f)
  */
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_filename, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2572, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_output_path, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2574, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_5, __pyx_kp_u_csv); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2572, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyUnicode_ConcatInPlace(__pyx_t_5, __pyx_kp_u_csv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2574, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_output_file = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
+  __pyx_v_output_file = ((PyObject*)__pyx_t_3);
+  __pyx_t_3 = 0;
 
-  /* "features.py":2573
+  /* "features.py":2575
  *     # Write to CSV
- *     output_file = f'{filename}.csv'
+ *     output_file = f'{output_path}.csv'
  *     with open(output_file, 'w', newline='', encoding='utf-8') as f:             # <<<<<<<<<<<<<<
  *         writer = csv.writer(f)
  *         writer.writerow(headers)
  */
   /*with:*/ {
-    __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2573, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2575, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_output_file);
     __Pyx_GIVEREF(__pyx_v_output_file);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_output_file)) __PYX_ERR(0, 2573, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_output_file)) __PYX_ERR(0, 2575, __pyx_L1_error);
     __Pyx_INCREF(__pyx_n_s_w);
     __Pyx_GIVEREF(__pyx_n_s_w);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_w)) __PYX_ERR(0, 2573, __pyx_L1_error);
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2573, __pyx_L1_error)
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_n_s_w)) __PYX_ERR(0, 2575, __pyx_L1_error);
+    __pyx_t_5 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_newline, __pyx_kp_s__13) < 0) __PYX_ERR(0, 2573, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_encoding, __pyx_kp_s_utf_8) < 0) __PYX_ERR(0, 2573, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2573, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2573, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_LookupSpecial(__pyx_t_1, __pyx_n_s_enter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2573, __pyx_L40_error)
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_newline, __pyx_kp_s__13) < 0) __PYX_ERR(0, 2575, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_encoding, __pyx_kp_s_utf_8) < 0) __PYX_ERR(0, 2575, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2575, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2575, __pyx_L40_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_1 = NULL;
     __pyx_t_6 = 0;
     #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-        __Pyx_INCREF(__pyx_t_4);
+    if (likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
         __pyx_t_6 = 1;
       }
     }
     #endif
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
-      __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2573, __pyx_L40_error)
+      PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+      __pyx_t_5 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2575, __pyx_L40_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
-    __pyx_t_2 = __pyx_t_5;
+    __pyx_t_3 = __pyx_t_5;
     __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     /*try:*/ {
       {
         __Pyx_PyThreadState_declare
@@ -49244,29 +49337,29 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __Pyx_XGOTREF(__pyx_t_8);
         __Pyx_XGOTREF(__pyx_t_9);
         /*try:*/ {
-          __Pyx_XDECREF_SET(__pyx_v_f, __pyx_t_2);
-          __pyx_t_2 = 0;
+          __Pyx_XDECREF_SET(__pyx_v_f, __pyx_t_3);
+          __pyx_t_3 = 0;
 
-          /* "features.py":2574
- *     output_file = f'{filename}.csv'
+          /* "features.py":2576
+ *     output_file = f'{output_path}.csv'
  *     with open(output_file, 'w', newline='', encoding='utf-8') as f:
  *         writer = csv.writer(f)             # <<<<<<<<<<<<<<
  *         writer.writerow(headers)
  *         writer.writerows(all_features)
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_csv_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2574, __pyx_L44_error)
-          __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_writer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2574, __pyx_L44_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_csv_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2576, __pyx_L44_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_writer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2576, __pyx_L44_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = NULL;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __pyx_t_2 = NULL;
           __pyx_t_6 = 0;
           #if CYTHON_UNPACK_METHODS
           if (unlikely(PyMethod_Check(__pyx_t_5))) {
-            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
-            if (likely(__pyx_t_1)) {
+            __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_5);
+            if (likely(__pyx_t_2)) {
               PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(__pyx_t_2);
               __Pyx_INCREF(function);
               __Pyx_DECREF_SET(__pyx_t_5, function);
               __pyx_t_6 = 1;
@@ -49274,33 +49367,33 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
           }
           #endif
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_f};
-            __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2574, __pyx_L44_error)
-            __Pyx_GOTREF(__pyx_t_2);
+            PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_f};
+            __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2576, __pyx_L44_error)
+            __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
-          __pyx_v_writer = __pyx_t_2;
-          __pyx_t_2 = 0;
+          __pyx_v_writer = __pyx_t_3;
+          __pyx_t_3 = 0;
 
-          /* "features.py":2575
+          /* "features.py":2577
  *     with open(output_file, 'w', newline='', encoding='utf-8') as f:
  *         writer = csv.writer(f)
  *         writer.writerow(headers)             # <<<<<<<<<<<<<<
  *         writer.writerows(all_features)
  * 
  */
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_writer, __pyx_n_s_writerow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2575, __pyx_L44_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_writer, __pyx_n_s_writerow); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2577, __pyx_L44_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = NULL;
+          __pyx_t_2 = NULL;
           __pyx_t_6 = 0;
           #if CYTHON_UNPACK_METHODS
           if (likely(PyMethod_Check(__pyx_t_5))) {
-            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
-            if (likely(__pyx_t_1)) {
+            __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_5);
+            if (likely(__pyx_t_2)) {
               PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(__pyx_t_2);
               __Pyx_INCREF(function);
               __Pyx_DECREF_SET(__pyx_t_5, function);
               __pyx_t_6 = 1;
@@ -49308,32 +49401,32 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
           }
           #endif
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_headers};
-            __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2575, __pyx_L44_error)
-            __Pyx_GOTREF(__pyx_t_2);
+            PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_headers};
+            __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2577, __pyx_L44_error)
+            __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "features.py":2576
+          /* "features.py":2578
  *         writer = csv.writer(f)
  *         writer.writerow(headers)
  *         writer.writerows(all_features)             # <<<<<<<<<<<<<<
  * 
  *     end_time = time.time()
  */
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_writer, __pyx_n_s_writerows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2576, __pyx_L44_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_writer, __pyx_n_s_writerows); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2578, __pyx_L44_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = NULL;
+          __pyx_t_2 = NULL;
           __pyx_t_6 = 0;
           #if CYTHON_UNPACK_METHODS
           if (likely(PyMethod_Check(__pyx_t_5))) {
-            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
-            if (likely(__pyx_t_1)) {
+            __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_5);
+            if (likely(__pyx_t_2)) {
               PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(__pyx_t_2);
               __Pyx_INCREF(function);
               __Pyx_DECREF_SET(__pyx_t_5, function);
               __pyx_t_6 = 1;
@@ -49341,18 +49434,18 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
           }
           #endif
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_all_features};
-            __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2576, __pyx_L44_error)
-            __Pyx_GOTREF(__pyx_t_2);
+            PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_all_features};
+            __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_5, __pyx_callargs+1-__pyx_t_6, 1+__pyx_t_6);
+            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2578, __pyx_L44_error)
+            __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
-          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "features.py":2573
+          /* "features.py":2575
  *     # Write to CSV
- *     output_file = f'{filename}.csv'
+ *     output_file = f'{output_path}.csv'
  *     with open(output_file, 'w', newline='', encoding='utf-8') as f:             # <<<<<<<<<<<<<<
  *         writer = csv.writer(f)
  *         writer.writerow(headers)
@@ -49366,36 +49459,36 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("features.get_all_features_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_1) < 0) __PYX_ERR(0, 2573, __pyx_L46_except_error)
-          __Pyx_XGOTREF(__pyx_t_2);
+          if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_5, &__pyx_t_2) < 0) __PYX_ERR(0, 2575, __pyx_L46_except_error)
+          __Pyx_XGOTREF(__pyx_t_3);
           __Pyx_XGOTREF(__pyx_t_5);
-          __Pyx_XGOTREF(__pyx_t_1);
-          __pyx_t_4 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2573, __pyx_L46_except_error)
-          __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_XGOTREF(__pyx_t_2);
+          __pyx_t_1 = PyTuple_Pack(3, __pyx_t_3, __pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2575, __pyx_L46_except_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_1, NULL);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2573, __pyx_L46_except_error)
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2575, __pyx_L46_except_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = __Pyx_PyObject_IsTrue(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (__pyx_t_14 < 0) __PYX_ERR(0, 2573, __pyx_L46_except_error)
+          if (__pyx_t_14 < 0) __PYX_ERR(0, 2575, __pyx_L46_except_error)
           __pyx_t_15 = (!__pyx_t_14);
           if (unlikely(__pyx_t_15)) {
-            __Pyx_GIVEREF(__pyx_t_2);
+            __Pyx_GIVEREF(__pyx_t_3);
             __Pyx_GIVEREF(__pyx_t_5);
-            __Pyx_XGIVEREF(__pyx_t_1);
-            __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_1);
-            __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_1 = 0; 
-            __PYX_ERR(0, 2573, __pyx_L46_except_error)
+            __Pyx_XGIVEREF(__pyx_t_2);
+            __Pyx_ErrRestoreWithState(__pyx_t_3, __pyx_t_5, __pyx_t_2);
+            __pyx_t_3 = 0; __pyx_t_5 = 0; __pyx_t_2 = 0; 
+            __PYX_ERR(0, 2575, __pyx_L46_except_error)
           }
-          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           goto __pyx_L45_exception_handled;
         }
         __pyx_L46_except_error:;
@@ -49414,10 +49507,10 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     /*finally:*/ {
       /*normal exit:*/{
-        if (__pyx_t_3) {
-          __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__6, NULL);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2573, __pyx_L1_error)
+        if (__pyx_t_4) {
+          __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__6, NULL);
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2575, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -49427,174 +49520,174 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
     }
     goto __pyx_L53;
     __pyx_L40_error:;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L1_error;
     __pyx_L53:;
   }
 
-  /* "features.py":2578
+  /* "features.py":2580
  *         writer.writerows(all_features)
  * 
  *     end_time = time.time()             # <<<<<<<<<<<<<<
  *     total_time = end_time - start_time
  *     avg_time = total_time / len(melody_data_list)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2578, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2580, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2578, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2580, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
   #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
     if (likely(__pyx_t_5)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
       __pyx_t_6 = 1;
     }
   }
   #endif
   {
     PyObject *__pyx_callargs[2] = {__pyx_t_5, NULL};
-    __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
+    __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_6, 0+__pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2578, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2580, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_v_end_time = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_v_end_time = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "features.py":2579
+  /* "features.py":2581
  * 
  *     end_time = time.time()
  *     total_time = end_time - start_time             # <<<<<<<<<<<<<<
  *     avg_time = total_time / len(melody_data_list)
  * 
  */
-  __pyx_t_1 = PyNumber_Subtract(__pyx_v_end_time, __pyx_v_start_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2579, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_v_total_time = __pyx_t_1;
-  __pyx_t_1 = 0;
+  __pyx_t_2 = PyNumber_Subtract(__pyx_v_end_time, __pyx_v_start_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2581, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_v_total_time = __pyx_t_2;
+  __pyx_t_2 = 0;
 
-  /* "features.py":2580
+  /* "features.py":2582
  *     end_time = time.time()
  *     total_time = end_time - start_time
  *     avg_time = total_time / len(melody_data_list)             # <<<<<<<<<<<<<<
  * 
  *     print(f"\nFeatures saved to {output_file}")
  */
-  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2580, __pyx_L1_error) }
-  __pyx_t_12 = PyObject_Length(__pyx_v_melody_data_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2580, __pyx_L1_error)
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2580, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_v_total_time, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2580, __pyx_L1_error)
+  if (unlikely(!__pyx_v_melody_data_list)) { __Pyx_RaiseUnboundLocalError("melody_data_list"); __PYX_ERR(0, 2582, __pyx_L1_error) }
+  __pyx_t_12 = PyObject_Length(__pyx_v_melody_data_list); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 2582, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2582, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_avg_time = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_v_total_time, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2582, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_avg_time = __pyx_t_3;
+  __pyx_t_3 = 0;
 
-  /* "features.py":2582
+  /* "features.py":2584
  *     avg_time = total_time / len(melody_data_list)
  * 
  *     print(f"\nFeatures saved to {output_file}")             # <<<<<<<<<<<<<<
  *     print(f"Generated in total time: {total_time:.2f} seconds")
  *     print(f"Average time per melody: {avg_time:.3f} seconds\n")
  */
-  __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Features_saved_to_2, __pyx_v_output_file); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2582, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Features_saved_to_2, __pyx_v_output_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2584, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2582, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "features.py":2583
+  /* "features.py":2585
  * 
  *     print(f"\nFeatures saved to {output_file}")
  *     print(f"Generated in total time: {total_time:.2f} seconds")             # <<<<<<<<<<<<<<
  *     print(f"Average time per melody: {avg_time:.3f} seconds\n")
  * 
  */
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2583, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2585, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_12 = 0;
   __pyx_t_11 = 127;
   __Pyx_INCREF(__pyx_kp_u_Generated_in_total_time);
   __pyx_t_12 += 25;
   __Pyx_GIVEREF(__pyx_kp_u_Generated_in_total_time);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_Generated_in_total_time);
-  __pyx_t_2 = __Pyx_PyObject_Format(__pyx_v_total_time, __pyx_kp_u_2f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2583, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_11;
-  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-  __pyx_t_2 = 0;
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_u_Generated_in_total_time);
+  __pyx_t_3 = __Pyx_PyObject_Format(__pyx_v_total_time, __pyx_kp_u_2f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2585, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_11;
+  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
+  __pyx_t_3 = 0;
   __Pyx_INCREF(__pyx_kp_u_seconds);
   __pyx_t_12 += 8;
   __Pyx_GIVEREF(__pyx_kp_u_seconds);
-  PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_seconds);
-  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2583, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2583, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_kp_u_seconds);
+  __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2585, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2585, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "features.py":2584
+  /* "features.py":2586
  *     print(f"\nFeatures saved to {output_file}")
  *     print(f"Generated in total time: {total_time:.2f} seconds")
  *     print(f"Average time per melody: {avg_time:.3f} seconds\n")             # <<<<<<<<<<<<<<
  * 
  *     print("Job complete\n")
  */
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2584, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2586, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_12 = 0;
   __pyx_t_11 = 127;
   __Pyx_INCREF(__pyx_kp_u_Average_time_per_melody);
   __pyx_t_12 += 25;
   __Pyx_GIVEREF(__pyx_kp_u_Average_time_per_melody);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_Average_time_per_melody);
-  __pyx_t_2 = __Pyx_PyObject_Format(__pyx_v_avg_time, __pyx_kp_u_3f); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2584, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_11;
-  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-  __pyx_t_2 = 0;
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_u_Average_time_per_melody);
+  __pyx_t_3 = __Pyx_PyObject_Format(__pyx_v_avg_time, __pyx_kp_u_3f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2586, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_11;
+  __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
+  __pyx_t_3 = 0;
   __Pyx_INCREF(__pyx_kp_u_seconds_2);
   __pyx_t_12 += 9;
   __Pyx_GIVEREF(__pyx_kp_u_seconds_2);
-  PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_seconds_2);
-  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2584, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2584, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_kp_u_seconds_2);
+  __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_12, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2586, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2586, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "features.py":2586
+  /* "features.py":2588
  *     print(f"Average time per melody: {avg_time:.3f} seconds\n")
  * 
  *     print("Job complete\n")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2586, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2588, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
@@ -49605,7 +49698,7 @@ static PyObject *__pyx_pf_8features_188get_all_features_csv(CYTHON_UNUSED PyObje
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_19);
   __Pyx_AddTraceback("features.get_all_features_csv", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -52699,7 +52792,6 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_F, __pyx_k_F, sizeof(__pyx_k_F), 0, 0, 1, 1},
     {&__pyx_kp_s_F_2, __pyx_k_F_2, sizeof(__pyx_k_F_2), 0, 0, 1, 0},
     {&__pyx_n_s_FantasticTokenizer, __pyx_k_FantasticTokenizer, sizeof(__pyx_k_FantasticTokenizer), 0, 0, 1, 1},
-    {&__pyx_kp_s_Feature_Set_features_py, __pyx_k_Feature_Set_features_py, sizeof(__pyx_k_Feature_Set_features_py), 0, 0, 1, 0},
     {&__pyx_kp_u_Features_saved_to, __pyx_k_Features_saved_to, sizeof(__pyx_k_Features_saved_to), 0, 1, 0, 0},
     {&__pyx_kp_u_Features_saved_to_2, __pyx_k_Features_saved_to_2, sizeof(__pyx_k_Features_saved_to_2), 0, 1, 0, 0},
     {&__pyx_n_s_G, __pyx_k_G, sizeof(__pyx_k_G), 0, 0, 1, 1},
@@ -52846,6 +52938,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_kp_s_f_2, __pyx_k_f_2, sizeof(__pyx_k_f_2), 0, 0, 1, 0},
     {&__pyx_n_s_features, __pyx_k_features, sizeof(__pyx_k_features), 0, 0, 1, 1},
     {&__pyx_n_s_features_by_melody, __pyx_k_features_by_melody, sizeof(__pyx_k_features_by_melody), 0, 0, 1, 1},
+    {&__pyx_kp_s_features_py, __pyx_k_features_py, sizeof(__pyx_k_features_py), 0, 0, 1, 0},
     {&__pyx_n_s_filename, __pyx_k_filename, sizeof(__pyx_k_filename), 0, 0, 1, 1},
     {&__pyx_n_s_first_features, __pyx_k_first_features, sizeof(__pyx_k_first_features), 0, 0, 1, 1},
     {&__pyx_n_s_float, __pyx_k_float, sizeof(__pyx_k_float), 0, 0, 1, 1},
@@ -52893,6 +52986,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_indent, __pyx_k_indent, sizeof(__pyx_k_indent), 0, 0, 1, 1},
     {&__pyx_n_s_inf, __pyx_k_inf, sizeof(__pyx_k_inf), 0, 0, 1, 1},
     {&__pyx_n_s_initializing, __pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 0, 1, 1},
+    {&__pyx_n_s_input_path, __pyx_k_input_path, sizeof(__pyx_k_input_path), 0, 0, 1, 1},
     {&__pyx_n_s_inscale, __pyx_k_inscale, sizeof(__pyx_k_inscale), 0, 0, 1, 1},
     {&__pyx_n_s_int, __pyx_k_int, sizeof(__pyx_k_int), 0, 0, 1, 1},
     {&__pyx_n_s_interpolation_contour, __pyx_k_interpolation_contour, sizeof(__pyx_k_interpolation_contour), 0, 0, 1, 1},
@@ -53038,6 +53132,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_open, __pyx_k_open, sizeof(__pyx_k_open), 0, 0, 1, 1},
     {&__pyx_n_s_other_sum, __pyx_k_other_sum, sizeof(__pyx_k_other_sum), 0, 0, 1, 1},
     {&__pyx_n_s_output_file, __pyx_k_output_file, sizeof(__pyx_k_output_file), 0, 0, 1, 1},
+    {&__pyx_n_s_output_path, __pyx_k_output_path, sizeof(__pyx_k_output_path), 0, 0, 1, 1},
     {&__pyx_n_s_p, __pyx_k_p, sizeof(__pyx_k_p), 0, 0, 1, 1},
     {&__pyx_n_s_pc, __pyx_k_pc, sizeof(__pyx_k_pc), 0, 0, 1, 1},
     {&__pyx_n_s_pc_values, __pyx_k_pc_values, sizeof(__pyx_k_pc_values), 0, 0, 1, 1},
@@ -53286,36 +53381,36 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "features.py":2517
+  /* "features.py":2519
  *         Writes features to CSV file with each melody as a row
  *     """
  *     print("Starting job...\n")             # <<<<<<<<<<<<<<
- *     with open("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json", encoding='utf-8') as f:
+ *     with open(input_path, encoding='utf-8') as f:
  *         melody_data_list = json.load(f)
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_Starting_job); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 2517, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_Starting_job); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 2519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "features.py":2543
+  /* "features.py":2545
  *         headers.extend(f"{category}.{feature}" for feature in features.keys())
  * 
  *     print("Starting parallel processing...\n")             # <<<<<<<<<<<<<<
  *     # Create pool of workers
  *     n_cores = cpu_count()
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_Starting_parallel_processing); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 2543, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_Starting_parallel_processing); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 2545, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "features.py":2586
+  /* "features.py":2588
  *     print(f"Average time per melody: {avg_time:.3f} seconds\n")
  * 
  *     print("Job complete\n")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_Job_complete); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 2586, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_Job_complete); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 2588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
 
@@ -53329,28 +53424,28 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__16 = PyTuple_Pack(1, __pyx_n_s_pitches); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_range, 41, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_range, 41, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 41, __pyx_L1_error)
 
   /* "features.py":56
- *     return range_func(pitches)
+ *     return int(range_func(pitches))
  * 
  * def pitch_standard_deviation(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the standard deviation of pitch values.
  * 
  */
-  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_standard_deviation, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_standard_deviation, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 56, __pyx_L1_error)
 
   /* "features.py":71
- *     return standard_deviation(pitches)
+ *     return float(standard_deviation(pitches))
  * 
  * def pitch_entropy(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the Shannon entropy of pitch values.
  * 
  */
-  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_entropy, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_entropy, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 71, __pyx_L1_error)
 
   /* "features.py":86
- *     return shannon_entropy(pitches)
+ *     return float(shannon_entropy(pitches))
  * 
  * def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of pitches.
@@ -53359,7 +53454,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__20 = PyTuple_Pack(9, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_durations, __pyx_n_s_weighted_pitches, __pyx_n_s_pitch, __pyx_n_s_duration, __pyx_n_s_repetitions, __pyx_n_s_i); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pcdist1, 86, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pcdist1, 86, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 86, __pyx_L1_error)
 
   /* "features.py":113
  *     return distribution_proportions(weighted_pitches)
@@ -53371,7 +53466,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__22 = PyTuple_Pack(2, __pyx_n_s_pitches, __pyx_n_s_num_midi_notes); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_basic_pitch_histogram, 113, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_basic_pitch_histogram, 113, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 113, __pyx_L1_error)
 
   /* "features.py":129
  *     return histogram_bins(pitches, num_midi_notes)
@@ -53380,7 +53475,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate ranking of pitches in descending order.
  * 
  */
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_ranking, 129, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_ranking, 129, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 129, __pyx_L1_error)
 
   /* "features.py":144
  *     return rank_values(pitches, descending=True)
@@ -53389,7 +53484,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate rate of pitch repetition.
  * 
  */
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_melodic_pitch_variety, 144, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_melodic_pitch_variety, 144, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 144, __pyx_L1_error)
 
   /* "features.py":159
  *     return repetition_rate(pitches)
@@ -53401,7 +53496,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__26 = PyTuple_Pack(8, __pyx_n_s_pitches, __pyx_n_s_pcs, __pyx_n_s_longest_sequence, __pyx_n_s_nine_percent_significant, __pyx_n_s_i, __pyx_n_s_pc, __pyx_n_s_consecutive_fifth_pcs, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_dominant_spread, 159, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_dominant_spread, 159, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 159, __pyx_L1_error)
 
   /* "features.py":184
  *     return len(longest_sequence)
@@ -53410,7 +53505,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate mean pitch value.
  * 
  */
-  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_mean_pitch, 184, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_mean_pitch, 184, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(0, 184, __pyx_L1_error)
 
   /* "features.py":199
  *     return np.mean(pitches)
@@ -53419,10 +53514,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Find most frequently occurring pitch.
  * 
  */
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_most_common_pitch, 199, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_most_common_pitch, 199, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 199, __pyx_L1_error)
 
   /* "features.py":214
- *     return mode(pitches)
+ *     return int(mode(pitches))
  * 
  * def number_of_common_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count pitch classes that appear in at least 9% of notes.
@@ -53431,19 +53526,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__30 = PyTuple_Pack(4, __pyx_n_s_pitches, __pyx_n_s_pcs, __pyx_n_s_significant_pcs, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_number_of_common_pitches, 214, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_number_of_common_pitches, 214, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 214, __pyx_L1_error)
 
   /* "features.py":231
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  * 
  * def number_of_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count number of unique pitches.
  * 
  */
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_number_of_pitches, 231, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_number_of_pitches, 231, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 231, __pyx_L1_error)
 
   /* "features.py":246
- *     return len(set(pitches))
+ *     return int(len(set(pitches)))
  * 
  * def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of pitch classes arranged in circle of fifths.
@@ -53452,7 +53547,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__33 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_pcs, __pyx_n_s_unique, __pyx_n_s_counts, __pyx_n_s_pc, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_folded_fifths_pitch_class_histog, 246, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_folded_fifths_pitch_class_histog, 246, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 246, __pyx_L1_error)
 
   /* "features.py":269
  *     return circle_of_fifths(unique, counts)
@@ -53464,25 +53559,25 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__35 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_histogram, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 269, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__35);
   __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_class_kurtosis_after_foldi, 269, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_class_kurtosis_after_foldi, 269, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 269, __pyx_L1_error)
 
   /* "features.py":288
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  * 
  * def pitch_class_skewness_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate skewness of folded fifths pitch class histogram.
  * 
  */
-  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_class_skewness_after_foldi, 288, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_class_skewness_after_foldi, 288, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 288, __pyx_L1_error)
 
   /* "features.py":307
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  * 
  * def pitch_class_variability_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate standard deviation of folded fifths pitch class histogram.
  * 
  */
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_class_variability_after_fo, 307, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_class_variability_after_fo, 307, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 307, __pyx_L1_error)
 
   /* "features.py":328
  * # Interval Features
@@ -53494,7 +53589,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__39 = PyTuple_Pack(2, __pyx_n_s_pitches, __pyx_n_s_i); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__39);
   __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_pitch_interval, 328, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_pitch_interval, 328, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 328, __pyx_L1_error)
 
   /* "features.py":343
  *     return [pitches[i+1] - pitches[i] for i in range(len(pitches)-1)]
@@ -53506,16 +53601,16 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__41 = PyTuple_Pack(2, __pyx_n_s_pitches, __pyx_n_s_x); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 343, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__41);
   __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_absolute_interval_range, 343, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 343, __pyx_L1_error)
+  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_absolute_interval_range, 343, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 343, __pyx_L1_error)
 
   /* "features.py":358
- *     return range_func([abs(x) for x in pitch_interval(pitches)])
+ *     return int(range_func([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def mean_absolute_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate mean absolute interval size.
  * 
  */
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_mean_absolute_interval, 358, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_mean_absolute_interval, 358, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 358, __pyx_L1_error)
 
   /* "features.py":376
  * mean_melodic_interval = mean_absolute_interval
@@ -53524,16 +53619,16 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate standard deviation of absolute interval sizes.
  * 
  */
-  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_standard_deviation_absolute_inte, 376, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 376, __pyx_L1_error)
+  __pyx_codeobj__44 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_standard_deviation_absolute_inte, 376, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__44)) __PYX_ERR(0, 376, __pyx_L1_error)
 
   /* "features.py":391
- *     return np.std([abs(x) for x in pitch_interval(pitches)])
+ *     return float(np.std([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def modal_interval(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Find most common interval size.
  * 
  */
-  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_modal_interval, 391, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 391, __pyx_L1_error)
+  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_modal_interval, 391, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 391, __pyx_L1_error)
 
   /* "features.py":409
  * most_common_interval = modal_interval
@@ -53542,10 +53637,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate Shannon entropy of interval distribution.
  * 
  */
-  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_interval_entropy, 409, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 409, __pyx_L1_error)
+  __pyx_codeobj__46 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_interval_entropy, 409, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__46)) __PYX_ERR(0, 409, __pyx_L1_error)
 
   /* "features.py":424
- *     return shannon_entropy(pitch_interval(pitches))
+ *     return float(shannon_entropy(pitch_interval(pitches)))
  * 
  * def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of intervals.
@@ -53554,7 +53649,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__47 = PyTuple_Pack(10, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_intervals, __pyx_n_s_durations, __pyx_n_s_weighted_intervals, __pyx_n_s_interval, __pyx_n_s_duration, __pyx_n_s_repetitions, __pyx_n_s_i); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__47);
   __Pyx_GIVEREF(__pyx_tuple__47);
-  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ivdist1, 424, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 424, __pyx_L1_error)
+  __pyx_codeobj__48 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__47, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ivdist1, 424, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__48)) __PYX_ERR(0, 424, __pyx_L1_error)
 
   /* "features.py":451
  *     return distribution_proportions(weighted_intervals)
@@ -53566,10 +53661,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__49 = PyTuple_Pack(8, __pyx_n_s_pitches, __pyx_n_s_directions, __pyx_n_s_mean, __pyx_n_s_variance, __pyx_n_s_std_dev, __pyx_n_s_i, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__49)) __PYX_ERR(0, 451, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__49);
   __Pyx_GIVEREF(__pyx_tuple__49);
-  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_interval_direction, 451, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) __PYX_ERR(0, 451, __pyx_L1_error)
+  __pyx_codeobj__50 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__49, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_interval_direction, 451, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__50)) __PYX_ERR(0, 451, __pyx_L1_error)
 
   /* "features.py":481
- *     return mean, std_dev
+ *     return float(mean), float(std_dev)
  * 
  * def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate average interval span of melodic arcs.
@@ -53578,10 +53673,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__51 = PyTuple_Pack(8, __pyx_n_s_pitches, __pyx_n_s_total_intervals, __pyx_n_s_number_intervals, __pyx_n_s_intervals, __pyx_n_s_direction, __pyx_n_s_interval_so_far, __pyx_n_s_interval, __pyx_n_s_value); if (unlikely(!__pyx_tuple__51)) __PYX_ERR(0, 481, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__51);
   __Pyx_GIVEREF(__pyx_tuple__51);
-  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_average_interval_span_by_melodic, 481, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_codeobj__52 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__51, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_average_interval_span_by_melodic, 481, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__52)) __PYX_ERR(0, 481, __pyx_L1_error)
 
   /* "features.py":535
- *     return value
+ *     return float(value)
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate absolute difference between two most common interval sizes.
@@ -53590,10 +53685,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__53 = PyTuple_Pack(7, __pyx_n_s_pitches, __pyx_n_s_intervals, __pyx_n_s_interval_counts, __pyx_n_s_interval, __pyx_n_s_sorted_intervals, __pyx_n_s_most_common, __pyx_n_s_second_most_common); if (unlikely(!__pyx_tuple__53)) __PYX_ERR(0, 535, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__53);
   __Pyx_GIVEREF(__pyx_tuple__53);
-  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_distance_between_most_prevalent_2, 535, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 535, __pyx_L1_error)
+  __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__53, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_distance_between_most_prevalent_2, 535, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 535, __pyx_L1_error)
 
   /* "features.py":565
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  * 
  * def melodic_interval_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of interval sizes.
@@ -53602,7 +53697,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__55 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_intervals, __pyx_n_s_num_intervals); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 565, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__55);
   __Pyx_GIVEREF(__pyx_tuple__55);
-  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_melodic_interval_histogram, 565, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 565, __pyx_L1_error)
+  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_melodic_interval_histogram, 565, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 565, __pyx_L1_error)
 
   /* "features.py":582
  *     return histogram_bins(intervals, num_intervals)
@@ -53614,10 +53709,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__57 = PyTuple_Pack(5, __pyx_n_s_pitches, __pyx_n_s_intervals, __pyx_n_s_large_intervals, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__57)) __PYX_ERR(0, 582, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__57);
   __Pyx_GIVEREF(__pyx_tuple__57);
-  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_melodic_large_intervals, 582, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 582, __pyx_L1_error)
+  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_melodic_large_intervals, 582, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 582, __pyx_L1_error)
 
   /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -53626,10 +53721,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__59 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_interval_level, __pyx_n_s_intervals, __pyx_n_s_large_intervals, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__59)) __PYX_ERR(0, 601, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__59);
   __Pyx_GIVEREF(__pyx_tuple__59);
-  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_variable_melodic_intervals, 601, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) __PYX_ERR(0, 601, __pyx_L1_error)
+  __pyx_codeobj__60 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__59, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_variable_melodic_intervals, 601, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__60)) __PYX_ERR(0, 601, __pyx_L1_error)
 
   /* "features.py":622
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def number_of_common_melodic_intervals(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count intervals that appear in at least 9% of melodic transitions.
@@ -53638,10 +53733,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__61 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_intervals, __pyx_n_s_significant_intervals); if (unlikely(!__pyx_tuple__61)) __PYX_ERR(0, 622, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__61);
   __Pyx_GIVEREF(__pyx_tuple__61);
-  __pyx_codeobj__62 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__61, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_number_of_common_melodic_interva, 622, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__62)) __PYX_ERR(0, 622, __pyx_L1_error)
+  __pyx_codeobj__62 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__61, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_number_of_common_melodic_interva, 622, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__62)) __PYX_ERR(0, 622, __pyx_L1_error)
 
   /* "features.py":643
- *     return len(significant_intervals)
+ *     return int(len(significant_intervals))
  * 
  * def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of most common interval.
@@ -53650,7 +53745,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__63 = PyTuple_Pack(4, __pyx_n_s_pitches, __pyx_n_s_intervals, __pyx_n_s_interval_counts, __pyx_n_s_interval); if (unlikely(!__pyx_tuple__63)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__63);
   __Pyx_GIVEREF(__pyx_tuple__63);
-  __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_prevalence_of_most_common_melodi, 643, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) __PYX_ERR(0, 643, __pyx_L1_error)
+  __pyx_codeobj__64 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__63, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_prevalence_of_most_common_melodi, 643, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__64)) __PYX_ERR(0, 643, __pyx_L1_error)
 
   /* "features.py":667
  * 
@@ -53662,7 +53757,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__65 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_durations, __pyx_n_s_sc, __pyx_n_s_i); if (unlikely(!__pyx_tuple__65)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__65);
   __Pyx_GIVEREF(__pyx_tuple__65);
-  __pyx_codeobj__66 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__65, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_step_contour_features, 667, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__66)) __PYX_ERR(0, 667, __pyx_L1_error)
+  __pyx_codeobj__66 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__65, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_step_contour_features, 667, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__66)) __PYX_ERR(0, 667, __pyx_L1_error)
 
   /* "features.py":688
  *     return sc.global_variation, sc.global_direction, sc.local_variation
@@ -53674,7 +53769,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__67 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ic); if (unlikely(!__pyx_tuple__67)) __PYX_ERR(0, 688, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__67);
   __Pyx_GIVEREF(__pyx_tuple__67);
-  __pyx_codeobj__68 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__67, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_interpolation_contour_featur, 688, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__68)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_codeobj__68 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__67, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_interpolation_contour_featur, 688, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__68)) __PYX_ERR(0, 688, __pyx_L1_error)
 
   /* "features.py":709
  * # Duration Features
@@ -53686,7 +53781,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__69 = PyTuple_Pack(1, __pyx_n_s_melody); if (unlikely(!__pyx_tuple__69)) __PYX_ERR(0, 709, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__69);
   __Pyx_GIVEREF(__pyx_tuple__69);
-  __pyx_codeobj__70 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__69, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_tempo, 709, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__70)) __PYX_ERR(0, 709, __pyx_L1_error)
+  __pyx_codeobj__70 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__69, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_tempo, 709, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__70)) __PYX_ERR(0, 709, __pyx_L1_error)
 
   /* "features.py":725
  *     return melody.tempo
@@ -53698,7 +53793,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__71 = PyTuple_Pack(3, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_i); if (unlikely(!__pyx_tuple__71)) __PYX_ERR(0, 725, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__71);
   __Pyx_GIVEREF(__pyx_tuple__71);
-  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_duration_range, 725, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 725, __pyx_L1_error)
+  __pyx_codeobj__72 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__71, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_duration_range, 725, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__72)) __PYX_ERR(0, 725, __pyx_L1_error)
 
   /* "features.py":742
  *     return range_func([ends[i] - starts[i] for i in range(len(starts))])
@@ -53710,7 +53805,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__73 = PyTuple_Pack(4, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_durations, __pyx_n_s_i); if (unlikely(!__pyx_tuple__73)) __PYX_ERR(0, 742, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__73);
   __Pyx_GIVEREF(__pyx_tuple__73);
-  __pyx_codeobj__74 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_mean_duration, 742, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__74)) __PYX_ERR(0, 742, __pyx_L1_error)
+  __pyx_codeobj__74 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_mean_duration, 742, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__74)) __PYX_ERR(0, 742, __pyx_L1_error)
 
   /* "features.py":760
  *     return float(np.mean(durations))
@@ -53719,7 +53814,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate standard deviation of note durations.
  * 
  */
-  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_duration_standard_deviation, 760, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 760, __pyx_L1_error)
+  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_duration_standard_deviation, 760, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 760, __pyx_L1_error)
 
   /* "features.py":778
  *     return float(np.std(durations))
@@ -53728,7 +53823,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Find most common note duration.
  * 
  */
-  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_modal_duration, 778, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) __PYX_ERR(0, 778, __pyx_L1_error)
+  __pyx_codeobj__76 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_modal_duration, 778, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__76)) __PYX_ERR(0, 778, __pyx_L1_error)
 
   /* "features.py":796
  *     return mode(durations)
@@ -53737,7 +53832,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate Shannon entropy of duration distribution.
  * 
  */
-  __pyx_codeobj__77 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_duration_entropy, 796, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__77)) __PYX_ERR(0, 796, __pyx_L1_error)
+  __pyx_codeobj__77 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_duration_entropy, 796, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__77)) __PYX_ERR(0, 796, __pyx_L1_error)
 
   /* "features.py":814
  *     return shannon_entropy(durations)
@@ -53749,7 +53844,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__78 = PyTuple_Pack(1, __pyx_n_s_starts); if (unlikely(!__pyx_tuple__78)) __PYX_ERR(0, 814, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__78);
   __Pyx_GIVEREF(__pyx_tuple__78);
-  __pyx_codeobj__79 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__78, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_length, 814, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__79)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_codeobj__79 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__78, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_length, 814, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__79)) __PYX_ERR(0, 814, __pyx_L1_error)
 
   /* "features.py":829
  *     return len(starts)
@@ -53758,7 +53853,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Count number of unique note durations.
  * 
  */
-  __pyx_codeobj__80 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_number_of_durations, 829, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__80)) __PYX_ERR(0, 829, __pyx_L1_error)
+  __pyx_codeobj__80 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__73, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_number_of_durations, 829, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__80)) __PYX_ERR(0, 829, __pyx_L1_error)
 
   /* "features.py":847
  *     return len(set(durations))
@@ -53770,7 +53865,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__81 = PyTuple_Pack(2, __pyx_n_s_starts, __pyx_n_s_ends); if (unlikely(!__pyx_tuple__81)) __PYX_ERR(0, 847, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__81);
   __Pyx_GIVEREF(__pyx_tuple__81);
-  __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_global_duration, 847, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_global_duration, 847, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) __PYX_ERR(0, 847, __pyx_L1_error)
 
   /* "features.py":864
  *     return ends[-1] - starts[0]
@@ -53779,7 +53874,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate average number of notes per unit time.
  * 
  */
-  __pyx_codeobj__83 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_note_density, 864, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__83)) __PYX_ERR(0, 864, __pyx_L1_error)
+  __pyx_codeobj__83 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_note_density, 864, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__83)) __PYX_ERR(0, 864, __pyx_L1_error)
 
   /* "features.py":881
  *     return len(starts) / global_duration(starts, ends)
@@ -53791,7 +53886,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__84 = PyTuple_Pack(3, __pyx_n_s_starts, __pyx_n_s_intervals, __pyx_n_s_i); if (unlikely(!__pyx_tuple__84)) __PYX_ERR(0, 881, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__84);
   __Pyx_GIVEREF(__pyx_tuple__84);
-  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi, 881, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 881, __pyx_L1_error)
+  __pyx_codeobj__85 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi, 881, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__85)) __PYX_ERR(0, 881, __pyx_L1_error)
 
   /* "features.py":899
  *     return float(np.mean(intervals)), float(np.std(intervals))
@@ -53803,7 +53898,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__86 = PyTuple_Pack(5, __pyx_n_s_starts, __pyx_n_s_intervals, __pyx_n_s_ratios, __pyx_n_s_i, __pyx_n_s_i); if (unlikely(!__pyx_tuple__86)) __PYX_ERR(0, 899, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__86);
   __Pyx_GIVEREF(__pyx_tuple__86);
-  __pyx_codeobj__87 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__86, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_ratio, 899, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__87)) __PYX_ERR(0, 899, __pyx_L1_error)
+  __pyx_codeobj__87 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__86, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_ratio, 899, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__87)) __PYX_ERR(0, 899, __pyx_L1_error)
 
   /* "features.py":919
  *     return float(np.mean(ratios)), float(np.std(ratios))
@@ -53812,7 +53907,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate range of inter-onset intervals.
  * 
  */
-  __pyx_codeobj__88 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_range, 919, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__88)) __PYX_ERR(0, 919, __pyx_L1_error)
+  __pyx_codeobj__88 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_range, 919, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__88)) __PYX_ERR(0, 919, __pyx_L1_error)
 
   /* "features.py":935
  *     return max(intervals) - min(intervals)
@@ -53821,7 +53916,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate mean of inter-onset intervals.
  * 
  */
-  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_mean, 935, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 935, __pyx_L1_error)
+  __pyx_codeobj__89 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_mean, 935, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__89)) __PYX_ERR(0, 935, __pyx_L1_error)
 
   /* "features.py":951
  *     return float(np.mean(intervals))
@@ -53830,7 +53925,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate standard deviation of inter-onset intervals.
  * 
  */
-  __pyx_codeobj__90 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_standard_deviation, 951, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__90)) __PYX_ERR(0, 951, __pyx_L1_error)
+  __pyx_codeobj__90 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__84, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_standard_deviation, 951, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__90)) __PYX_ERR(0, 951, __pyx_L1_error)
 
   /* "features.py":967
  *     return float(np.std(intervals))
@@ -53842,7 +53937,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__91 = PyTuple_Pack(7, __pyx_n_s_starts, __pyx_n_s_intervals, __pyx_n_s_ratios, __pyx_n_s_contour, __pyx_n_s_i, __pyx_n_s_i, __pyx_n_s_ratio); if (unlikely(!__pyx_tuple__91)) __PYX_ERR(0, 967, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__91);
   __Pyx_GIVEREF(__pyx_tuple__91);
-  __pyx_codeobj__92 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__91, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_contour, 967, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__92)) __PYX_ERR(0, 967, __pyx_L1_error)
+  __pyx_codeobj__92 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__91, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_contour, 967, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__92)) __PYX_ERR(0, 967, __pyx_L1_error)
 
   /* "features.py":988
  *     return float(np.mean(contour)), float(np.std(contour))
@@ -53854,7 +53949,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__93 = PyTuple_Pack(5, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_durations, __pyx_n_s_num_durations, __pyx_n_s_i); if (unlikely(!__pyx_tuple__93)) __PYX_ERR(0, 988, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__93);
   __Pyx_GIVEREF(__pyx_tuple__93);
-  __pyx_codeobj__94 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__93, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_duration_histogram, 988, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__94)) __PYX_ERR(0, 988, __pyx_L1_error)
+  __pyx_codeobj__94 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__93, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_duration_histogram, 988, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__94)) __PYX_ERR(0, 988, __pyx_L1_error)
 
   /* "features.py":1007
  *     return histogram_bins(durations, num_durations)
@@ -53866,7 +53961,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__95 = PyTuple_Pack(4, __pyx_n_s_starts, __pyx_n_s_intervals, __pyx_n_s_num_intervals, __pyx_n_s_i); if (unlikely(!__pyx_tuple__95)) __PYX_ERR(0, 1007, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__95);
   __Pyx_GIVEREF(__pyx_tuple__95);
-  __pyx_codeobj__96 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__95, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_ioi_histogram, 1007, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__96)) __PYX_ERR(0, 1007, __pyx_L1_error)
+  __pyx_codeobj__96 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__95, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_ioi_histogram, 1007, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__96)) __PYX_ERR(0, 1007, __pyx_L1_error)
 
   /* "features.py":1025
  * 
@@ -53878,7 +53973,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__97 = PyTuple_Pack(4, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlation, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__97)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__97);
   __Pyx_GIVEREF(__pyx_tuple__97);
-  __pyx_codeobj__98 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__97, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_tonalness, 1025, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__98)) __PYX_ERR(0, 1025, __pyx_L1_error)
+  __pyx_codeobj__98 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__97, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_tonalness, 1025, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__98)) __PYX_ERR(0, 1025, __pyx_L1_error)
 
   /* "features.py":1042
  *     return correlation[0][1]
@@ -53890,7 +53985,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__99 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlations, __pyx_n_s_top_corr, __pyx_n_s_second_corr, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__99)) __PYX_ERR(0, 1042, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__99);
   __Pyx_GIVEREF(__pyx_tuple__99);
-  __pyx_codeobj__100 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__99, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_tonal_clarity, 1042, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__100)) __PYX_ERR(0, 1042, __pyx_L1_error)
+  __pyx_codeobj__100 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__99, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_tonal_clarity, 1042, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__100)) __PYX_ERR(0, 1042, __pyx_L1_error)
 
   /* "features.py":1072
  *     return top_corr / second_corr
@@ -53902,7 +53997,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__101 = PyTuple_Pack(8, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlations, __pyx_n_s_top_corr, __pyx_n_s_other_sum, __pyx_n_s_pitch, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__101)) __PYX_ERR(0, 1072, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__101);
   __Pyx_GIVEREF(__pyx_tuple__101);
-  __pyx_codeobj__102 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__101, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_tonal_spike, 1072, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__102)) __PYX_ERR(0, 1072, __pyx_L1_error)
+  __pyx_codeobj__102 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__101, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_tonal_spike, 1072, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__102)) __PYX_ERR(0, 1072, __pyx_L1_error)
 
   /* "features.py":1102
  *     return top_corr / other_sum
@@ -53914,7 +54009,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__103 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlations, __pyx_n_s_corr_values, __pyx_n_s_pitch, __pyx_n_s_corr); if (unlikely(!__pyx_tuple__103)) __PYX_ERR(0, 1102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__103);
   __Pyx_GIVEREF(__pyx_tuple__103);
-  __pyx_codeobj__104 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__103, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_tonal_entropy, 1102, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__104)) __PYX_ERR(0, 1102, __pyx_L1_error)
+  __pyx_codeobj__104 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__103, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_tonal_entropy, 1102, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__104)) __PYX_ERR(0, 1102, __pyx_L1_error)
 
   /* "features.py":1127
  *     return shannon_entropy(corr_values)
@@ -53923,7 +54018,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Returns a dictionary mapping key names to their semitone distances from C.
  * 
  */
-  __pyx_codeobj__105 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_key_distances, 1127, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__105)) __PYX_ERR(0, 1127, __pyx_L1_error)
+  __pyx_codeobj__105 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_key_distances, 1127, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__105)) __PYX_ERR(0, 1127, __pyx_L1_error)
 
   /* "features.py":1142
  *     }
@@ -53935,7 +54030,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__106 = PyTuple_Pack(6, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlations, __pyx_n_s_key_name, __pyx_n_s_key_distances, __pyx_n_s_pitch); if (unlikely(!__pyx_tuple__106)) __PYX_ERR(0, 1142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__106);
   __Pyx_GIVEREF(__pyx_tuple__106);
-  __pyx_codeobj__107 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__106, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_referent, 1142, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__107)) __PYX_ERR(0, 1142, __pyx_L1_error)
+  __pyx_codeobj__107 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__106, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_referent, 1142, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__107)) __PYX_ERR(0, 1142, __pyx_L1_error)
 
   /* "features.py":1160
  *     return key_distances[key_name]
@@ -53947,7 +54042,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__108 = PyTuple_Pack(11, __pyx_n_s_pitches, __pyx_n_s_pitch_classes, __pyx_n_s_correlations, __pyx_n_s_key_centre, __pyx_n_s_scale, __pyx_n_s_key_name, __pyx_n_s_key_distances, __pyx_n_s_root, __pyx_n_s_pc, __pyx_n_s_pitch, __pyx_n_s_note); if (unlikely(!__pyx_tuple__108)) __PYX_ERR(0, 1160, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__108);
   __Pyx_GIVEREF(__pyx_tuple__108);
-  __pyx_codeobj__109 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__108, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_inscale, 1160, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__109)) __PYX_ERR(0, 1160, __pyx_L1_error)
+  __pyx_codeobj__109 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__108, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_inscale, 1160, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__109)) __PYX_ERR(0, 1160, __pyx_L1_error)
 
   /* "features.py":1191
  *     return 1
@@ -53959,7 +54054,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__110 = PyTuple_Pack(15, __pyx_n_s_pitches, __pyx_n_s_notes_ints, __pyx_n_s_central_pitch_profile, __pyx_n_s_central_pitch, __pyx_n_s_range_profile, __pyx_n_s_rpk_major, __pyx_n_s_rpk_minor, __pyx_n_s_total_prob, __pyx_n_s_i, __pyx_n_s_prox_profile, __pyx_n_s_rp, __pyx_n_s_rpk, __pyx_n_s_rpk_normed, __pyx_n_s_note_prob, __pyx_n_s_p); if (unlikely(!__pyx_tuple__110)) __PYX_ERR(0, 1191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__110);
   __Pyx_GIVEREF(__pyx_tuple__110);
-  __pyx_codeobj__111 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__110, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_temperley_likelihood, 1191, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__111)) __PYX_ERR(0, 1191, __pyx_L1_error)
+  __pyx_codeobj__111 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__110, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_temperley_likelihood, 1191, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__111)) __PYX_ERR(0, 1191, __pyx_L1_error)
 
   /* "features.py":1232
  *     return total_prob
@@ -53971,7 +54066,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__112 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_p, __pyx_n_s_p); if (unlikely(!__pyx_tuple__112)) __PYX_ERR(0, 1232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__112);
   __Pyx_GIVEREF(__pyx_tuple__112);
-  __pyx_codeobj__113 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__112, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_tonalness_histogram, 1232, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__113)) __PYX_ERR(0, 1232, __pyx_L1_error)
+  __pyx_codeobj__113 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__112, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_tonalness_histogram, 1232, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__113)) __PYX_ERR(0, 1232, __pyx_L1_error)
 
   /* "features.py":1239
  *     return histogram_bins(compute_tonality_vector(p)[0][1], 24)
@@ -53983,7 +54078,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__114 = PyTuple_Pack(2, __pyx_n_s_melody, __pyx_n_s_pitches); if (unlikely(!__pyx_tuple__114)) __PYX_ERR(0, 1239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__114);
   __Pyx_GIVEREF(__pyx_tuple__114);
-  __pyx_codeobj__115 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__114, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_narmour_features, 1239, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__115)) __PYX_ERR(0, 1239, __pyx_L1_error)
+  __pyx_codeobj__115 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__114, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_narmour_features, 1239, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__115)) __PYX_ERR(0, 1239, __pyx_L1_error)
 
   /* "features.py":1276
  * 
@@ -53992,7 +54087,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate the proportion of notes in the melody that constitute triadic movement.
  * 
  */
-  __pyx_codeobj__116 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_amount_of_arpeggiation, 1276, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__116)) __PYX_ERR(0, 1276, __pyx_L1_error)
+  __pyx_codeobj__116 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_amount_of_arpeggiation, 1276, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__116)) __PYX_ERR(0, 1276, __pyx_L1_error)
 
   /* "features.py":1293
  * 
@@ -54001,7 +54096,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate the proportion of chromatic motion in the melody.
  * 
  */
-  __pyx_codeobj__117 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_chromatic_motion, 1293, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__117)) __PYX_ERR(0, 1293, __pyx_L1_error)
+  __pyx_codeobj__117 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_chromatic_motion, 1293, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__117)) __PYX_ERR(0, 1293, __pyx_L1_error)
 
   /* "features.py":1309
  *     return chromatic_motion_proportion(pitches)
@@ -54013,7 +54108,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__118 = PyTuple_Pack(3, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ends); if (unlikely(!__pyx_tuple__118)) __PYX_ERR(0, 1309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__118);
   __Pyx_GIVEREF(__pyx_tuple__118);
-  __pyx_codeobj__119 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__118, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_melodic_embellishment, 1309, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__119)) __PYX_ERR(0, 1309, __pyx_L1_error)
+  __pyx_codeobj__119 = (PyObject*)__Pyx_PyCode_New(3, 0, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__118, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_melodic_embellishment, 1309, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__119)) __PYX_ERR(0, 1309, __pyx_L1_error)
 
   /* "features.py":1334
  *     return melodic_embellishment_proportion(pitches, starts, ends)
@@ -54022,7 +54117,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate the proportion of repeated notes in the melody.
  * 
  */
-  __pyx_codeobj__120 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_repeated_notes, 1334, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__120)) __PYX_ERR(0, 1334, __pyx_L1_error)
+  __pyx_codeobj__120 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_repeated_notes, 1334, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__120)) __PYX_ERR(0, 1334, __pyx_L1_error)
 
   /* "features.py":1350
  *     return repeated_notes_proportion(pitches)
@@ -54031,7 +54126,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate the proportion of stepwise motion in the melody.
  * 
  */
-  __pyx_codeobj__121 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_stepwise_motion, 1350, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__121)) __PYX_ERR(0, 1350, __pyx_L1_error)
+  __pyx_codeobj__121 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_stepwise_motion, 1350, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__121)) __PYX_ERR(0, 1350, __pyx_L1_error)
 
   /* "features.py":1366
  *     return stepwise_motion_proportion(pitches)
@@ -54043,7 +54138,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__122 = PyTuple_Pack(9, __pyx_n_s_melody, __pyx_n_s_pitches, __pyx_n_s_starts, __pyx_n_s_ends, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_ngram_counts, __pyx_n_s_n, __pyx_n_s_counts); if (unlikely(!__pyx_tuple__122)) __PYX_ERR(0, 1366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__122);
   __Pyx_GIVEREF(__pyx_tuple__122);
-  __pyx_codeobj__123 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__122, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_mtype_features, 1366, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__123)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __pyx_codeobj__123 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__122, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_mtype_features, 1366, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__123)) __PYX_ERR(0, 1366, __pyx_L1_error)
 
   /* "features.py":1402
  *     }
@@ -54055,7 +54150,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__124 = PyTuple_Pack(4, __pyx_n_s_ngram, __pyx_n_s_corpus_stats, __pyx_n_s_ngram_str, __pyx_n_s_doc_freqs); if (unlikely(!__pyx_tuple__124)) __PYX_ERR(0, 1402, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__124);
   __Pyx_GIVEREF(__pyx_tuple__124);
-  __pyx_codeobj__125 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__124, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_ngram_document_frequency, 1402, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__125)) __PYX_ERR(0, 1402, __pyx_L1_error)
+  __pyx_codeobj__125 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__124, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_ngram_document_frequency, 1402, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__125)) __PYX_ERR(0, 1402, __pyx_L1_error)
 
   /* "features.py":1426
  *     return 0
@@ -54067,7 +54162,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__126 = PyTuple_Pack(13, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_tf_values, __pyx_n_s_df_values, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_ngram, __pyx_n_s_tf, __pyx_n_s_df, __pyx_n_s_correlation); if (unlikely(!__pyx_tuple__126)) __PYX_ERR(0, 1426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__126);
   __Pyx_GIVEREF(__pyx_tuple__126);
-  __pyx_codeobj__127 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_tfdf_spearman, 1426, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__127)) __PYX_ERR(0, 1426, __pyx_L1_error)
+  __pyx_codeobj__127 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_tfdf_spearman, 1426, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__127)) __PYX_ERR(0, 1426, __pyx_L1_error)
 
   /* "features.py":1475
  *         return 0.0
@@ -54076,7 +54171,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute Kendall correlation between term and document frequencies.
  * 
  */
-  __pyx_codeobj__128 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_tfdf_kendall, 1475, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__128)) __PYX_ERR(0, 1475, __pyx_L1_error)
+  __pyx_codeobj__128 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__126, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_tfdf_kendall, 1475, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__128)) __PYX_ERR(0, 1475, __pyx_L1_error)
 
   /* "features.py":1524
  *         return 0.0
@@ -54088,7 +54183,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__129 = PyTuple_Pack(19, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_tfdf_values, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_tf_vector, __pyx_n_s_df_vector, __pyx_n_s_ngram, __pyx_n_s_tf, __pyx_n_s_df, __pyx_n_s_tf_array, __pyx_n_s_df_array, __pyx_n_s_tf_norm, __pyx_n_s_df_norm, __pyx_n_s_tfdf, __pyx_n_s_mean_tfdf); if (unlikely(!__pyx_tuple__129)) __PYX_ERR(0, 1524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__129);
   __Pyx_GIVEREF(__pyx_tuple__129);
-  __pyx_codeobj__130 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 19, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__129, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_tfdf, 1524, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__130)) __PYX_ERR(0, 1524, __pyx_L1_error)
+  __pyx_codeobj__130 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 19, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__129, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_tfdf, 1524, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__130)) __PYX_ERR(0, 1524, __pyx_L1_error)
 
   /* "features.py":1588
  *     return mean_tfdf
@@ -54100,7 +54195,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__131 = PyTuple_Pack(16, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_distances, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_total_tf, __pyx_n_s_ngram, __pyx_n_s_tf, __pyx_n_s_df, __pyx_n_s_norm_tf, __pyx_n_s_norm_df, __pyx_n_s_dist, __pyx_n_s_mean_dist); if (unlikely(!__pyx_tuple__131)) __PYX_ERR(0, 1588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__131);
   __Pyx_GIVEREF(__pyx_tuple__131);
-  __pyx_codeobj__132 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__131, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_norm_log_dist, 1588, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__132)) __PYX_ERR(0, 1588, __pyx_L1_error)
+  __pyx_codeobj__132 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__131, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_norm_log_dist, 1588, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__132)) __PYX_ERR(0, 1588, __pyx_L1_error)
 
   /* "features.py":1642
  *     return mean_dist
@@ -54112,7 +54207,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__133 = PyTuple_Pack(10, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_max_df, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_ngram, __pyx_n_s_df); if (unlikely(!__pyx_tuple__133)) __PYX_ERR(0, 1642, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__133);
   __Pyx_GIVEREF(__pyx_tuple__133);
-  __pyx_codeobj__134 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__133, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_max_log_df, 1642, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__134)) __PYX_ERR(0, 1642, __pyx_L1_error)
+  __pyx_codeobj__134 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__133, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_max_log_df, 1642, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__134)) __PYX_ERR(0, 1642, __pyx_L1_error)
 
   /* "features.py":1678
  *     return 0.0
@@ -54124,7 +54219,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__135 = PyTuple_Pack(10, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_min_df, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_ngram, __pyx_n_s_df); if (unlikely(!__pyx_tuple__135)) __PYX_ERR(0, 1678, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__135);
   __Pyx_GIVEREF(__pyx_tuple__135);
-  __pyx_codeobj__136 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__135, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_min_log_df, 1678, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__136)) __PYX_ERR(0, 1678, __pyx_L1_error)
+  __pyx_codeobj__136 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 10, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__135, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_min_log_df, 1678, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__136)) __PYX_ERR(0, 1678, __pyx_L1_error)
 
   /* "features.py":1714
  *     return 0.0
@@ -54136,7 +54231,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__137 = PyTuple_Pack(11, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_total_log_df, __pyx_n_s_count, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_ngram, __pyx_n_s_df); if (unlikely(!__pyx_tuple__137)) __PYX_ERR(0, 1714, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__137);
   __Pyx_GIVEREF(__pyx_tuple__137);
-  __pyx_codeobj__138 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__137, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_log_df, 1714, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__138)) __PYX_ERR(0, 1714, __pyx_L1_error)
+  __pyx_codeobj__138 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__137, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_log_df, 1714, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__138)) __PYX_ERR(0, 1714, __pyx_L1_error)
 
   /* "features.py":1752
  *     return 0.0
@@ -54148,7 +54243,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__139 = PyTuple_Pack(16, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_total_entropy, __pyx_n_s_n_lengths, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_dfs, __pyx_n_s_total_df, __pyx_n_s_ngram, __pyx_n_s_df, __pyx_n_s_probs, __pyx_n_s_entropy, __pyx_n_s_df); if (unlikely(!__pyx_tuple__139)) __PYX_ERR(0, 1752, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__139);
   __Pyx_GIVEREF(__pyx_tuple__139);
-  __pyx_codeobj__140 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__139, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_entropy, 1752, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__140)) __PYX_ERR(0, 1752, __pyx_L1_error)
+  __pyx_codeobj__140 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 16, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__139, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_entropy, 1752, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__140)) __PYX_ERR(0, 1752, __pyx_L1_error)
 
   /* "features.py":1807
  *     return 0.0
@@ -54160,7 +54255,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__141 = PyTuple_Pack(11, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_ngram_dfs, __pyx_n_s_n, __pyx_n_s_df_counts, __pyx_n_s_ngram_counts, __pyx_n_s_ngram, __pyx_n_s_df); if (unlikely(!__pyx_tuple__141)) __PYX_ERR(0, 1807, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__141);
   __Pyx_GIVEREF(__pyx_tuple__141);
-  __pyx_codeobj__142 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_productivity, 1807, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__142)) __PYX_ERR(0, 1807, __pyx_L1_error)
+  __pyx_codeobj__142 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_productivity, 1807, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__142)) __PYX_ERR(0, 1807, __pyx_L1_error)
 
   /* "features.py":1848
  *     return mean_productivity(ngram_dfs)
@@ -54169,7 +54264,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute mean document frequency Yule's K for a melody.
  * 
  */
-  __pyx_codeobj__143 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_yules_k, 1848, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__143)) __PYX_ERR(0, 1848, __pyx_L1_error)
+  __pyx_codeobj__143 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_yules_k, 1848, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__143)) __PYX_ERR(0, 1848, __pyx_L1_error)
 
   /* "features.py":1889
  *     return yules_k(ngram_dfs)
@@ -54178,7 +54273,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute mean document frequency Simpson's D for a melody.
  * 
  */
-  __pyx_codeobj__144 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_simpsons_d, 1889, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__144)) __PYX_ERR(0, 1889, __pyx_L1_error)
+  __pyx_codeobj__144 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_simpsons_d, 1889, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__144)) __PYX_ERR(0, 1889, __pyx_L1_error)
 
   /* "features.py":1930
  *     return simpsons_d(ngram_dfs)
@@ -54187,7 +54282,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute mean document frequency Sichel's S for a melody.
  * 
  */
-  __pyx_codeobj__145 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_sichels_s, 1930, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__145)) __PYX_ERR(0, 1930, __pyx_L1_error)
+  __pyx_codeobj__145 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_sichels_s, 1930, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__145)) __PYX_ERR(0, 1930, __pyx_L1_error)
 
   /* "features.py":1971
  *     return sichels_s(ngram_dfs)
@@ -54196,7 +54291,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute mean document frequency Honor's H for a melody.
  * 
  */
-  __pyx_codeobj__146 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_df_honores_h, 1971, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__146)) __PYX_ERR(0, 1971, __pyx_L1_error)
+  __pyx_codeobj__146 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__141, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_df_honores_h, 1971, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__146)) __PYX_ERR(0, 1971, __pyx_L1_error)
 
   /* "features.py":2012
  *     return honores_h(ngram_dfs)
@@ -54208,7 +54303,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__147 = PyTuple_Pack(22, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_global_weights, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_corpus_total, __pyx_n_s_pc_values, __pyx_n_s_ngram, __pyx_n_s_local_freq, __pyx_n_s_df, __pyx_n_s_pc, __pyx_n_s_entropy_sum, __pyx_n_s_glob_w, __pyx_n_s_total_freq, __pyx_n_s_weighted_glob_w, __pyx_n_s_genexpr, __pyx_n_s_genexpr, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__147)) __PYX_ERR(0, 2012, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__147);
   __Pyx_GIVEREF(__pyx_tuple__147);
-  __pyx_codeobj__148 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 22, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__147, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mean_global_weight, 2012, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__148)) __PYX_ERR(0, 2012, __pyx_L1_error)
+  __pyx_codeobj__148 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 22, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__147, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mean_global_weight, 2012, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__148)) __PYX_ERR(0, 2012, __pyx_L1_error)
 
   /* "features.py":2074
  *     return float(np.mean(global_weights)) if global_weights else 0.0
@@ -54220,7 +54315,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__149 = PyTuple_Pack(17, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_global_weights, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_corpus_total, __pyx_n_s_ngram, __pyx_n_s_local_freq, __pyx_n_s_df, __pyx_n_s_pc, __pyx_n_s_entropy, __pyx_n_s_glob_w, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__149)) __PYX_ERR(0, 2074, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__149);
   __Pyx_GIVEREF(__pyx_tuple__149);
-  __pyx_codeobj__150 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__149, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mtcf_std_g_weight, 2074, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__150)) __PYX_ERR(0, 2074, __pyx_L1_error)
+  __pyx_codeobj__150 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 17, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__149, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mtcf_std_g_weight, 2074, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__150)) __PYX_ERR(0, 2074, __pyx_L1_error)
 
   /* "features.py":2123
  *     return float(np.std(global_weights)) if global_weights else 0.0
@@ -54232,7 +54327,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__151 = PyTuple_Pack(18, __pyx_n_s_melody, __pyx_n_s_tokenizer, __pyx_n_s_tokens, __pyx_n_s_f, __pyx_n_s_corpus_stats, __pyx_n_s_gl_weights, __pyx_n_s_n, __pyx_n_s_ngram_counts, __pyx_n_s_corpus_total, __pyx_n_s_ngram, __pyx_n_s_local_freq, __pyx_n_s_df, __pyx_n_s_pc, __pyx_n_s_entropy, __pyx_n_s_glob_w, __pyx_n_s_gl_weight, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__151)) __PYX_ERR(0, 2123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__151);
   __Pyx_GIVEREF(__pyx_tuple__151);
-  __pyx_codeobj__152 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__151, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mtcf_mean_gl_weight, 2123, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__152)) __PYX_ERR(0, 2123, __pyx_L1_error)
+  __pyx_codeobj__152 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__151, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mtcf_mean_gl_weight, 2123, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__152)) __PYX_ERR(0, 2123, __pyx_L1_error)
 
   /* "features.py":2174
  *     return float(np.mean(gl_weights)) if gl_weights else 0.0
@@ -54241,7 +54336,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Calculate standard deviation of global-local weights across m-types.
  * 
  */
-  __pyx_codeobj__153 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__151, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_compute_mtcf_std_gl_weight, 2174, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__153)) __PYX_ERR(0, 2174, __pyx_L1_error)
+  __pyx_codeobj__153 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__151, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_compute_mtcf_std_gl_weight, 2174, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__153)) __PYX_ERR(0, 2174, __pyx_L1_error)
 
   /* "features.py":2226
  * 
@@ -54250,7 +54345,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *     """Compute all corpus-based features for a melody.
  * 
  */
-  __pyx_codeobj__154 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__69, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_corpus_features, 2226, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__154)) __PYX_ERR(0, 2226, __pyx_L1_error)
+  __pyx_codeobj__154 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__69, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_corpus_features, 2226, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__154)) __PYX_ERR(0, 2226, __pyx_L1_error)
 
   /* "features.py":2256
  *     }
@@ -54262,7 +54357,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__155 = PyTuple_Pack(2, __pyx_n_s_melody, __pyx_n_s_pitch_features); if (unlikely(!__pyx_tuple__155)) __PYX_ERR(0, 2256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__155);
   __Pyx_GIVEREF(__pyx_tuple__155);
-  __pyx_codeobj__156 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__155, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_pitch_features, 2256, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__156)) __PYX_ERR(0, 2256, __pyx_L1_error)
+  __pyx_codeobj__156 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__155, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_pitch_features, 2256, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__156)) __PYX_ERR(0, 2256, __pyx_L1_error)
 
   /* "features.py":2289
  *     return pitch_features
@@ -54274,7 +54369,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__157 = PyTuple_Pack(4, __pyx_n_s_melody, __pyx_n_s_interval_features, __pyx_n_s_direction_mean, __pyx_n_s_direction_sd); if (unlikely(!__pyx_tuple__157)) __PYX_ERR(0, 2289, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__157);
   __Pyx_GIVEREF(__pyx_tuple__157);
-  __pyx_codeobj__158 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__157, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_interval_features, 2289, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__158)) __PYX_ERR(0, 2289, __pyx_L1_error)
+  __pyx_codeobj__158 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__157, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_interval_features, 2289, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__158)) __PYX_ERR(0, 2289, __pyx_L1_error)
 
   /* "features.py":2324
  *     return interval_features
@@ -54286,7 +54381,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__159 = PyTuple_Pack(4, __pyx_n_s_melody, __pyx_n_s_contour_features, __pyx_n_s_step_contour, __pyx_n_s_interpolation_contour); if (unlikely(!__pyx_tuple__159)) __PYX_ERR(0, 2324, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__159);
   __Pyx_GIVEREF(__pyx_tuple__159);
-  __pyx_codeobj__160 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__159, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_contour_features, 2324, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__160)) __PYX_ERR(0, 2324, __pyx_L1_error)
+  __pyx_codeobj__160 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__159, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_contour_features, 2324, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__160)) __PYX_ERR(0, 2324, __pyx_L1_error)
 
   /* "features.py":2356
  *     return contour_features
@@ -54298,7 +54393,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__161 = PyTuple_Pack(4, __pyx_n_s_melody, __pyx_n_s_duration_features, __pyx_n_s_ioi_ratio_mean, __pyx_n_s_ioi_ratio_std); if (unlikely(!__pyx_tuple__161)) __PYX_ERR(0, 2356, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__161);
   __Pyx_GIVEREF(__pyx_tuple__161);
-  __pyx_codeobj__162 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__161, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_duration_features, 2356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__162)) __PYX_ERR(0, 2356, __pyx_L1_error)
+  __pyx_codeobj__162 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__161, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_duration_features, 2356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__162)) __PYX_ERR(0, 2356, __pyx_L1_error)
 
   /* "features.py":2393
  *     return duration_features
@@ -54310,7 +54405,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__163 = PyTuple_Pack(2, __pyx_n_s_melody, __pyx_n_s_tonality_features); if (unlikely(!__pyx_tuple__163)) __PYX_ERR(0, 2393, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__163);
   __Pyx_GIVEREF(__pyx_tuple__163);
-  __pyx_codeobj__164 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__163, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_tonality_features, 2393, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__164)) __PYX_ERR(0, 2393, __pyx_L1_error)
+  __pyx_codeobj__164 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__163, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_tonality_features, 2393, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__164)) __PYX_ERR(0, 2393, __pyx_L1_error)
 
   /* "features.py":2423
  *     return tonality_features
@@ -54322,7 +54417,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__165 = PyTuple_Pack(2, __pyx_n_s_melody, __pyx_n_s_movement_features); if (unlikely(!__pyx_tuple__165)) __PYX_ERR(0, 2423, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__165);
   __Pyx_GIVEREF(__pyx_tuple__165);
-  __pyx_codeobj__166 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__165, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_melodic_movement_features, 2423, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__166)) __PYX_ERR(0, 2423, __pyx_L1_error)
+  __pyx_codeobj__166 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__165, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_melodic_movement_features, 2423, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__166)) __PYX_ERR(0, 2423, __pyx_L1_error)
 
   /* "features.py":2447
  *     return movement_features
@@ -54334,7 +54429,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__167 = PyTuple_Pack(9, __pyx_n_s_filename, __pyx_n_s_f, __pyx_n_s_melody_data_list, __pyx_n_s_features_by_melody, __pyx_n_s_i, __pyx_n_s_melody_data, __pyx_n_s_mel, __pyx_n_s_melody_features, __pyx_n_s_output_file); if (unlikely(!__pyx_tuple__167)) __PYX_ERR(0, 2447, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__167);
   __Pyx_GIVEREF(__pyx_tuple__167);
-  __pyx_codeobj__168 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__167, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_all_features_json, 2447, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__168)) __PYX_ERR(0, 2447, __pyx_L1_error)
+  __pyx_codeobj__168 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__167, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_all_features_json, 2447, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__168)) __PYX_ERR(0, 2447, __pyx_L1_error)
 
   /* "features.py":2474
  *     print(f"Features saved to {output_file}")
@@ -54346,26 +54441,26 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__169 = PyTuple_Pack(5, __pyx_n_s_args, __pyx_n_s_melody_id, __pyx_n_s_melody_data, __pyx_n_s_mel, __pyx_n_s_melody_features); if (unlikely(!__pyx_tuple__169)) __PYX_ERR(0, 2474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__169);
   __Pyx_GIVEREF(__pyx_tuple__169);
-  __pyx_codeobj__170 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__169, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_process_melody, 2474, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__170)) __PYX_ERR(0, 2474, __pyx_L1_error)
+  __pyx_codeobj__170 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__169, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_process_melody, 2474, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__170)) __PYX_ERR(0, 2474, __pyx_L1_error)
 
   /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
-  __pyx_tuple__171 = PyTuple_Pack(23, __pyx_n_s_filename, __pyx_n_s_f, __pyx_n_s_melody_data_list, __pyx_n_s_start_time, __pyx_n_s_mel, __pyx_n_s_first_features, __pyx_n_s_headers, __pyx_n_s_category, __pyx_n_s_features, __pyx_n_s_n_cores, __pyx_n_s_melody_args, __pyx_n_s_all_features, __pyx_n_s_pool, __pyx_n_s_melody_id, __pyx_n_s_melody_features, __pyx_n_s_row, __pyx_n_s_output_file, __pyx_n_s_writer, __pyx_n_s_end_time, __pyx_n_s_total_time, __pyx_n_s_avg_time, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__171)) __PYX_ERR(0, 2504, __pyx_L1_error)
+  __pyx_tuple__171 = PyTuple_Pack(24, __pyx_n_s_input_path, __pyx_n_s_output_path, __pyx_n_s_f, __pyx_n_s_melody_data_list, __pyx_n_s_start_time, __pyx_n_s_mel, __pyx_n_s_first_features, __pyx_n_s_headers, __pyx_n_s_category, __pyx_n_s_features, __pyx_n_s_n_cores, __pyx_n_s_melody_args, __pyx_n_s_all_features, __pyx_n_s_pool, __pyx_n_s_melody_id, __pyx_n_s_melody_features, __pyx_n_s_row, __pyx_n_s_output_file, __pyx_n_s_writer, __pyx_n_s_end_time, __pyx_n_s_total_time, __pyx_n_s_avg_time, __pyx_n_s_genexpr, __pyx_n_s_genexpr); if (unlikely(!__pyx_tuple__171)) __PYX_ERR(0, 2504, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__171);
   __Pyx_GIVEREF(__pyx_tuple__171);
-  __pyx_codeobj__172 = (PyObject*)__Pyx_PyCode_New(1, 0, 0, 23, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__171, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Feature_Set_features_py, __pyx_n_s_get_all_features_csv, 2504, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__172)) __PYX_ERR(0, 2504, __pyx_L1_error)
+  __pyx_codeobj__172 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 24, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__171, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_features_py, __pyx_n_s_get_all_features_csv, 2504, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__172)) __PYX_ERR(0, 2504, __pyx_L1_error)
 
-  /* "features.py":2591
+  /* "features.py":2593
  * if __name__ == "__main__":
  *     # get_all_features_json('item_features')
- *     get_all_features_csv('item_features2')             # <<<<<<<<<<<<<<
+ *     get_all_features_csv('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json', 'item_features2')             # <<<<<<<<<<<<<<
  */
-  __pyx_tuple__173 = PyTuple_Pack(1, __pyx_n_s_item_features2); if (unlikely(!__pyx_tuple__173)) __PYX_ERR(0, 2591, __pyx_L1_error)
+  __pyx_tuple__173 = PyTuple_Pack(2, __pyx_kp_s_Users_davidwhyatt_Documents_Git_2, __pyx_n_s_item_features2); if (unlikely(!__pyx_tuple__173)) __PYX_ERR(0, 2593, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__173);
   __Pyx_GIVEREF(__pyx_tuple__173);
   __Pyx_RefNannyFinishContext();
@@ -54806,15 +54901,15 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_ptype_8features___pyx_scope_struct_17_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8features___pyx_scope_struct_17_genexpr_spec, NULL); if (unlikely(!__pyx_ptype_8features___pyx_scope_struct_17_genexpr)) __PYX_ERR(0, 2541, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8features___pyx_scope_struct_17_genexpr_spec, __pyx_ptype_8features___pyx_scope_struct_17_genexpr) < 0) __PYX_ERR(0, 2541, __pyx_L1_error)
+  __pyx_ptype_8features___pyx_scope_struct_17_genexpr = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_8features___pyx_scope_struct_17_genexpr_spec, NULL); if (unlikely(!__pyx_ptype_8features___pyx_scope_struct_17_genexpr)) __PYX_ERR(0, 2543, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_8features___pyx_scope_struct_17_genexpr_spec, __pyx_ptype_8features___pyx_scope_struct_17_genexpr) < 0) __PYX_ERR(0, 2543, __pyx_L1_error)
   #else
   __pyx_ptype_8features___pyx_scope_struct_17_genexpr = &__pyx_type_8features___pyx_scope_struct_17_genexpr;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_ptype_8features___pyx_scope_struct_17_genexpr) < 0) __PYX_ERR(0, 2541, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_ptype_8features___pyx_scope_struct_17_genexpr) < 0) __PYX_ERR(0, 2543, __pyx_L1_error)
   #endif
   #if PY_MAJOR_VERSION < 3
   __pyx_ptype_8features___pyx_scope_struct_17_genexpr->tp_print = 0;
@@ -55763,7 +55858,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":56
- *     return range_func(pitches)
+ *     return int(range_func(pitches))
  * 
  * def pitch_standard_deviation(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the standard deviation of pitch values.
@@ -55781,7 +55876,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":71
- *     return standard_deviation(pitches)
+ *     return float(standard_deviation(pitches))
  * 
  * def pitch_entropy(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate the Shannon entropy of pitch values.
@@ -55799,7 +55894,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":86
- *     return shannon_entropy(pitches)
+ *     return float(shannon_entropy(pitches))
  * 
  * def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of pitches.
@@ -55927,7 +56022,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":214
- *     return mode(pitches)
+ *     return int(mode(pitches))
  * 
  * def number_of_common_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count pitch classes that appear in at least 9% of notes.
@@ -55945,7 +56040,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":231
- *     return len(significant_pcs)
+ *     return int(len(significant_pcs))
  * 
  * def number_of_pitches(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count number of unique pitches.
@@ -55963,7 +56058,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":246
- *     return len(set(pitches))
+ *     return int(len(set(pitches)))
  * 
  * def folded_fifths_pitch_class_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of pitch classes arranged in circle of fifths.
@@ -55999,7 +56094,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":288
- *     return kurtosis(list(histogram.keys()))
+ *     return float(kurtosis(list(histogram.keys())))
  * 
  * def pitch_class_skewness_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate skewness of folded fifths pitch class histogram.
@@ -56017,7 +56112,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":307
- *     return skew(list(histogram.keys()))
+ *     return float(skew(list(histogram.keys())))
  * 
  * def pitch_class_variability_after_folding(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate standard deviation of folded fifths pitch class histogram.
@@ -56071,7 +56166,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":358
- *     return range_func([abs(x) for x in pitch_interval(pitches)])
+ *     return int(range_func([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def mean_absolute_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate mean absolute interval size.
@@ -56119,7 +56214,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":391
- *     return np.std([abs(x) for x in pitch_interval(pitches)])
+ *     return float(np.std([abs(x) for x in pitch_interval(pitches)]))
  * 
  * def modal_interval(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Find most common interval size.
@@ -56167,7 +56262,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":424
- *     return shannon_entropy(pitch_interval(pitches))
+ *     return float(shannon_entropy(pitch_interval(pitches)))
  * 
  * def ivdist1(pitches: list[int], starts: list[float], ends: list[float]) -> dict:             # <<<<<<<<<<<<<<
  *     """Calculate duration-weighted distribution of intervals.
@@ -56205,7 +56300,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":481
- *     return mean, std_dev
+ *     return float(mean), float(std_dev)
  * 
  * def average_interval_span_by_melodic_arcs(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate average interval span of melodic arcs.
@@ -56223,7 +56318,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":535
- *     return value
+ *     return float(value)
  * 
  * def distance_between_most_prevalent_melodic_intervals(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate absolute difference between two most common interval sizes.
@@ -56241,7 +56336,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":565
- *     return abs(most_common - second_most_common)
+ *     return float(abs(most_common - second_most_common))
  * 
  * def melodic_interval_histogram(pitches: list[int]) -> dict:             # <<<<<<<<<<<<<<
  *     """Create histogram of interval sizes.
@@ -56277,7 +56372,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":601
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def variable_melodic_intervals(pitches: list[int], interval_level: int) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of intervals >= specified size.
@@ -56296,7 +56391,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "features.py":622
- *     return large_intervals / len(intervals) if intervals else 0.0
+ *     return float(large_intervals / len(intervals) if intervals else 0.0)
  * 
  * def number_of_common_melodic_intervals(pitches: list[int]) -> int:             # <<<<<<<<<<<<<<
  *     """Count intervals that appear in at least 9% of melodic transitions.
@@ -56314,7 +56409,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "features.py":643
- *     return len(significant_intervals)
+ *     return int(len(significant_intervals))
  * 
  * def prevalence_of_most_common_melodic_interval(pitches: list[int]) -> float:             # <<<<<<<<<<<<<<
  *     """Calculate proportion of most common interval.
@@ -57475,7 +57570,7 @@ if (!__Pyx_RefNanny) {
   /* "features.py":2504
  *     return melody_id, melody_features
  * 
- * def get_all_features_csv(filename) -> None:             # <<<<<<<<<<<<<<
+ * def get_all_features_csv(input_path, output_path) -> None:             # <<<<<<<<<<<<<<
  *     """Generate CSV file with features for all melodies using multiprocessing.
  * 
  */
@@ -57489,37 +57584,37 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_all_features_csv, __pyx_t_2) < 0) __PYX_ERR(0, 2504, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "features.py":2589
+  /* "features.py":2591
  * 
  * 
  * if __name__ == "__main__":             # <<<<<<<<<<<<<<
  *     # get_all_features_json('item_features')
- *     get_all_features_csv('item_features2')
+ *     get_all_features_csv('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json', 'item_features2')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2589, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2591, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_main, Py_EQ)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 2589, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_main, Py_EQ)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 2591, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_4) {
 
-    /* "features.py":2591
+    /* "features.py":2593
  * if __name__ == "__main__":
  *     # get_all_features_json('item_features')
- *     get_all_features_csv('item_features2')             # <<<<<<<<<<<<<<
+ *     get_all_features_csv('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json', 'item_features2')             # <<<<<<<<<<<<<<
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_all_features_csv); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2591, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_get_all_features_csv); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2593, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__173, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2591, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__173, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2593, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "features.py":2589
+    /* "features.py":2591
  * 
  * 
  * if __name__ == "__main__":             # <<<<<<<<<<<<<<
  *     # get_all_features_json('item_features')
- *     get_all_features_csv('item_features2')
+ *     get_all_features_csv('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json', 'item_features2')
  */
   }
 
@@ -58540,6 +58635,155 @@ __Pyx_RaiseUnexpectedTypeError(const char *expected, PyObject *obj)
     return 0;
 }
 
+/* pybytes_as_double */
+static double __Pyx_SlowPyString_AsDouble(PyObject *obj) {
+    PyObject *float_value;
+#if PY_MAJOR_VERSION >= 3
+    float_value = PyFloat_FromString(obj);
+#else
+    float_value = PyFloat_FromString(obj, 0);
+#endif
+    if (likely(float_value)) {
+#if CYTHON_ASSUME_SAFE_MACROS
+        double value = PyFloat_AS_DOUBLE(float_value);
+#else
+        double value = PyFloat_AsDouble(float_value);
+#endif
+        Py_DECREF(float_value);
+        return value;
+    }
+    return (double)-1;
+}
+static const char* __Pyx__PyBytes_AsDouble_Copy(const char* start, char* buffer, Py_ssize_t length) {
+    int last_was_punctuation = 1;
+    Py_ssize_t i;
+    for (i=0; i < length; i++) {
+        char chr = start[i];
+        int is_punctuation = (chr == '_') | (chr == '.') | (chr == 'e') | (chr == 'E');
+        *buffer = chr;
+        buffer += (chr != '_');
+        if (unlikely(last_was_punctuation & is_punctuation)) goto parse_failure;
+        last_was_punctuation = is_punctuation;
+    }
+    if (unlikely(last_was_punctuation)) goto parse_failure;
+    *buffer = '\0';
+    return buffer;
+parse_failure:
+    return NULL;
+}
+static double __Pyx__PyBytes_AsDouble_inf_nan(const char* start, Py_ssize_t length) {
+    int matches = 1;
+    char sign = start[0];
+    int is_signed = (sign == '+') | (sign == '-');
+    start += is_signed;
+    length -= is_signed;
+    switch (start[0]) {
+        #ifdef Py_NAN
+        case 'n':
+        case 'N':
+            if (unlikely(length != 3)) goto parse_failure;
+            matches &= (start[1] == 'a' || start[1] == 'A');
+            matches &= (start[2] == 'n' || start[2] == 'N');
+            if (unlikely(!matches)) goto parse_failure;
+            return (sign == '-') ? -Py_NAN : Py_NAN;
+        #endif
+        case 'i':
+        case 'I':
+            if (unlikely(length < 3)) goto parse_failure;
+            matches &= (start[1] == 'n' || start[1] == 'N');
+            matches &= (start[2] == 'f' || start[2] == 'F');
+            if (likely(length == 3 && matches))
+                return (sign == '-') ? -Py_HUGE_VAL : Py_HUGE_VAL;
+            if (unlikely(length != 8)) goto parse_failure;
+            matches &= (start[3] == 'i' || start[3] == 'I');
+            matches &= (start[4] == 'n' || start[4] == 'N');
+            matches &= (start[5] == 'i' || start[5] == 'I');
+            matches &= (start[6] == 't' || start[6] == 'T');
+            matches &= (start[7] == 'y' || start[7] == 'Y');
+            if (unlikely(!matches)) goto parse_failure;
+            return (sign == '-') ? -Py_HUGE_VAL : Py_HUGE_VAL;
+        case '.': case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+            break;
+        default:
+            goto parse_failure;
+    }
+    return 0.0;
+parse_failure:
+    return -1.0;
+}
+static CYTHON_INLINE int __Pyx__PyBytes_AsDouble_IsSpace(char ch) {
+    return (ch == 0x20) | !((ch < 0x9) | (ch > 0xd));
+}
+CYTHON_UNUSED static double __Pyx__PyBytes_AsDouble(PyObject *obj, const char* start, Py_ssize_t length) {
+    double value;
+    Py_ssize_t i, digits;
+    const char *last = start + length;
+    char *end;
+    while (__Pyx__PyBytes_AsDouble_IsSpace(*start))
+        start++;
+    while (start < last - 1 && __Pyx__PyBytes_AsDouble_IsSpace(last[-1]))
+        last--;
+    length = last - start;
+    if (unlikely(length <= 0)) goto fallback;
+    value = __Pyx__PyBytes_AsDouble_inf_nan(start, length);
+    if (unlikely(value == -1.0)) goto fallback;
+    if (value != 0.0) return value;
+    digits = 0;
+    for (i=0; i < length; digits += start[i++] != '_');
+    if (likely(digits == length)) {
+        value = PyOS_string_to_double(start, &end, NULL);
+    } else if (digits < 40) {
+        char number[40];
+        last = __Pyx__PyBytes_AsDouble_Copy(start, number, length);
+        if (unlikely(!last)) goto fallback;
+        value = PyOS_string_to_double(number, &end, NULL);
+    } else {
+        char *number = (char*) PyMem_Malloc((digits + 1) * sizeof(char));
+        if (unlikely(!number)) goto fallback;
+        last = __Pyx__PyBytes_AsDouble_Copy(start, number, length);
+        if (unlikely(!last)) {
+            PyMem_Free(number);
+            goto fallback;
+        }
+        value = PyOS_string_to_double(number, &end, NULL);
+        PyMem_Free(number);
+    }
+    if (likely(end == last) || (value == (double)-1 && PyErr_Occurred())) {
+        return value;
+    }
+fallback:
+    return __Pyx_SlowPyString_AsDouble(obj);
+}
+
+/* pynumber_float */
+static CYTHON_INLINE PyObject* __Pyx__PyNumber_Float(PyObject* obj) {
+    double val;
+    if (PyLong_CheckExact(obj)) {
+#if CYTHON_USE_PYLONG_INTERNALS
+        if (likely(__Pyx_PyLong_IsCompact(obj))) {
+            val = (double) __Pyx_PyLong_CompactValue(obj);
+            goto no_error;
+        }
+#endif
+        val = PyLong_AsDouble(obj);
+    } else if (PyUnicode_CheckExact(obj)) {
+        val = __Pyx_PyUnicode_AsDouble(obj);
+    } else if (PyBytes_CheckExact(obj)) {
+        val = __Pyx_PyBytes_AsDouble(obj);
+    } else if (PyByteArray_CheckExact(obj)) {
+        val = __Pyx_PyByteArray_AsDouble(obj);
+    } else {
+        return PyNumber_Float(obj);
+    }
+    if (unlikely(val == -1 && PyErr_Occurred())) {
+        return NULL;
+    }
+#if CYTHON_USE_PYLONG_INTERNALS
+no_error:
+#endif
+    return PyFloat_FromDouble(val);
+}
+
 /* GetItemInt */
 static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
     PyObject *r;
@@ -59107,6 +59351,12 @@ static CYTHON_INLINE PyObject* __Pyx_PyTuple_GetSlice(
 }
 #endif
 
+/* PyObjectCallOneArg */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *args[2] = {NULL, arg};
+    return __Pyx_PyObject_FastCall(func, args+1, 1 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET);
+}
+
 /* set_iter */
 static CYTHON_INLINE PyObject* __Pyx_set_iterator(PyObject* iterable, int is_set,
                                                   Py_ssize_t* p_orig_length, int* p_source_is_set) {
@@ -59302,155 +59552,6 @@ static PyObject *__Pyx_PyLong_AbsNeg(PyObject *n) {
 }
 #endif
 
-/* pybytes_as_double */
-static double __Pyx_SlowPyString_AsDouble(PyObject *obj) {
-    PyObject *float_value;
-#if PY_MAJOR_VERSION >= 3
-    float_value = PyFloat_FromString(obj);
-#else
-    float_value = PyFloat_FromString(obj, 0);
-#endif
-    if (likely(float_value)) {
-#if CYTHON_ASSUME_SAFE_MACROS
-        double value = PyFloat_AS_DOUBLE(float_value);
-#else
-        double value = PyFloat_AsDouble(float_value);
-#endif
-        Py_DECREF(float_value);
-        return value;
-    }
-    return (double)-1;
-}
-static const char* __Pyx__PyBytes_AsDouble_Copy(const char* start, char* buffer, Py_ssize_t length) {
-    int last_was_punctuation = 1;
-    Py_ssize_t i;
-    for (i=0; i < length; i++) {
-        char chr = start[i];
-        int is_punctuation = (chr == '_') | (chr == '.') | (chr == 'e') | (chr == 'E');
-        *buffer = chr;
-        buffer += (chr != '_');
-        if (unlikely(last_was_punctuation & is_punctuation)) goto parse_failure;
-        last_was_punctuation = is_punctuation;
-    }
-    if (unlikely(last_was_punctuation)) goto parse_failure;
-    *buffer = '\0';
-    return buffer;
-parse_failure:
-    return NULL;
-}
-static double __Pyx__PyBytes_AsDouble_inf_nan(const char* start, Py_ssize_t length) {
-    int matches = 1;
-    char sign = start[0];
-    int is_signed = (sign == '+') | (sign == '-');
-    start += is_signed;
-    length -= is_signed;
-    switch (start[0]) {
-        #ifdef Py_NAN
-        case 'n':
-        case 'N':
-            if (unlikely(length != 3)) goto parse_failure;
-            matches &= (start[1] == 'a' || start[1] == 'A');
-            matches &= (start[2] == 'n' || start[2] == 'N');
-            if (unlikely(!matches)) goto parse_failure;
-            return (sign == '-') ? -Py_NAN : Py_NAN;
-        #endif
-        case 'i':
-        case 'I':
-            if (unlikely(length < 3)) goto parse_failure;
-            matches &= (start[1] == 'n' || start[1] == 'N');
-            matches &= (start[2] == 'f' || start[2] == 'F');
-            if (likely(length == 3 && matches))
-                return (sign == '-') ? -Py_HUGE_VAL : Py_HUGE_VAL;
-            if (unlikely(length != 8)) goto parse_failure;
-            matches &= (start[3] == 'i' || start[3] == 'I');
-            matches &= (start[4] == 'n' || start[4] == 'N');
-            matches &= (start[5] == 'i' || start[5] == 'I');
-            matches &= (start[6] == 't' || start[6] == 'T');
-            matches &= (start[7] == 'y' || start[7] == 'Y');
-            if (unlikely(!matches)) goto parse_failure;
-            return (sign == '-') ? -Py_HUGE_VAL : Py_HUGE_VAL;
-        case '.': case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-            break;
-        default:
-            goto parse_failure;
-    }
-    return 0.0;
-parse_failure:
-    return -1.0;
-}
-static CYTHON_INLINE int __Pyx__PyBytes_AsDouble_IsSpace(char ch) {
-    return (ch == 0x20) | !((ch < 0x9) | (ch > 0xd));
-}
-CYTHON_UNUSED static double __Pyx__PyBytes_AsDouble(PyObject *obj, const char* start, Py_ssize_t length) {
-    double value;
-    Py_ssize_t i, digits;
-    const char *last = start + length;
-    char *end;
-    while (__Pyx__PyBytes_AsDouble_IsSpace(*start))
-        start++;
-    while (start < last - 1 && __Pyx__PyBytes_AsDouble_IsSpace(last[-1]))
-        last--;
-    length = last - start;
-    if (unlikely(length <= 0)) goto fallback;
-    value = __Pyx__PyBytes_AsDouble_inf_nan(start, length);
-    if (unlikely(value == -1.0)) goto fallback;
-    if (value != 0.0) return value;
-    digits = 0;
-    for (i=0; i < length; digits += start[i++] != '_');
-    if (likely(digits == length)) {
-        value = PyOS_string_to_double(start, &end, NULL);
-    } else if (digits < 40) {
-        char number[40];
-        last = __Pyx__PyBytes_AsDouble_Copy(start, number, length);
-        if (unlikely(!last)) goto fallback;
-        value = PyOS_string_to_double(number, &end, NULL);
-    } else {
-        char *number = (char*) PyMem_Malloc((digits + 1) * sizeof(char));
-        if (unlikely(!number)) goto fallback;
-        last = __Pyx__PyBytes_AsDouble_Copy(start, number, length);
-        if (unlikely(!last)) {
-            PyMem_Free(number);
-            goto fallback;
-        }
-        value = PyOS_string_to_double(number, &end, NULL);
-        PyMem_Free(number);
-    }
-    if (likely(end == last) || (value == (double)-1 && PyErr_Occurred())) {
-        return value;
-    }
-fallback:
-    return __Pyx_SlowPyString_AsDouble(obj);
-}
-
-/* pynumber_float */
-static CYTHON_INLINE PyObject* __Pyx__PyNumber_Float(PyObject* obj) {
-    double val;
-    if (PyLong_CheckExact(obj)) {
-#if CYTHON_USE_PYLONG_INTERNALS
-        if (likely(__Pyx_PyLong_IsCompact(obj))) {
-            val = (double) __Pyx_PyLong_CompactValue(obj);
-            goto no_error;
-        }
-#endif
-        val = PyLong_AsDouble(obj);
-    } else if (PyUnicode_CheckExact(obj)) {
-        val = __Pyx_PyUnicode_AsDouble(obj);
-    } else if (PyBytes_CheckExact(obj)) {
-        val = __Pyx_PyBytes_AsDouble(obj);
-    } else if (PyByteArray_CheckExact(obj)) {
-        val = __Pyx_PyByteArray_AsDouble(obj);
-    } else {
-        return PyNumber_Float(obj);
-    }
-    if (unlikely(val == -1 && PyErr_Occurred())) {
-        return NULL;
-    }
-#if CYTHON_USE_PYLONG_INTERNALS
-no_error:
-#endif
-    return PyFloat_FromDouble(val);
-}
-
 /* RaiseUnboundLocalError */
 static CYTHON_INLINE void __Pyx_RaiseUnboundLocalError(const char *varname) {
     PyErr_Format(PyExc_UnboundLocalError, "local variable '%s' referenced before assignment", varname);
@@ -59584,12 +59685,6 @@ static void __Pyx_Generator_Replace_StopIteration(int in_async_gen) {
         in_async_gen ? "async generator raised StopIteration" :
         #endif
         "generator raised StopIteration");
-}
-
-/* PyObjectCallOneArg */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-    PyObject *args[2] = {NULL, arg};
-    return __Pyx_PyObject_FastCall(func, args+1, 1 | __Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET);
 }
 
 /* PyIntCompare */
