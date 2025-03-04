@@ -6,6 +6,8 @@ The actual feature calculations are handled in features.py.
 from collections import Counter, defaultdict
 import json
 from typing import List, Dict, Tuple
+from tqdm import tqdm
+import multiprocessing as mp
 from mtypes import FantasticTokenizer
 from representations import Melody, read_midijson
 
@@ -57,8 +59,30 @@ def _convert_strings_to_tuples(key: str) -> Tuple:
         # If not a tuple string, return the original key
         return key
 
+def process_melody_ngrams(args) -> Counter:
+    """Process n-grams for a single melody.
+    
+    Parameters
+    ----------
+    args : tuple
+        Tuple containing (melody, n_range)
+        
+    Returns
+    -------
+    Counter
+        Counter object containing n-gram counts for the melody
+    """
+    melody, n_range = args
+    tokenizer = FantasticTokenizer()
+    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    counts = Counter()
+    for n in range(n_range[0], n_range[1] + 1):
+        counts.update(tokenizer.ngram_counts(n))
+    return counts
+
 def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 4)) -> Dict:
-    """Compute n-gram frequencies across the entire corpus.
+    """Compute n-gram frequencies across the entire corpus using multiprocessing.
     
     Parameters
     ----------
@@ -72,25 +96,30 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
     Dict
         Dictionary containing corpus-wide n-gram statistics
     """
-    tokenizer = FantasticTokenizer()
-    corpus_counts = defaultdict(Counter)
-
-    for melody in melodies:
-        # Tokenize melody
-        tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-        # Get n-grams for each length
-        for n in range(n_range[0], n_range[1] + 1):
-            counts = tokenizer.ngram_counts(n)
-
-            # Update corpus-wide counts
-            corpus_counts[n].update(counts)
-
-    # Convert defaultdict and Counter objects to regular dicts for JSON serialization
+    # Prepare arguments for multiprocessing
+    args = [(melody, n_range) for melody in melodies]
+    
+    # Use all available CPU cores
+    num_cores = mp.cpu_count()
+    
+    # Create a pool of workers
+    with mp.Pool(num_cores) as pool:
+        # Process melodies in parallel with progress bar
+        results = list(tqdm(
+            pool.imap(process_melody_ngrams, args),
+            total=len(melodies),
+            desc=f"Computing n-grams using {num_cores} cores"
+        ))
+    
+    # Combine results from all processes
+    total_counts = Counter()
+    for counts in results:
+        total_counts.update(counts)
+    
+    # Format results for JSON serialization
     frequencies = {'document_frequencies': {}}
-    for n, counts in corpus_counts.items():
-        for k, v in counts.items():
-            frequencies['document_frequencies'][str(k)] = {'count': v}
+    for k, v in total_counts.items():
+        frequencies['document_frequencies'][str(k)] = {'count': v}
 
     return {
         'document_frequencies': frequencies['document_frequencies'],
@@ -134,22 +163,46 @@ def load_corpus_stats(filename: str) -> Dict:
 
     return stats
 
+def load_melody(idx: int, filename: str) -> Melody:
+    """Load a single melody from a JSON file.
+    
+    Parameters
+    ----------
+    idx : int
+        Index of melody to load
+    filename : str
+        Path to JSON file
+        
+    Returns
+    -------
+    Melody
+        Loaded melody object
+    """
+    melody_data = read_midijson(filename)[idx]
+    return Melody(melody_data, tempo=100)
+
 if __name__ == "__main__":
     # Example usage
-    melodies = []
-    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json'
-    for i in range(0, 1920, 1):
-        melody_data = read_midijson(
-            '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/mididata5.json')[i]
-        melody = Melody(melody_data, tempo=100)
-        melodies.append(melody)
+    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json'
+    
+    # Create arguments for parallel loading
+    num_cores = mp.cpu_count()
+    melody_indices = [(i, filename) for i in range(8470)]
+    
+    # Load melodies in parallel
+    with mp.Pool(num_cores) as pool:
+        melodies = list(tqdm(
+            pool.starmap(load_melody, melody_indices),
+            total=len(melody_indices),
+            desc=f"Loading melodies using {num_cores} cores"
+        ))
 
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'corpus_stats2.json')
+    save_corpus_stats(corpus_stats, 'essen_corpus_stats.json')
 
     # Load and verify
-    loaded_stats = load_corpus_stats('corpus_stats2.json')
+    loaded_stats = load_corpus_stats('essen_corpus_stats.json')
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")

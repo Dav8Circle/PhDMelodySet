@@ -1449,7 +1449,7 @@ def compute_tfdf_spearman(melody: Melody) -> float:
     df_values = []
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Get TF and DF values for each n-gram length
@@ -1498,7 +1498,7 @@ def compute_tfdf_kendall(melody: Melody) -> float:
     df_values = []
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Get TF and DF values for each n-gram length
@@ -1544,7 +1544,7 @@ def compute_tfdf(melody: Melody) -> float:
 
     tfdf_values = []
     # Load corpus statistics from JSON file
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     # Calculate TFDF using dot product for each n-gram length
@@ -1607,7 +1607,7 @@ def compute_norm_log_dist(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     distances = []
@@ -1659,7 +1659,7 @@ def compute_max_log_df(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     max_df = 0
@@ -1694,7 +1694,7 @@ def compute_min_log_df(melody: Melody) -> float:
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     min_df = float('inf')  # Initialize to infinity
@@ -1730,7 +1730,7 @@ def compute_mean_log_df(melody: Melody) -> float:
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     total_log_df = 0.0
@@ -1770,7 +1770,7 @@ def compute_mean_df_entropy(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     total_entropy = 0.0
@@ -1821,7 +1821,7 @@ def compute_mean_df_productivity(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1862,7 +1862,7 @@ def compute_mean_df_yules_k(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1903,7 +1903,7 @@ def compute_mean_df_simpsons_d(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1944,7 +1944,7 @@ def compute_mean_df_sichels_s(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -1985,7 +1985,7 @@ def compute_mean_df_honores_h(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     ngram_dfs = []
@@ -2031,7 +2031,7 @@ def compute_mean_global_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     global_weights = []
@@ -2088,7 +2088,7 @@ def compute_mtcf_std_g_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     global_weights = []
@@ -2137,7 +2137,7 @@ def compute_mtcf_mean_gl_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     gl_weights = []
@@ -2188,7 +2188,7 @@ def compute_mtcf_std_gl_weight(melody: Melody) -> float:
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
     # Load corpus statistics
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/corpus_stats2.json', encoding='utf-8') as f:
+    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
         corpus_stats = json.load(f)
 
     gl_weights = []

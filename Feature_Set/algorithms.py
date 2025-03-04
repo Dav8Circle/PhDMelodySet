@@ -7,7 +7,6 @@ since they do not group well with the others.
 __author__ = "David Whyatt"
 
 import numpy as np
-from collections import Counter
 
 def ratio(x: list[float], y: list[float]) -> list[float]:
     """Calculates the ratio between corresponding elements in two lists.
