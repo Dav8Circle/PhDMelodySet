@@ -24,7 +24,8 @@ class Melody:
             midi_data (dict): Dictionary containing MIDI sequence data
         """
         self._midi_data = midi_data
-        self._midi_sequence = midi_data['MIDI Sequence'].split('), ')
+        # Split on 'Note(' and remove the first empty string
+        self._midi_sequence = midi_data['MIDI Sequence'].split('Note(')[1:]
         self._tempo = tempo
 
     @property
@@ -36,12 +37,14 @@ class Melody:
         """
         pitches = []
         for note in self._midi_sequence:
+            # Find pitch value between 'pitch=' and the next comma or closing parenthesis
             pitch_start = note.find('pitch=') + 6
             pitch_end = note.find(',', pitch_start)
             if pitch_end == -1:  # Handle the last note which ends with ')'
                 pitch_end = note.find(')', pitch_start)
-            pitch = int(note[pitch_start:pitch_end])
-            pitches.append(pitch)
+            if pitch_end != -1:  # Only process if we found a valid pitch
+                pitch = int(note[pitch_start:pitch_end])
+                pitches.append(pitch)
         return pitches
 
     @property
@@ -53,10 +56,12 @@ class Melody:
         """
         starts = []
         for note in self._midi_sequence:
+            # Find start time between 'start=' and the next comma
             start_start = note.find('start=') + 6
             start_end = note.find(',', start_start)
-            start = float(note[start_start:start_end])
-            starts.append(start)
+            if start_end != -1:  # Only process if we found a valid start time
+                start = float(note[start_start:start_end])
+                starts.append(start)
         return starts
 
     @property
@@ -68,10 +73,12 @@ class Melody:
         """
         ends = []
         for note in self._midi_sequence:
+            # Find end time between 'end=' and the next comma
             end_start = note.find('end=') + 4
             end_end = note.find(',', end_start)
-            end = float(note[end_start:end_end])
-            ends.append(end)
+            if end_end != -1:  # Only process if we found a valid end time
+                end = float(note[end_start:end_end])
+                ends.append(end)
         return ends
     
     @property

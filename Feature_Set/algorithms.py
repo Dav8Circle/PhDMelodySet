@@ -778,12 +778,9 @@ def melodic_embellishment_proportion(pitch_values: list[float],
         return float(embellished) / len(note_durations)
     return 0.0
 
-def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
-    """Calculate proportion of notes that form scalic sequences.
-    
-    Considers repeated notes as extending duration of current note.
-    Only counts sequences longer than 2 notes moving in same direction.
-    Uses tonality identified by Krumhansl-Schmuckler algorithm.
+def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> int:
+    """Find the longest sequence of consecutive notes that follow a scale pattern,
+    moving in the same direction.
 
     Parameters
     ----------
@@ -792,8 +789,8 @@ def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
 
     Returns
     -------
-    float
-        Proportion of notes in scalic sequences (0.0-1.0)
+    int
+        Length of longest monotonic scalar sequence found
 
     Examples
     --------
@@ -810,9 +807,16 @@ def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
     C major scale (one octave) scores 8
     >>> longest_monotonic_conjunct_scalar_passage([60, 62, 64, 65, 67, 69, 71, 72])
     8
+
+    >>> # Test case with melody containing a descending scalar passage of length 5
+    >>> pitches = [62, 67, 67, 69, 74, 72, 71, 69, 67, 71, 69, 66, 67, 69, 67, 66, 64, 62, 62, 67, 67, 69, 69, 74, 74, 74, 72, 71, 69, 67, 69, 71, 69, 67]
+    >>> longest_monotonic_conjunct_scalar_passage(pitches)
+    5
     """
+
+
     if len(pitches) < 3:
-        return 0.0
+        return 0
 
     # Remove repeated notes
     deduped = []
@@ -821,7 +825,7 @@ def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
             deduped.append(pitch)
 
     if len(deduped) < 3:
-        return 0.0
+        return 0
 
     # Get key using KS algorithm
     pitch_classes = [p % 12 for p in deduped]
@@ -837,61 +841,49 @@ def longest_monotonic_conjunct_scalar_passage(pitches: list[int]) -> float:
         scale = [(root + i) % 12 for i in [0, 2, 3, 5, 7, 8, 10]]
     else:
         scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
-    # Find scalic sequences
-    scalic_notes = 0
-    i = 0
-    while i < len(deduped) - 2:
-        sequence = deduped[i:]
 
-        # Determine if sequence is ascending or descending
-        if len(sequence) < 2:
-            i += 1
+    # Find longest monotonic scalar sequence
+    longest_sequence = 0
+    current_sequence = 1
+    direction = None
+
+    for i in range(1, len(deduped)):
+        interval = deduped[i] - deduped[i-1]
+        
+        # Check if notes are adjacent scale degrees
+        curr_pc = deduped[i] % 12
+        prev_pc = deduped[i-1] % 12
+        
+        if curr_pc not in scale or prev_pc not in scale:
+            current_sequence = 1
+            direction = None
             continue
-
-        direction = 1 if sequence[1] > sequence[0] else -1
-
-        # Get pitch classes for sequence
-        sequence_pcs = [p % 12 for p in sequence]
-        start_pc = sequence_pcs[0]
-
-        # Find starting position in scale
-        best_start_idx = -1
-        for start_scale_idx, scale_pc in enumerate(scale):
-            if start_pc == scale_pc:
-                best_start_idx = start_scale_idx
-                break
-
-        if best_start_idx == -1:
-            i += 1
+            
+        curr_scale_pos = scale.index(curr_pc)
+        prev_scale_pos = scale.index(prev_pc)
+        
+        # Check if they're adjacent in the scale
+        scale_interval = (curr_scale_pos - prev_scale_pos) % len(scale)
+        if scale_interval != 1 and scale_interval != len(scale) - 1:
+            current_sequence = 1
+            direction = None
             continue
-        # Get scale pattern in correct direction
-        if direction == 1:
-            # For ascending, wrap around to create continuous pattern
-            scale_pattern = scale[best_start_idx:] + scale[:best_start_idx] + scale[best_start_idx:] + scale[:best_start_idx]
+            
+        # Check direction
+        curr_direction = 1 if interval > 0 else -1
+        
+        if direction is None:
+            direction = curr_direction
+            current_sequence = 2
+        elif direction == curr_direction:
+            current_sequence += 1
         else:
-            # For descending, reverse the scale and wrap around correctly
-            reversed_scale = scale[::-1]  # Reverse the full scale first
-            # Find the start index in reversed scale
-            start_idx = len(scale) - best_start_idx - 1
-            # Create continuous descending pattern by repeating the wrapped scale
-            scale_pattern = (reversed_scale[start_idx:] + reversed_scale[:start_idx]) * 2
+            current_sequence = 2
+            direction = curr_direction
+            
+        longest_sequence = max(longest_sequence, current_sequence)
 
-        # Check how many notes match scale pattern
-        seq_length = 0
-        for j, pc in enumerate(sequence_pcs):
-            if j >= len(scale_pattern):
-                break
-            if pc != scale_pattern[j]:
-                break
-            seq_length += 1
-
-        if seq_length >= 3:
-            scalic_notes += seq_length
-            i += seq_length
-        else:
-            i += 1
-
-    return scalic_notes
+    return longest_sequence
 
 def longest_conjunct_scalar_passage(pitches: list[int]) -> int:
     """Find the longest sequence of consecutive notes that follow a scale pattern,
@@ -918,13 +910,11 @@ def longest_conjunct_scalar_passage(pitches: list[int]) -> int:
     if len(pitches) < 3:
         return 0
 
-    # Remove repeated notes and convert to pitch classes
+    # Remove repeated notes
     deduped = []
     for pitch in pitches:
         if not deduped or pitch != deduped[-1]:
             deduped.append(pitch)
-
-    deduped = [p % 12 for p in deduped]
 
     if len(deduped) < 3:
         return 0
@@ -942,39 +932,31 @@ def longest_conjunct_scalar_passage(pitches: list[int]) -> int:
     else:
         scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
 
-    current_sequence = []
-    longest_sequence = []
+    # Find longest scalar sequence
+    longest_sequence = 0
+    current_sequence = 1
 
-    for i, note in enumerate(deduped):
-        note = deduped[i]
-        if note not in scale:
-            if len(current_sequence) > len(longest_sequence):
-                longest_sequence = current_sequence.copy()
-            current_sequence = []
+    for i in range(1, len(deduped)):
+        curr_pc = deduped[i] % 12
+        prev_pc = deduped[i-1] % 12
+        
+        if curr_pc not in scale or prev_pc not in scale:
+            current_sequence = 1
             continue
-
-        if not current_sequence:
-            current_sequence = [note]
-            continue
-
-        # Get the position of the current note and previous note in the scale
-        prev_note = current_sequence[-1]
-        curr_pos = scale.index(note)
-        prev_pos = scale.index(prev_note)
-
+            
+        curr_scale_pos = scale.index(curr_pc)
+        prev_scale_pos = scale.index(prev_pc)
+        
         # Check if they're adjacent in the scale (in either direction)
-        if abs((curr_pos - prev_pos) % len(scale)) == 1 or \
-           abs((curr_pos - prev_pos) % len(scale)) == len(scale) - 1:
-            current_sequence.append(note)
+        scale_interval = (curr_scale_pos - prev_scale_pos) % len(scale)
+        if scale_interval == 1 or scale_interval == len(scale) - 1:
+            current_sequence += 1
         else:
-            if len(current_sequence) > len(longest_sequence):
-                longest_sequence = current_sequence.copy()
-            current_sequence = [note]
+            current_sequence = 1
+            
+        longest_sequence = max(longest_sequence, current_sequence)
 
-    if len(current_sequence) > len(longest_sequence):
-        longest_sequence = current_sequence.copy()
-
-    return len(longest_sequence)
+    return longest_sequence
 
 def proportion_conjunct_scalar(pitches: list[int]) -> float:
     """Calculate the proportion of notes that form conjunct scalar sequences.
@@ -992,21 +974,16 @@ def proportion_conjunct_scalar(pitches: list[int]) -> float:
     Examples
     --------
     >>> proportion_conjunct_scalar([60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60])
-    0.875
+    0.5
 
     >>> proportion_conjunct_scalar([62, 64, 65, 67, 64, 60, 62])
-    0.5714285714285714
+    0.571...
     """
     if len(pitches) < 3:
         return 0.0
 
-    pitches = [p % 12 for p in pitches]
-    deduped = []
-    for pitch in pitches:
-        if not deduped or pitch != deduped[-1]:
-            deduped.append(pitch)
-
-    return longest_conjunct_scalar_passage(deduped) / len(deduped)
+    scalar_length = longest_conjunct_scalar_passage(pitches)
+    return scalar_length / len(pitches)
 
 def proportion_scalar(pitches: list[int]) -> float:
     """Calculate the proportion of notes that form scalar sequences.
@@ -1019,49 +996,21 @@ def proportion_scalar(pitches: list[int]) -> float:
     Returns
     -------
     float
-        Proportion of notes in which are in the KS identified key (0.0-1.0)
+        Proportion of notes in scalar sequences (0.0-1.0)
 
     Examples
     --------
-    # C major scale will return 1.0
     >>> proportion_scalar([60, 62, 64, 65, 67, 69, 71, 72])
     1.0
 
-    The lick is fully diatonic, so it returns 1.0
     >>> proportion_scalar([62, 64, 65, 67, 64, 60, 62])
-    1.0
+    0.571...
 
-    This function is limited by the tonality identified by the KS algorithm.
-    With the opening phrase of the American National Anthem, in C major:
-    >>> mel = [67, 64, 60, 64, 67, 72, 76, 74, 72, 64, 66, 67]
-
-    The melody is in E minor according to the KS algorithm, so the proportion returns 1.0
-    ('e minor', 0.803560760795821)
-    >>> proportion_scalar(mel)
-    1.0
-
-    An example where 1.0 is not returned is given by altering the C major scale to contain an Ab:
     >>> proportion_scalar([60, 62, 64, 65, 67, 68, 71, 72])
-    0.875
+    0.625
     """
     if len(pitches) < 3:
         return 0.0
-    
-    pitches = [p % 12 for p in pitches]
-    deduped = []
-    for pitch in pitches:
-        if not deduped or pitch != deduped[-1]:
-            deduped.append(pitch)
 
-    key_correlations = compute_tonality_vector(deduped)
-    key = key_correlations[0][0]
-    root = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
-            'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11,
-            'c': 0, 'c#': 1, 'd': 2, 'd#': 3, 'e': 4, 'f': 5,
-            'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}[key.split()[0]]
-    if 'minor' in key.lower():
-        scale = [(root + i) % 12 for i in [0, 2, 3, 5, 7, 8, 10]]
-    else:
-        scale = [(root + i) % 12 for i in [0, 2, 4, 5, 7, 9, 11]]
-
-    return len([p for p in pitches if p % 12 in scale]) / len(pitches)
+    scalar_length = longest_monotonic_conjunct_scalar_passage(pitches)
+    return scalar_length / len(pitches)

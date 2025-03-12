@@ -52,14 +52,16 @@ def yules_k(ngram_counts: list[Counter]) -> float:
     
     k_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
             
         # Get frequency of frequencies
-        freq_spec = Counter(counts.values())
+        freq_spec = Counter(filtered_counts.values())
         
         # Calculate N (total tokens)
-        N = sum(counts.values())
+        N = sum(filtered_counts.values())
         if N == 0:
             continue
             
@@ -119,11 +121,13 @@ def simpsons_d(ngram_counts: list[Counter]) -> float:
     
     d_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
         
         # Get counts
-        count_values = list(counts.values())
+        count_values = list(filtered_counts.values())
         N = sum(count_values)  # total tokens
         
         if N <= 1:
@@ -180,14 +184,16 @@ def sichels_s(ngram_counts: list[Counter]) -> float:
     
     s_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
             
         # Count how many n-grams occur exactly twice
-        doubles = sum(1 for count in counts.values() if count == 2)
+        doubles = sum(1 for count in filtered_counts.values() if count == 2)
         
         # Total number of unique n-grams
-        V = len(counts)
+        V = len(filtered_counts)
         
         if V == 0:
             continue
@@ -243,17 +249,19 @@ def honores_h(ngram_counts: list[Counter]) -> float:
     
     h_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
             
         # Get total tokens (N)
-        N = sum(counts.values())
+        N = sum(filtered_counts.values())
         
         # Get number of hapax legomena (V1)
-        V1 = sum(1 for count in counts.values() if count == 1)
+        V1 = sum(1 for count in filtered_counts.values() if count == 1)
         
         # Get total types (V)
-        V = len(counts)
+        V = len(filtered_counts)
         
         # Handle edge cases
         if V == 0 or V1 == 0 or V1 == V:
@@ -310,17 +318,19 @@ def mean_entropy(ngram_counts: list[Counter]) -> float:
     
     entropy_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
             
         # Get total tokens
-        N = sum(counts.values())
+        N = sum(filtered_counts.values())
         
         if N <= 1:
             continue
             
         # Calculate probabilities
-        probs = [count/N for count in counts.values()]
+        probs = [count/N for count in filtered_counts.values()]
         
         # Calculate entropy
         H = -np.sum(probs * np.log2(probs))
@@ -376,17 +386,19 @@ def mean_productivity(ngram_counts: list[Counter]) -> float:
     
     productivity_values = []
     for counts in ngram_counts:
-        if not counts:
+        # Filter out n-grams longer than 5
+        filtered_counts = Counter({k: v for k, v in counts.items() if len(k) <= 5})
+        if not filtered_counts:
             continue
             
         # Get total tokens
-        N = sum(counts.values())
+        N = sum(filtered_counts.values())
         
         if N == 0:
             continue
             
         # Count hapax legomena (types occurring once)
-        V1N = sum(1 for count in counts.values() if count == 1)
+        V1N = sum(1 for count in filtered_counts.values() if count == 1)
         
         # Calculate productivity
         prod = V1N / N
