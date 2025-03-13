@@ -4,7 +4,6 @@ Features are the product of an input list and at least one algorithm.
 """
 __author__ = "David Whyatt"
 
-import asyncio
 import json
 import math
 import csv
@@ -2425,22 +2424,26 @@ def get_melodic_movement_features(melody: Melody) -> Dict:
     
     return movement_features
 
-def get_all_features_json(filename) -> Dict:
+def get_all_features_json(filename, corpus_path=None) -> Dict:
     """Get all features for all melodies in a JSON file.
     
     Parameters
     ----------
     filename : str
         Path to the JSON file containing melody data
+    corpus_path : str, optional
+        Path to corpus statistics JSON file. If None, corpus features will not be computed.
         
     Returns
     -------
     Dict
         Dictionary mapping melody IDs to their feature dictionaries
     """
-    # Load corpus statistics once at the start
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
-        corpus_stats = json.load(f)
+    # Load corpus statistics if path is provided
+    corpus_stats = None
+    if corpus_path:
+        with open(corpus_path, encoding='utf-8') as f:
+            corpus_stats = json.load(f)
     
     # Load melody data
     with open(filename, encoding='utf-8') as f:
@@ -2458,9 +2461,13 @@ def get_all_features_json(filename) -> Dict:
             'tonality_features': get_tonality_features(mel),
             'narmour_features': get_narmour_features(mel),
             'melodic_movement_features': get_melodic_movement_features(mel),
-            'mtype_features': get_mtype_features(mel),
-            'corpus_features': get_corpus_features(mel, corpus_stats)
+            'mtype_features': get_mtype_features(mel)
         }
+        
+        # Add corpus features only if corpus stats are available
+        if corpus_stats:
+            melody_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
+            
         features_by_melody[melody_data['ID']] = melody_features
         
         if i % 100 == 0:  # Print progress every 100 melodies
@@ -2520,13 +2527,15 @@ def process_melody(args):
     melody_features['mtype_features'] = get_mtype_features(mel)
     timing_stats['mtype_features'] = time.time() - start
     
-    start = time.time()
-    melody_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
-    timing_stats['corpus_features'] = time.time() - start
+    # Add corpus features only if corpus stats are available
+    if corpus_stats:
+        start = time.time()
+        melody_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
+        timing_stats['corpus_features'] = time.time() - start
     
     return melody_data['ID'], melody_features, timing_stats
 
-def get_all_features_csv(input_path, output_path) -> None:
+def get_all_features_csv(input_path, output_path, corpus_path=None) -> None:
     """Generate CSV file with features for all melodies using multiprocessing.
     
     Parameters
@@ -2535,6 +2544,8 @@ def get_all_features_csv(input_path, output_path) -> None:
         Path to input JSON file
     output_path : str
         Path to output CSV file
+    corpus_path : str, optional
+        Path to corpus statistics JSON file. If None, corpus features will not be computed.
         
     Returns
     -------
@@ -2543,9 +2554,13 @@ def get_all_features_csv(input_path, output_path) -> None:
     """
     print("Starting job...\n")
     
-    # Load corpus statistics once at the start
-    with open('/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json', encoding='utf-8') as f:
-        corpus_stats = json.load(f)
+    # Load corpus statistics if path is provided
+    corpus_stats = None
+    if corpus_path:
+        with open(corpus_path, encoding='utf-8') as f:
+            corpus_stats = json.load(f)
+    else:
+        print("No corpus path provided, corpus features will not be computed")
     
     with open(input_path, encoding='utf-8') as f:
         melody_data_list = json.load(f)
@@ -2563,9 +2578,12 @@ def get_all_features_csv(input_path, output_path) -> None:
         'tonality_features': get_tonality_features(mel),
         'narmour_features': get_narmour_features(mel),
         'melodic_movement_features': get_melodic_movement_features(mel),
-        'mtype_features': get_mtype_features(mel),
-        'corpus_features': get_corpus_features(mel, corpus_stats)
+        'mtype_features': get_mtype_features(mel)
     }
+    
+    # Add corpus features only if corpus stats are available
+    if corpus_stats:
+        first_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
 
     # Create header by flattening feature names
     headers = ['melody_id']
@@ -2636,7 +2654,7 @@ def get_all_features_csv(input_path, output_path) -> None:
     avg_timing_stats = {}
     for stat_key in all_timing_stats[0].keys():
         avg_timing_stats[stat_key] = sum(stats[stat_key] for stats in all_timing_stats) / len(all_timing_stats)
-    
+
     print("\nAverage time per feature component:")
     for component, avg_time in sorted(avg_timing_stats.items(), key=lambda x: x[1], reverse=True):
         print(f"{component}: {avg_time:.3f} seconds ({(avg_time/total_time)*100:.1f}% of total time)")
@@ -2646,5 +2664,8 @@ def get_all_features_csv(input_path, output_path) -> None:
 if __name__ == "__main__":
     # get_all_features_json('item_features')
     get_all_features_csv(
-        input_path='/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json',
-        output_path='essen')
+        input_path=
+        '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json',
+        output_path='temp',
+        corpus_path=
+        '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json')

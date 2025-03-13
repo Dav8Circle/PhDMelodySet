@@ -406,7 +406,6 @@ def mean_productivity(ngram_counts: list[Counter]) -> float:
     
     return float(np.mean(productivity_values)) if productivity_values else 0.0
 
-
 def repetition_rate(values: list[float]) -> float:
     """Calculates the average distance between all repeated values in the list.
 
