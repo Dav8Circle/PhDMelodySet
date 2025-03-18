@@ -3,7 +3,6 @@ pytest
 scipy
 pretty-midi
 pandas
-tqdm
 multiprocessing
 csv
 time

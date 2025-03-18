@@ -12,7 +12,7 @@ from random import choices
 import time
 from typing import Dict
 from multiprocessing import Pool, cpu_count
-from algorithms import (
+from Feature_Set.algorithms import (
     rank_values, nine_percent_significant_values, circle_of_fifths,
     compute_tonality_vector, arpeggiation_proportion,
     chromatic_motion_proportion, stepwise_motion_proportion,
@@ -20,21 +20,20 @@ from algorithms import (
     longest_monotonic_conjunct_scalar_passage, longest_conjunct_scalar_passage,
     proportion_conjunct_scalar, proportion_scalar
 )
-from complexity import (
+from Feature_Set.complexity import (
     consecutive_fifths, repetition_rate, yules_k, simpsons_d, sichels_s, honores_h, mean_entropy,
     mean_productivity
 )
-from distributional import distribution_proportions, histogram_bins, kurtosis, skew
-from interpolation_contour import InterpolationContour
-from mtypes import FantasticTokenizer
-from narmour import (
+from Feature_Set.distributional import distribution_proportions, histogram_bins, kurtosis, skew
+from Feature_Set.interpolation_contour import InterpolationContour
+from Feature_Set.mtypes import FantasticTokenizer
+from Feature_Set.narmour import (
     proximity, closure, registral_direction, registral_return, intervallic_difference)
-from representations import Melody
-from stats import range_func, standard_deviation, shannon_entropy, mode
-from step_contour import StepContour
+from Feature_Set.representations import Melody
+from Feature_Set.stats import range_func, standard_deviation, shannon_entropy, mode
+from Feature_Set.step_contour import StepContour
 import numpy as np
 import scipy
-from tqdm import tqdm
 
 # Pitch Features
 
@@ -2486,54 +2485,27 @@ def process_melody(args):
     Returns
     -------
     tuple
-        Tuple containing (melody_id, feature_dict, timing_stats)
+        Tuple containing (melody_id, feature_dict)
     """
     melody_data, corpus_stats = args
     mel = Melody(melody_data, tempo=100)
-    
-    timing_stats = {}
-    melody_features = {}
-    
-    # Time each feature extraction component
-    start = time.time()
-    melody_features['pitch_features'] = get_pitch_features(mel)
-    timing_stats['pitch_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['interval_features'] = get_interval_features(mel)
-    timing_stats['interval_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['contour_features'] = get_contour_features(mel)
-    timing_stats['contour_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['duration_features'] = get_duration_features(mel)
-    timing_stats['duration_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['tonality_features'] = get_tonality_features(mel)
-    timing_stats['tonality_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['narmour_features'] = get_narmour_features(mel)
-    timing_stats['narmour_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['melodic_movement_features'] = get_melodic_movement_features(mel)
-    timing_stats['melodic_movement_features'] = time.time() - start
-    
-    start = time.time()
-    melody_features['mtype_features'] = get_mtype_features(mel)
-    timing_stats['mtype_features'] = time.time() - start
+
+    melody_features = {
+        'pitch_features': get_pitch_features(mel),
+        'interval_features': get_interval_features(mel),
+        'contour_features': get_contour_features(mel),
+        'duration_features': get_duration_features(mel),
+        'tonality_features': get_tonality_features(mel),
+        'narmour_features': get_narmour_features(mel),
+        'melodic_movement_features': get_melodic_movement_features(mel),
+        'mtype_features': get_mtype_features(mel)
+    }
     
     # Add corpus features only if corpus stats are available
     if corpus_stats:
-        start = time.time()
         melody_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
-        timing_stats['corpus_features'] = time.time() - start
     
-    return melody_data['ID'], melody_features, timing_stats
+    return melody_data['ID'], melody_features
 
 def get_all_features_csv(input_path, output_path, corpus_path=None) -> None:
     """Generate CSV file with features for all melodies using multiprocessing.
@@ -2599,7 +2571,6 @@ def get_all_features_csv(input_path, output_path, corpus_path=None) -> None:
     melody_args = [(melody_data, corpus_stats) for melody_data in melody_data_list]
     # Process melodies in parallel
     all_features = []
-    all_timing_stats = []
     print("Processing melodies...")
     
     import itertools
@@ -2624,14 +2595,14 @@ def get_all_features_csv(input_path, output_path, corpus_path=None) -> None:
             sleep(0.1)
             
         # Get all results
-        for melody_id, melody_features, timing_stats in async_result.get():
+        for melody_id, melody_features in async_result.get():
             # Flatten feature values into a single row
             row = [melody_id]
             for category, features in melody_features.items():
                 row.extend(features.values())
             all_features.append(row)
-            all_timing_stats.append(timing_stats)
     print("\nProcessing complete")
+    
     # Sort results by melody_id
     all_features.sort(key=lambda x: x[0])
     
@@ -2650,22 +2621,4 @@ def get_all_features_csv(input_path, output_path, corpus_path=None) -> None:
     print(f"Generated in total time: {total_time:.2f} seconds")
     print(f"Average time per melody: {avg_time:.3f} seconds\n")
 
-    # Calculate and display timing statistics
-    avg_timing_stats = {}
-    for stat_key in all_timing_stats[0].keys():
-        avg_timing_stats[stat_key] = sum(stats[stat_key] for stats in all_timing_stats) / len(all_timing_stats)
-
-    print("\nAverage time per feature component:")
-    for component, avg_time in sorted(avg_timing_stats.items(), key=lambda x: x[1], reverse=True):
-        print(f"{component}: {avg_time:.3f} seconds ({(avg_time/total_time)*100:.1f}% of total time)")
-
     print("\nJob complete\n")
-
-if __name__ == "__main__":
-    # get_all_features_json('item_features')
-    get_all_features_csv(
-        input_path=
-        '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json',
-        output_path='temp',
-        corpus_path=
-        '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_corpus_stats.json')
