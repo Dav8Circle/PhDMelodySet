@@ -63,15 +63,15 @@ loadings_df <- data.frame(
 # Add feature categories based on variable names
 loadings_df <- loadings_df %>%
   mutate(category = case_when(
-    grepl("pitch", variable) ~ "pitch_features",
-    grepl("interval", variable) ~ "interval_features", 
-    grepl("contour", variable) ~ "contour_features",
-    grepl("duration", variable) ~ "duration_features",
-    grepl("tonality", variable) ~ "tonality_features",
-    grepl("narmour", variable) ~ "narmour_features",
-    grepl("melodic_movement", variable) ~ "melodic_movement_features",
-    grepl("mtype", variable) ~ "mtype_features",
-    grepl("corpus", variable) ~ "corpus_features"
+    starts_with(variable, "pitch") ~ "pitch_features",
+    starts_with(variable, "interval") ~ "interval_features",
+    starts_with(variable, "contour") ~ "contour_features", 
+    starts_with(variable, "duration") ~ "duration_features",
+    starts_with(variable, "tonality") ~ "tonality_features",
+    starts_with(variable, "narmour") ~ "narmour_features",
+    starts_with(variable, "melodic_movement") ~ "melodic_movement_features",
+    starts_with(variable, "mtype") ~ "mtype_features",
+    starts_with(variable, "corpus") ~ "corpus_features"
   ))
 
 # Bind the PCA scores with the melody_ids

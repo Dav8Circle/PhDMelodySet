@@ -83,7 +83,7 @@ def pitch_entropy(pitches: list[int]) -> float:
     return float(shannon_entropy(pitches))
 
 def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float:
-    """Calculate duration-weighted distribution of pitches.
+    """Calculate duration-weighted distribution of pitch classes.
 
     Parameters
     ----------
@@ -97,17 +97,25 @@ def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float
     Returns
     -------
     float
-        Duration-weighted distribution proportion of pitches
+        Duration-weighted distribution proportion of pitch classes
     """
+    if not pitches or not starts or not ends:
+        return 0.0
+        
     durations = [ends[i] - starts[i] for i in range(len(starts))]
-    # Create weighted list by repeating each pitch according to its duration
-    weighted_pitches = []
+    # Create weighted list by repeating each pitch class according to its duration
+    weighted_pitch_classes = []
     for pitch, duration in zip(pitches, durations):
+        # Convert pitch to pitch class (0-11)
+        pitch_class = pitch % 12
         # Convert duration to integer number of repetitions (e.g. duration 2.5 -> 25 repetitions)
-        repetitions = int(duration * 10)
-        weighted_pitches.extend([pitch] * repetitions)
+        repetitions = max(1, int(duration * 10))  # Ensure at least 1 repetition
+        weighted_pitch_classes.extend([pitch_class] * repetitions)
 
-    return distribution_proportions(weighted_pitches)
+    if not weighted_pitch_classes:
+        return 0.0
+        
+    return distribution_proportions(weighted_pitch_classes)
 
 def basic_pitch_histogram(pitches: list[int]) -> dict:
     """Create histogram of pitch values within range of input pitches.
@@ -122,7 +130,11 @@ def basic_pitch_histogram(pitches: list[int]) -> dict:
     dict
         Dictionary mapping pitch values to counts
     """
-    num_midi_notes = int(range_func(pitches))
+    if not pitches:
+        return {}
+        
+    # Use number of unique pitches as number of bins, with minimum of 1
+    num_midi_notes = max(1, len(set(pitches)))
     return histogram_bins(pitches, num_midi_notes)
 
 def pitch_ranking(pitches: list[int]) -> float:
@@ -575,7 +587,7 @@ def melodic_interval_histogram(pitches: list[int]) -> dict:
         Dictionary mapping interval sizes to counts
     """
     intervals = pitch_interval(pitches)
-    num_intervals = int(range_func(intervals))
+    num_intervals = max(1, int(range_func(intervals)))
     return histogram_bins(intervals, num_intervals)
 
 def melodic_large_intervals(pitches: list[int]) -> float:
@@ -1468,6 +1480,10 @@ def compute_tfdf_spearman(melody: Melody, corpus_stats: dict) -> float:
     if len(tf_values) < 2:
         return 0.0
 
+    # Check if arrays have any variance
+    if np.var(tf_values) == 0 or np.var(df_values) == 0:
+        return 0.0
+
     # Calculate Spearman correlation with maximum rank for ties
     if len(tf_values) > 0 and len(df_values) > 0:
         correlation = scipy.stats.spearmanr(tf_values, df_values)[0]
@@ -2291,7 +2307,9 @@ def get_duration_features(melody: Melody) -> Dict:
     ioi_ratio_mean, ioi_ratio_std = ioi_ratio(melody.starts)
     duration_features['ioi_ratio_mean'] = ioi_ratio_mean
     duration_features['ioi_ratio_std'] = ioi_ratio_std
-    duration_features['ioi_contour'] = ioi_contour(melody.starts)
+    ioi_contour_mean, ioi_contour_std = ioi_contour(melody.starts)
+    duration_features['ioi_contour_mean'] = ioi_contour_mean
+    duration_features['ioi_contour_std'] = ioi_contour_std
     duration_features['ioi_range'] = ioi_range(melody.starts)
     duration_features['ioi_histogram'] = ioi_histogram(melody.starts)
     duration_features['duration_histogram'] = duration_histogram(melody.starts, melody.ends)

@@ -9,7 +9,7 @@ item_bank <-
   rename(item_id = id)
 
 df <- 
-  read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", n_max = 1e4) |> 
+  read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", n_max = 1e6) |> 
   filter(test == "mdt") |> 
   left_join(item_bank |> select(- c("discrimination", "difficulty", "guessing", "inattention")), by = "item_id")
 
@@ -91,7 +91,7 @@ reg8a <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif +
 
 reg8b <- lm(score_item ~ as.factor(oddity) + displacement + contour_dif + 
               in_key + change_note + ability_WL + num_notes, data=df2)
-
+summary(reg8b)
 # Produce a plot of reg8a against the data it's fitted to
 plot(df2$score_item, predict(reg8a))
 

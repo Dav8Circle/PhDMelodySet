@@ -178,16 +178,23 @@ def load_melody(idx: int, filename: str) -> Melody:
     Melody
         Loaded melody object
     """
-    melody_data = read_midijson(filename)[idx]
-    return Melody(melody_data, tempo=100)
+    melody_data = read_midijson(filename)
+    if idx >= len(melody_data):
+        raise IndexError(f"Index {idx} is out of range for file with {len(melody_data)} melodies")
+    return Melody(melody_data[idx], tempo=100)
 
 if __name__ == "__main__":
     # Example usage
-    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json'
+    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/miq_midi.json'
+    
+    # Get the actual number of melodies in the file
+    melody_data = read_midijson(filename)
+    num_melodies = len(melody_data)
+    print(f"Found {num_melodies} melodies in file")
     
     # Create arguments for parallel loading
     num_cores = mp.cpu_count()
-    melody_indices = [(i, filename) for i in range(8470)]
+    melody_indices = [(i, filename) for i in range(num_melodies)]
     
     # Load melodies in parallel
     with mp.Pool(num_cores) as pool:
@@ -199,10 +206,10 @@ if __name__ == "__main__":
 
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'essen_corpus_stats.json')
+    save_corpus_stats(corpus_stats, 'miq_corpus_stats.json')
 
     # Load and verify
-    loaded_stats = load_corpus_stats('essen_corpus_stats.json')
+    loaded_stats = load_corpus_stats('miq_corpus_stats.json')
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")
