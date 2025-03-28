@@ -49,7 +49,7 @@ df2 <- df %>%
 # lets instead consider it a factor in the regression 
 
 reg2 <- lm(score ~ item_id + as.factor(oddity) + difficulty + 
-             displacement + length_crotchets + contour_dif + in_key,
+          displacement + length_crotchets + contour_dif + in_key,
            data = scores_by_item)
 
 plot(reg2)

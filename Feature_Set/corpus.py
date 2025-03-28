@@ -206,10 +206,10 @@ if __name__ == "__main__":
 
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'miq_corpus_stats.json')
+    save_corpus_stats(corpus_stats, 'original_mel_miq_corpus_stats.json')
 
     # Load and verify
-    loaded_stats = load_corpus_stats('miq_corpus_stats.json')
+    loaded_stats = load_corpus_stats('original_mel_miq_corpus_stats.json')
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")
