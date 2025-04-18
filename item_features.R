@@ -30,6 +30,33 @@ fviz_pca_var(pca_data,
              geom = "text")
 
 # Create scree plot of PCA results
+
+# Define feature categories based on column names from essen_features.csv
+feature_categories <- data.frame(
+  feature = colnames(df2),
+  category = case_when(
+    grepl("pitch_range|pitch_mean|pitch_std|pitch_mode", colnames(df2)) ~ "Pitch Statistics",
+    grepl("entropy|information", colnames(df2)) ~ "Information Theory",
+    grepl("interval", colnames(df2)) ~ "Intervals",
+    grepl("contour", colnames(df2)) ~ "Contour",
+    grepl("tonality", colnames(df2)) ~ "Tonality",
+    grepl("rhythm|duration", colnames(df2)) ~ "Rhythm",
+    TRUE ~ "Other"
+  )
+)
+
+# Create PCA variable plot colored by category
+fviz_pca_var(pca_data,
+             col.var = feature_categories$category, 
+             repel = TRUE,
+             axes = c(1,2),
+             title = "PCA Variables by Feature Type") +
+  scale_color_brewer(palette = "Set2") +
+  theme_minimal() +
+  theme(legend.title = element_text(face = "bold"))
+
+
+
 fviz_eig(pca_data, 
          addlabels = TRUE,
          ylim = c(0, 50),

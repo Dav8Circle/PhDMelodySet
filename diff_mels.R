@@ -2,6 +2,12 @@
 original_features <- read.csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/original_mel_miq_mels.csv")
 miq_features <- read.csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/miq_mels.csv")
 
+# Load required libraries
+library(gbm)
+library(tidyverse)
+library(caret)
+library(ggplot2)
+
 # Keep melody ID column
 melody_id <- original_features$melody_id
 
@@ -34,13 +40,25 @@ feature_diffs <- feature_diffs %>%
   mutate(across(everything(), ~replace(., is.infinite(.), NA))) %>%
   mutate(across(everything(), ~replace(., is.na(.), 0)))
 
-# Scale the features
-feature_diffs <- scale(feature_diffs)
+# Create 80-20 split before scaling and PCA
+set.seed(123)  # for reproducibility
+n_samples <- nrow(feature_diffs)
+train_idx <- sample(1:n_samples, size = floor(0.8 * n_samples))
+train_data <- feature_diffs[train_idx, ]
+test_data <- feature_diffs[-train_idx, ]
 
-# Perform PCA
-pca <- prcomp(feature_diffs)
+# Scale the features using only training data
+scaler <- preProcess(train_data, method = c("center", "scale"))
+train_data_scaled <- predict(scaler, train_data)
+test_data_scaled <- predict(scaler, test_data)
 
-# Print summary of PCA
+# Perform PCA on training data
+pca <- prcomp(train_data_scaled)
+
+# Transform test data using the PCA from training
+test_data_pca <- predict(pca, test_data_scaled)
+
+# Print summary of PCA (based on training data)
 print(summary(pca))
 
 # Plot scree plot
@@ -48,12 +66,6 @@ plot(pca$sdev^2/sum(pca$sdev^2), type="b",
      xlab="Principal Component", 
      ylab="Proportion of Variance Explained",
      main="Scree Plot")
-
-# Load required libraries
-library(gbm)
-library(tidyverse)
-library(caret)
-library(ggplot2)
 
 # Load in the original item bank file
 item_bank <- 
@@ -66,12 +78,13 @@ df <-
   filter(test == "mdt") |> 
   left_join(item_bank |> select(- c("discrimination", "difficulty", "guessing", "inattention")), by = "item_id")
 
-# Extract first 15 PCs
-pc_scores <- pca$x[, 1:15]
+# Extract first 15 PCs for both train and test sets
+train_pc_scores <- pca$x[, 1:15]
+test_pc_scores <- test_data_pca[, 1:15]
 
-# Prepare data for GBM
-gbm_data <- as.data.frame(pc_scores) %>%
-  mutate(melody_id = melody_id) %>%
+# Prepare data for GBM - Training set
+train_gbm_data <- as.data.frame(train_pc_scores) %>%
+  mutate(melody_id = melody_id[train_idx]) %>%
   left_join(
     df %>% 
     group_by(item_id) %>%
@@ -80,17 +93,24 @@ gbm_data <- as.data.frame(pc_scores) %>%
   ) %>%
   na.omit()
 
-# Split response and predictors
-y <- gbm_data$mean_score
-X <- gbm_data %>% select(-c(mean_score, melody_id))
+# Prepare data for GBM - Test set
+test_gbm_data <- as.data.frame(test_pc_scores) %>%
+  mutate(melody_id = melody_id[-train_idx]) %>%
+  left_join(
+    df %>% 
+    group_by(item_id) %>%
+    summarise(mean_score = mean(score)),
+    by = c("melody_id" = "item_id")
+  ) %>%
+  na.omit()
 
-# Create train/test split
-set.seed(123)
-train_idx <- createDataPartition(y, p = 0.8, list = FALSE)
-X_train <- X[train_idx,]
-X_test <- X[-train_idx,]
-y_train <- y[train_idx]
-y_test <- y[-train_idx]
+# Split response and predictors for training
+X_train <- train_gbm_data %>% select(-c(mean_score, melody_id))
+y_train <- train_gbm_data$mean_score
+
+# Split response and predictors for testing
+X_test <- test_gbm_data %>% select(-c(mean_score, melody_id))
+y_test <- test_gbm_data$mean_score
 
 # Create parameter grid for GBM
 gbm_grid <- expand.grid(
@@ -110,7 +130,6 @@ ctrl <- trainControl(
 )
 
 # Train GBM with cross-validation
-set.seed(123)
 gbm_cv <- train(
   x = X_train,
   y = y_train,

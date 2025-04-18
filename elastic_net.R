@@ -255,7 +255,7 @@ test_plot_data <- data.frame(
   N = test_data$n_ratings
 )
 
-plot_data <- rbind(train_plot_data, test_plot_data)
+plot_data <- rbind(traind_plot_data, test_plot_data)
 
 # Add standard error of the mean
 plot_data$SE <- plot_data$SD / sqrt(plot_data$N)

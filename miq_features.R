@@ -121,7 +121,7 @@ df_with_pcs <- df_with_pcs %>%
     score_item = mean(score))
 
 # Fit linear model using first 5 PCs to predict score
-pc_model <- lm(mean_score ~ PC1 + PC2 + PC3 + PC4 + PC5 + difficulty
+pc_model <- lm(score_item ~ PC1 + PC2 + PC3 + PC4 + PC5 + difficulty
                + ability_WL, data = df_with_pcs)
 summary(pc_model)
 

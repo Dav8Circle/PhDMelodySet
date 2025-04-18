@@ -1,0 +1,15 @@
+{
+    "batch_size": 16,
+    "num_layers": 2,
+    "hidden_size_0": 330,
+    "hidden_size_1": 373,
+    "dropout_rate_0": 0.2946207463889636,
+    "dropout_rate_1": 0.19740634238309762,
+    "activation_fn": "ReLU",
+    "lr": 0.0014321668739738416,
+    "weight_decay": 0.000598039456829555,
+    "scheduler": "CosineAnnealingLR",
+    "T_max": 20,
+    "num_epochs": 96,
+    "patience": 23
+}

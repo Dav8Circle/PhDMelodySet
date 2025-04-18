@@ -1,0 +1,12 @@
+{
+    "batch_size": 19,
+    "hidden_size_0": 364,
+    "hidden_size_1": 346,
+    "dropout_rate_0": 0.2662768193433334,
+    "dropout_rate_1": 0.21096115663461162,
+    "lr": 0.00178263187012664,
+    "weight_decay": 0.0008826300453139951,
+    "num_epochs": 94,
+    "patience": 24,
+    "T_max": 19
+}

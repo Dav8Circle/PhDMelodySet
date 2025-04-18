@@ -1,5 +1,6 @@
 library(tidyverse)
 library(PCAtest)
+library(dplyr)
 setwd("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis")
 
 # Read in features CSV
@@ -18,9 +19,7 @@ melody_names <- data.frame(
 features <- merge(features, melody_names, by.x="melody_id", by.y="ID")
 
 # Keep numeric columns plus melody_id and Original_Melody
-features <- features %>%
-  select(-matches("\\{.*\\}")) %>%
-  select(melody_id, Original_Melody, where(is.numeric))
+features_numeric <- select_if(features, is.numeric)
 
 # Extract country from Original_Melody by taking only the letter parts
 features <- features %>%
@@ -63,15 +62,15 @@ loadings_df <- data.frame(
 # Add feature categories based on variable names
 loadings_df <- loadings_df %>%
   mutate(category = case_when(
-    starts_with(variable, "pitch") ~ "pitch_features",
-    starts_with(variable, "interval") ~ "interval_features",
-    starts_with(variable, "contour") ~ "contour_features", 
-    starts_with(variable, "duration") ~ "duration_features",
-    starts_with(variable, "tonality") ~ "tonality_features",
-    starts_with(variable, "narmour") ~ "narmour_features",
-    starts_with(variable, "melodic_movement") ~ "melodic_movement_features",
-    starts_with(variable, "mtype") ~ "mtype_features",
-    starts_with(variable, "corpus") ~ "corpus_features"
+    grepl("^pitch", variable) ~ "pitch_features",
+    grepl("^interval", variable) ~ "interval_features",
+    grepl("^contour", variable) ~ "contour_features", 
+    grepl("^duration", variable) ~ "duration_features",
+    grepl("^tonality", variable) ~ "tonality_features",
+    grepl("^narmour", variable) ~ "narmour_features",
+    grepl("^melodic_movement", variable) ~ "melodic_movement_features",
+    grepl("^mtype", variable) ~ "mtype_features",
+    grepl("^corpus", variable) ~ "corpus_features"
   ))
 
 # Bind the PCA scores with the melody_ids
@@ -312,3 +311,128 @@ dev.off()
 jpeg("hclust.jpeg", width = 1200, height = 1200, quality=100)
 plot(hclust_features)
 dev.off()
+
+# Create correlation matrix visualization
+library(corrplot)
+
+# Create feature categories
+feature_categories <- data.frame(
+  feature = colnames(features_numeric),
+  category = case_when(
+    grepl("^pitch", colnames(features_numeric)) ~ "pitch_features",
+    grepl("^interval", colnames(features_numeric)) ~ "interval_features",
+    grepl("^contour", colnames(features_numeric)) ~ "contour_features", 
+    grepl("^duration", colnames(features_numeric)) ~ "duration_features",
+    grepl("^tonality", colnames(features_numeric)) ~ "tonality_features",
+    grepl("^narmour", colnames(features_numeric)) ~ "narmour_features",
+    grepl("^melodic_movement", colnames(features_numeric)) ~ "melodic_movement_features",
+    grepl("^mtype", colnames(features_numeric)) ~ "mtype_features",
+    grepl("^corpus", colnames(features_numeric)) ~ "corpus_features"
+  )
+)
+
+# Order features by category
+ordered_features <- feature_categories %>%
+  arrange(category) %>%
+  pull(feature)
+
+# Reorder correlation matrix
+cor_matrix <- cor(features_numeric[ordered_features])
+
+# Create correlation plot
+jpeg("correlation_matrix.jpeg", width = 1200, height = 1200, quality=100)
+corrplot(cor_matrix, 
+         method = "color",
+         type = "upper", 
+         order = "original",  # Use our custom ordering
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = 0.7,
+         title = "Feature Correlation Matrix (Grouped by Category)",
+         mar = c(0,0,2,0))
+
+# Add category labels
+category_positions <- cumsum(table(feature_categories$category))
+category_midpoints <- c(0, category_positions[-length(category_positions)]) + 
+                     diff(c(0, category_positions)) / 2
+
+# Add category labels at the top
+text(x = category_midpoints, 
+     y = -0.05, 
+     labels = names(category_positions),
+     cex = 0.8,
+     srt = 45,
+     adj = 1)
+dev.off()
+
+# Perform PCA
+pca <- prcomp(features_numeric[ordered_features], scale. = TRUE)
+
+# Extract loadings for PC1 and PC2
+loadings <- data.frame(
+  feature = rownames(pca$rotation),
+  PC1 = pca$rotation[,1],
+  PC2 = pca$rotation[,2]
+)
+
+# Add feature categories
+loadings <- loadings %>%
+  left_join(feature_categories, by="feature")
+
+# Create correlation circle plot
+jpeg("correlation_circle.jpeg", width = 1000, height = 1000, quality=100)
+
+ggplot(loadings, aes(x = PC1, y = PC2, color = category, label = feature)) +
+  geom_point() +
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), alpha = 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
+  # Add circle
+  annotate("path",
+           x = cos(seq(0, 2*pi, length.out = 100)),
+           y = sin(seq(0, 2*pi, length.out = 100)),
+           color = "gray", linetype = "dashed") +
+  coord_fixed(ratio = 1) +
+  theme_minimal() +
+  labs(
+    title = "PCA Correlation Circle",
+    subtitle = "PC1 vs PC2",
+    x = paste0("PC1 (", round(summary(pca)$importance[2,1] * 100, 1), "% explained variance)"),
+    y = paste0("PC2 (", round(summary(pca)$importance[2,2] * 100, 1), "% explained variance)")
+  )
+
+dev.off()
+
+# Analyze correlations between pitch, interval, and contour features
+selected_features <- feature_categories %>%
+  filter(category %in% c("pitch_features", "interval_features", "contour_features"))
+
+# Calculate mean absolute correlation between feature types
+cor_matrix <- cor(features_numeric[, selected_features$feature])
+feature_type_cors <- data.frame(
+  feature1 = selected_features$feature,
+  category1 = selected_features$category
+) %>%
+  crossing(
+    feature2 = selected_features$feature,
+    category2 = selected_features$category
+  ) %>%
+  filter(feature1 < feature2) %>%  # avoid duplicates
+  mutate(
+    correlation = sapply(seq_len(n()), function(i) 
+      cor_matrix[feature1[i], feature2[i]]
+  )
+)
+
+# Calculate average absolute correlation between feature types
+feature_type_summary <- feature_type_cors %>%
+  group_by(category1, category2) %>%
+  summarize(
+    mean_abs_cor = mean(abs(correlation)),
+    n = n(),
+    .groups = 'drop'
+  )
+
+# Print summary
+print("Average absolute correlations between feature types:")
+print(feature_type_summary)

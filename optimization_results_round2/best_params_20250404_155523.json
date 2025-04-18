@@ -1,0 +1,22 @@
+{
+    "num_layers": 3,
+    "batch_size": 18,
+    "hidden_size_0": 315,
+    "hidden_size_1": 555,
+    "hidden_size_2": 280,
+    "dropout_rate_0": 0.24564223734809837,
+    "dropout_rate_1": 0.2531728035986378,
+    "dropout_rate_2": 0.0946036869673886,
+    "activation_fn": "SiLU",
+    "lr": 0.0018869199202045093,
+    "weight_decay": 0.0001982510037686263,
+    "optimizer": "AdamW",
+    "scheduler": "ExponentialLR",
+    "num_epochs": 135,
+    "patience": 24,
+    "use_batch_norm": false,
+    "use_residual": true,
+    "use_kfold": true,
+    "k_folds": 5,
+    "gamma": 0.9679803437802658
+}
