@@ -59,7 +59,7 @@ def _convert_strings_to_tuples(key: str) -> Tuple:
         # If not a tuple string, return the original key
         return key
 
-def process_melody_ngrams(args) -> Counter:
+def process_melody_ngrams(args) -> set:
     """Process n-grams for a single melody.
     
     Parameters
@@ -69,19 +69,19 @@ def process_melody_ngrams(args) -> Counter:
         
     Returns
     -------
-    Counter
-        Counter object containing n-gram counts for the melody
+    set
+        Set of unique n-grams found in the melody
     """
     melody, n_range = args
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
     
-    counts = Counter()
+    unique_ngrams = set()
     for n in range(n_range[0], n_range[1] + 1):
-        counts.update(tokenizer.ngram_counts(n))
-    return counts
+        unique_ngrams.update(tokenizer.ngram_counts(n).keys())
+    return unique_ngrams
 
-def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 4)) -> Dict:
+def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 6)) -> Dict:
     """Compute n-gram frequencies across the entire corpus using multiprocessing.
     
     Parameters
@@ -111,14 +111,14 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
             desc=f"Computing n-grams using {num_cores} cores"
         ))
     
-    # Combine results from all processes
-    total_counts = Counter()
-    for counts in results:
-        total_counts.update(counts)
+    # Count document frequency (number of melodies containing each n-gram)
+    doc_freq = Counter()
+    for ngrams in results:
+        doc_freq.update(ngrams)
     
     # Format results for JSON serialization
     frequencies = {'document_frequencies': {}}
-    for k, v in total_counts.items():
+    for k, v in doc_freq.items():
         frequencies['document_frequencies'][str(k)] = {'count': v}
 
     return {
@@ -184,8 +184,8 @@ def load_melody(idx: int, filename: str) -> Melody:
     return Melody(melody_data[idx], tempo=100)
 
 if __name__ == "__main__":
-    # Example usage
-    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/miq_midi.json'
+    # Example usage for Essen collection
+    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json'
     
     # Get the actual number of melodies in the file
     melody_data = read_midijson(filename)
@@ -206,10 +206,10 @@ if __name__ == "__main__":
 
     # Compute and save corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'original_mel_miq_corpus_stats.json')
+    save_corpus_stats(corpus_stats, 'essen_corpus_stats.json')
 
     # Load and verify
-    loaded_stats = load_corpus_stats('original_mel_miq_corpus_stats.json')
+    loaded_stats = load_corpus_stats('essen_corpus_stats.json')
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")

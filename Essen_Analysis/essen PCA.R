@@ -4,7 +4,7 @@ library(dplyr)
 setwd("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis")
 
 # Read in features CSV
-features <- read_csv("essen3.csv")
+features <- read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/essen_features.csv")
 # Read in JSON file for melody names
 library(jsonlite)
 melodies <- fromJSON("essen_midi_sequences.json")
@@ -21,26 +21,50 @@ features <- merge(features, melody_names, by.x="melody_id", by.y="ID")
 # Keep numeric columns plus melody_id and Original_Melody
 features_numeric <- select_if(features, is.numeric)
 
-# Extract country from Original_Melody by taking only the letter parts
-features <- features %>%
-  mutate(country = str_extract(Original_Melody, "[A-Za-z]+"))
-
-features_numeric <- features %>%
-  select(-c(Original_Melody, country))
+# Remove tempo features
+features_numeric <- features_numeric %>%
+  select(-matches("tempo"))
 
 # Remove columns with zero variance
-var_zero <- apply(features_numeric, 2, var)
-features_numeric <- features_numeric[, var_zero != 0]
+zero_var_cols <- sapply(features_numeric, function(x) var(x) == 0)
+features_numeric <- features_numeric[, !zero_var_cols]
+
 # Print features that were dropped due to zero variance
-dropped_features <- names(var_zero[var_zero == 0])
-cat("Features dropped due to zero variance:\n")
-print(dropped_features)
+dropped_features <- names(features_numeric)[zero_var_cols]
+if(length(dropped_features) > 0) {
+  cat("Features dropped due to zero variance:\n")
+  print(dropped_features)
+} else {
+  cat("No features were dropped due to zero variance\n")
+}
 
 # Remove melody_id 
 features_numeric <- features_numeric %>% 
   select(-melody_id)
 
 features_scaled <- scale(features_numeric)
+
+# Check for zero variance features
+var_features <- apply(features_scaled, 2, var)
+
+zero_var_features <- names(var_features[var_features == 0])
+# Check for NAs and include them as zero variance features
+na_features <- colnames(features_scaled)[apply(features_scaled, 2, function(x) any(is.na(x)))]
+zero_var_features <- c(zero_var_features, na_features)
+
+
+# Remove zero variance features if any exist
+if(length(zero_var_features) > 0) {
+  cat("Removing zero variance features after scaling:\n")
+  print(zero_var_features)
+  features_scaled <- features_scaled[, !colnames(features_scaled) %in% zero_var_features]
+} else {
+  cat("No zero variance features found after scaling\n") 
+}
+
+source("/Users/davidwhyatt/R/joshpcatest.R")
+results <- simple_pca_perm_for_loop(features_scaled)
+View(results)
 
 pca_res <- PCAtest(features_scaled, nboot=1000, nperm=1000, alpha=0.05,
                    varcorr=TRUE, plot=FALSE)

@@ -37,6 +37,43 @@ import scipy
 
 # Pitch Features
 
+from typing import Optional, Callable, Any
+
+# def preprocess_melody(func: Callable) -> Callable:
+#     """Decorator that extracts pitches from a Score object if provided.
+    
+#     If a Score object is provided as the second argument, extracts its pitches
+#     attribute and passes that as the first argument to the decorated function.
+#     Otherwise passes through the original arguments unchanged.
+    
+#     Parameters
+#     ----------
+#     func : Callable
+#         Function to decorate
+        
+#     Returns
+#     -------
+#     Callable
+#         Decorated function that handles Score objects
+#     """
+#     def wrapper(pitches: list[int], Score: Optional[Score] = None, *args, **kwargs) -> Any:
+#         kwargs = {}
+#         requested_parameters = inspect.signature(func).parameters
+
+#         if Score is not None:
+#             if 'pitches' in requested_parameters:
+#                 kwargs['pitches'] = Score.pitches
+#             if 'starts' in requested_parameters:
+#                 kwargs['starts'] = Score.starts
+#             if 'ends' in requested_parameters:
+#                 kwargs['ends'] = Score.ends
+
+#         return func(**kwargs)
+#     return wrapper
+
+
+
+# @preprocess_melody
 def pitch_range(pitches: list[int]) -> int:
     """Calculate the range between the highest and lowest pitches.
 
@@ -1402,7 +1439,7 @@ def get_mtype_features(melody: Melody) -> dict:
 
     # Get counts for each n-gram length
     ngram_counts = []
-    for n in range(1, 5):
+    for n in range(1, 6):
         counts = tokenizer.ngram_counts(n=n)
         ngram_counts.append(counts)
 
@@ -1468,7 +1505,7 @@ def compute_tfdf_spearman(melody: Melody, corpus_stats: dict) -> float:
     df_values = []
     
     # Get TF and DF values for each n-gram length
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         for ngram, tf in ngram_counts.items():
             df = get_ngram_document_frequency(ngram, corpus_stats)
@@ -1519,7 +1556,7 @@ def compute_tfdf_kendall(melody: Melody, corpus_stats: dict) -> float:
     df_values = []
     
     # Get TF and DF values for each n-gram length
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         for ngram, tf in ngram_counts.items():
             df = get_ngram_document_frequency(ngram, corpus_stats)
@@ -1564,7 +1601,7 @@ def compute_tfdf(melody: Melody, corpus_stats: dict) -> float:
     tfdf_values = []
     
     # Calculate TFDF using dot product for each n-gram length
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         if not ngram_counts:
             continue
@@ -1626,7 +1663,7 @@ def compute_norm_log_dist(melody: Melody, corpus_stats: dict) -> float:
 
     distances = []
     # Calculate distances for each n-gram length
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         if not ngram_counts:
             continue
@@ -1676,7 +1713,7 @@ def compute_max_log_df(melody: Melody, corpus_stats: dict) -> float:
 
     max_df = 0
     # Find maximum document frequency across all n-gram lengths
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         for ngram in ngram_counts:
             df = get_ngram_document_frequency(ngram, corpus_stats)
@@ -1710,7 +1747,7 @@ def compute_min_log_df(melody: Melody, corpus_stats: dict) -> float:
 
     min_df = float('inf')  # Initialize to infinity
     # Find minimum document frequency across all n-gram lengths
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         for ngram in ngram_counts:
             df = get_ngram_document_frequency(ngram, corpus_stats)
@@ -1746,7 +1783,7 @@ def compute_mean_log_df(melody: Melody, corpus_stats: dict) -> float:
     total_log_df = 0.0
     count = 0
     # Calculate sum of log document frequencies across all n-gram lengths
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         for ngram in ngram_counts:
             df = get_ngram_document_frequency(ngram, corpus_stats)
@@ -1785,7 +1822,7 @@ def compute_mean_df_entropy(melody: Melody, corpus_stats: dict) -> float:
     n_lengths = 0
     
     # Calculate entropy for each n-gram length
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         if not ngram_counts:
             continue
@@ -1811,8 +1848,14 @@ def compute_mean_df_entropy(melody: Melody, corpus_stats: dict) -> float:
     if n_lengths > 0:
         return total_entropy / n_lengths
     return 0.0
+
 def compute_mean_df_productivity(melody: Melody, corpus_stats: dict) -> float:
     """Compute mean document frequency productivity for a melody.
+    
+    This follows FANTASTIC's implementation where:
+    - For each n-gram length, calculate productivity as the proportion of hapax legomena
+    - Hapax legomena are n-grams that appear exactly once in the corpus
+    - The final result is the mean productivity across all n-gram lengths
     
     Parameters
     ----------
@@ -1829,48 +1872,33 @@ def compute_mean_df_productivity(melody: Melody, corpus_stats: dict) -> float:
     tokenizer = FantasticTokenizer()
     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
 
-    ngram_dfs = []
-    # Get document frequencies dictionary once
-    doc_freqs = corpus_stats.get('document_frequencies', {})
-
-    # Calculate document frequencies for each n-gram length
-    for n in range(1, 5):
-        df_counts = Counter()
+    productivities = []
+    
+    # Calculate productivity for each n-gram length
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
-
         if not ngram_counts:
             continue
-
+            
         # Get document frequencies for this n-gram length
-        total_df = 0
-        for ngram, tf in ngram_counts.items():
-            # Convert ngram to string only once
-            ngram_str = str(ngram)
-            # Look up document frequency directly
-            df = doc_freqs.get(ngram_str, {}).get('count', 0)
-            if df > 0:  # Only include non-zero document frequencies
-                df_counts[ngram_str] = df
-                total_df += df
+        df_counts = Counter()
+        for ngram in ngram_counts:
+            df = get_ngram_document_frequency(ngram, corpus_stats)
+            if df > 0:
+                df_counts[ngram] = df
                 
-        if df_counts and total_df > 0:
-            # Normalize counts by total
-            for ngram in df_counts:
-                df_counts[ngram] /= total_df
-            ngram_dfs.append(df_counts)
+        if df_counts:
+            # Calculate productivity as proportion of hapax legomena
+            hapax = sum(1 for df in df_counts.values() if df == 1)
+            total = sum(df_counts.values())
+            if total > 0:
+                productivity = hapax / total
+                productivities.append(productivity)
     
-    # Calculate mean productivity across n-gram lengths
-    if not ngram_dfs:
-        return 0.0
-        
-    total_productivity = 0.0
-    for df_counts in ngram_dfs:
-        # Count hapax legomena (n-grams that appear once)
-        hapax = sum(1 for df in df_counts.values() if df <= 1/len(df_counts))
-        # Calculate productivity as proportion of hapax legomena
-        productivity = hapax / len(df_counts) if len(df_counts) > 0 else 0.0
-        total_productivity += productivity
-        
-    return total_productivity / len(ngram_dfs)
+    # Return mean productivity across n-gram lengths
+    if productivities:
+        return sum(productivities) / len(productivities)
+    return "Failed"
 
 def compute_mean_df_yules_k(melody: Melody, corpus_stats: dict) -> float:
     """Compute mean document frequency Yule's K for a melody.
@@ -1892,7 +1920,7 @@ def compute_mean_df_yules_k(melody: Melody, corpus_stats: dict) -> float:
     
     # Get document frequencies for each n-gram length
     ngram_counts = []
-    for n in range(1, 5):
+    for n in range(1, 6):
         counts = tokenizer.ngram_counts(n=n)
         if not counts:
             continue
@@ -1932,7 +1960,7 @@ def compute_mean_df_simpsons_d(melody: Melody, corpus_stats: dict) -> float:
     
     # Get document frequencies for each n-gram length
     ngram_counts = []
-    for n in range(1, 5):
+    for n in range(1, 6):
         counts = tokenizer.ngram_counts(n=n)
         if not counts:
             continue
@@ -1972,7 +2000,7 @@ def compute_mean_df_sichels_s(melody: Melody, corpus_stats: dict) -> float:
     
     # Get document frequencies for each n-gram length
     ngram_counts = []
-    for n in range(1, 5):
+    for n in range(1, 6):
         counts = tokenizer.ngram_counts(n=n)
         if not counts:
             continue
@@ -2012,7 +2040,7 @@ def compute_mean_df_honores_h(melody: Melody, corpus_stats: dict) -> float:
     
     # Get document frequencies for each n-gram length
     ngram_counts = []
-    for n in range(1, 5):
+    for n in range(1, 6):
         counts = tokenizer.ngram_counts(n=n)
         if not counts:
             continue
@@ -2056,7 +2084,7 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     doc_freqs = corpus_stats.get('document_frequencies', {})
     total_docs = len(corpus_stats['document_frequencies'])
     
-    for n in range(1, 5):
+    for n in range(1, 6):
         ngram_counts = tokenizer.ngram_counts(n=n)
         if not ngram_counts:
             continue
