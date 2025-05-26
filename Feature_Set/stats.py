@@ -5,119 +5,72 @@ to aid in the calculation of features which use descriptive statistics.
 __author__ = "David Whyatt"
 
 import numpy as np
+import scipy.stats
 
-def range_func(values: list[float]) -> float:
-    """Calculates the range (difference between max and min) of a list of numbers.
-
+def range_func(values) -> float:
+    """Calculate range between highest and lowest values.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    values : list or numpy.ndarray
+        List or array of values to calculate range for
+        
     Returns
     -------
     float
-        The range of the values. Returns 0 for empty list.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> range_func([1, 2, 3, 4, 5])
-    4.0
-    >>> range_func([])  # Empty list
-    0.0
-    >>> range_func([1.5, 2.5, 3.5])
-    2.0
+        Range between highest and lowest values
     """
-    if not values:
+    values = np.asarray(values)
+    if values.size == 0:
         return 0.0
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-    return float(max(values_array) - min(values_array))
+    return float(np.ptp(values))
 
-def standard_deviation(values: list[float]) -> float:
-    """Calculates the population standard deviation of a list of numbers.
-
+def standard_deviation(values) -> float:
+    """Calculate standard deviation of values.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    values : list or numpy.ndarray
+        List or array of values to calculate standard deviation for
+        
     Returns
     -------
     float
-        The standard deviation of the values. Returns 0 for empty list.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> standard_deviation([1, 2, 3, 4, 5])
-    1.414...
-    >>> standard_deviation([])  # Empty list
-    0.0
-    >>> standard_deviation([2, 2, 2])  # No variation
-    0.0
+        Standard deviation of values
     """
-    if not values:
+    values = np.asarray(values)
+    if values.size == 0:
         return 0.0
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-    return float(np.std(values_array, ddof=0))
+    return float(np.std(values))
 
-
-def shannon_entropy(values: list[float]) -> float:
-    """Calculates the Shannon entropy (base-2) of a list of numbers.
-
+def shannon_entropy(values) -> float:
+    """Calculate Shannon entropy of a distribution.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    values : list or numpy.ndarray
+        List or array of values to calculate entropy for
+        
     Returns
     -------
     float
-        The Shannon entropy of the values. Returns 0 for empty list.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> shannon_entropy([1, 1, 2, 2])  # Equal probabilities
-    1.0
-    >>> shannon_entropy([1, 1, 1])  # All same value
-    -0.0
-    >>> shannon_entropy([])  # Empty list
-    0.0
+        Shannon entropy value
     """
-    if not values:
+    # Convert to numpy array if not already
+    values = np.asarray(values)
+    
+    # Check if array is empty
+    if values.size == 0:
         return 0.0
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
-    # Calculate probabilities of each unique value
-    _, counts = np.unique(values_array, return_counts=True)
-    probabilities = counts / len(values_array)
-
-    # Calculate entropy using the formula: -sum(p * log2(p))
-    entropy = -np.sum(probabilities * np.log2(probabilities))
-    return float(entropy)
+        
+    # Get unique values and their counts
+    unique, counts = np.unique(values, return_counts=True)
+    
+    # Calculate probabilities
+    probs = counts / counts.sum()
+    
+    # Calculate entropy
+    return -np.sum(probs * np.log2(probs))
 
 
 def natural_entropy(values: list[float]) -> float:
@@ -200,56 +153,23 @@ def mean(values: list[float]) -> float:
 
     return float(np.mean(values_array))
 
-def mode(values: list[float]) -> float:
-    """Calculates the mode (most frequent value) of a list of numbers.
-
+def mode(values) -> float:
+    """Find most common value.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to analyze
-
+    values : list or numpy.ndarray
+        List or array of values to find mode for
+        
     Returns
     -------
     float
-        The mode. If multiple modes exist, returns the smallest one.
-        Returns 0 for empty list.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> mode([1, 1, 2, 3])  # Single mode
-    1.0
-    >>> mode([1, 1, 2, 2])  # Multiple modes, returns smallest
-    1.0
-    >>> mode([])  # Empty list
-    0.0
+        Most common value
     """
-    if not values:
+    values = np.asarray(values)
+    if values.size == 0:
         return 0.0
-
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
-    if len(values_array) == 0:
-        return 0.0
-
-    # Get value counts
-    unique, counts = np.unique(values_array, return_counts=True)
-
-    # Find max count
-    max_count = np.max(counts)
-
-    # Get all modes (values with max count)
-    modes = unique[counts == max_count]
-
-    # Return smallest mode
-    return float(np.min(modes))
+    return float(scipy.stats.mode(values, keepdims=False)[0])
 
 def length(values: list[float]) -> float:
     """Returns the length (number of elements) of a list of numbers.

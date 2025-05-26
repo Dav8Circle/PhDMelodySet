@@ -8,33 +8,12 @@ import json
 from typing import List, Dict, Tuple
 from tqdm import tqdm
 import multiprocessing as mp
-from mtypes import FantasticTokenizer
-from representations import Melody, read_midijson
+import os
+from pathlib import Path
+from Feature_Set.melody_tokenizer import FantasticTokenizer
+from Feature_Set.representations import Melody, read_midijson
+from Feature_Set.import_mid import import_midi
 
-def _convert_tuples_to_strings(data: Dict) -> Dict:
-    """Convert tuple keys to strings for JSON serialization.
-    
-    Parameters
-    ----------
-    data : Dict
-        Dictionary with potential tuple keys
-        
-    Returns
-    -------
-    Dict
-        Dictionary with tuple keys converted to strings
-    """
-    converted = {}
-    for key, value in data.items():
-        if isinstance(key, tuple):
-            # Convert tuple to string representation 
-            # json.dumps converts None to "null"
-            key_list = tuple("None" if x is None else x for x in key)
-            str_key = str(key_list)  # Use str() to preserve tuple format
-            converted[str_key] = value
-        else:
-            converted[key] = value
-    return converted
 
 def _convert_strings_to_tuples(key: str) -> Tuple:
     """Convert a string-encoded tuple key back to a tuple.
@@ -74,11 +53,27 @@ def process_melody_ngrams(args) -> set:
     """
     melody, n_range = args
     tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
+    
+    # Segment the melody first
+    segments = tokenizer.segment_melody(melody, phrase_gap=1.5, units="quarters")
+    
+    # Get tokens for each segment
+    all_tokens = []
+    for segment in segments:
+        segment_tokens = tokenizer.tokenize_melody(
+            segment.pitches, 
+            segment.starts, 
+            segment.ends
+        )
+        all_tokens.extend(segment_tokens)
     
     unique_ngrams = set()
     for n in range(n_range[0], n_range[1] + 1):
-        unique_ngrams.update(tokenizer.ngram_counts(n).keys())
+        # Count n-grams in the combined tokens
+        for i in range(len(all_tokens) - n + 1):
+            ngram = tuple(all_tokens[i:i + n])
+            unique_ngrams.add(ngram)
+            
     return unique_ngrams
 
 def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 6)) -> Dict:
@@ -183,33 +178,114 @@ def load_melody(idx: int, filename: str) -> Melody:
         raise IndexError(f"Index {idx} is out of range for file with {len(melody_data)} melodies")
     return Melody(melody_data[idx], tempo=100)
 
+def load_midi_melody(midi_path: str) -> Melody:
+    """Load a melody from a MIDI file.
+    
+    Parameters
+    ----------
+    midi_path : str
+        Path to MIDI file
+        
+    Returns
+    -------
+    Melody or None
+        Loaded melody object, or None if the file could not be loaded
+    """
+    try:
+        melody_data = import_midi(midi_path)
+        if melody_data is None:
+            return None
+        return Melody(melody_data, tempo=100)
+    except Exception as e:
+        print(f"Warning: Error creating Melody object from {midi_path}: {str(e)}")
+        return None
+
+def load_melodies_from_directory(directory: str, file_type: str = "json") -> List[Melody]:
+    """Load melodies from a directory containing either JSON or MIDI files.
+    
+    Parameters
+    ----------
+    directory : str
+        Path to directory containing melody files
+    file_type : str
+        Type of files to load ("json" or "midi")
+        
+    Returns
+    -------
+    List[Melody]
+        List of loaded melody objects
+    """
+    directory = Path(directory)
+    if not directory.exists():
+        raise FileNotFoundError(f"Directory not found: {directory}")
+        
+    if file_type == "json":
+        # For JSON, we expect a single file containing multiple melodies
+        json_files = list(directory.glob("*.json"))
+        if not json_files:
+            raise FileNotFoundError(f"No JSON files found in {directory}")
+        if len(json_files) > 1:
+            raise ValueError(f"Multiple JSON files found in {directory}. Please specify a single file.")
+            
+        melody_data = read_midijson(str(json_files[0]))
+        num_melodies = len(melody_data)
+        print(f"Found {num_melodies} melodies in {json_files[0]}")
+        
+        # Create arguments for parallel loading
+        num_cores = mp.cpu_count()
+        melody_indices = [(i, str(json_files[0])) for i in range(num_melodies)]
+        
+        # Load melodies in parallel
+        with mp.Pool(num_cores) as pool:
+            melodies = list(tqdm(
+                pool.starmap(load_melody, melody_indices),
+                total=len(melody_indices),
+                desc=f"Loading melodies using {num_cores} cores"
+            ))
+            
+    elif file_type == "midi":
+        # For MIDI, we expect multiple files, each containing one melody
+        midi_files = list(directory.glob("*.mid")) + list(directory.glob("*.midi"))
+        if not midi_files:
+            raise FileNotFoundError(f"No MIDI files found in {directory}")
+            
+        print(f"Found {len(midi_files)} MIDI files")
+        
+        # Load melodies in parallel
+        num_cores = mp.cpu_count()
+        with mp.Pool(num_cores) as pool:
+            melodies = list(tqdm(
+                pool.imap(load_midi_melody, [str(f) for f in midi_files]),
+                total=len(midi_files),
+                desc=f"Loading MIDI files using {num_cores} cores"
+            ))
+    else:
+        raise ValueError("file_type must be either 'json' or 'midi'")
+        
+    return melodies
+
 if __name__ == "__main__":
-    # Example usage for Essen collection
-    filename = '/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/Essen_Analysis/essen_midi_sequences.json'
+    # Example usage
+    midi_dir = '/Users/davidwhyatt/Downloads/01_Essen Folksong Database (.mid-conversions)'
+    output_file = "essen_corpus_stats.json"
     
-    # Get the actual number of melodies in the file
-    melody_data = read_midijson(filename)
-    num_melodies = len(melody_data)
-    print(f"Found {num_melodies} melodies in file")
+    # Load melodies from MIDI files
+    melodies = load_melodies_from_directory(midi_dir, file_type="midi")
+    # Filter out None values
+    melodies = [m for m in melodies if m is not None]
+    if not melodies:
+        print("Error: No valid melodies found")
+        exit(1)
+    print(f"Processing {len(melodies)} valid melodies")
     
-    # Create arguments for parallel loading
-    num_cores = mp.cpu_count()
-    melody_indices = [(i, filename) for i in range(num_melodies)]
-    
-    # Load melodies in parallel
-    with mp.Pool(num_cores) as pool:
-        melodies = list(tqdm(
-            pool.starmap(load_melody, melody_indices),
-            total=len(melody_indices),
-            desc=f"Loading melodies using {num_cores} cores"
-        ))
-
-    # Compute and save corpus statistics
+    # Compute corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    save_corpus_stats(corpus_stats, 'essen_corpus_stats.json')
-
+    
+    # Save to JSON
+    save_corpus_stats(corpus_stats, output_file)
+    
     # Load and verify
-    loaded_stats = load_corpus_stats('essen_corpus_stats.json')
+    loaded_stats = load_corpus_stats(output_file)
     print("Corpus statistics saved and loaded successfully.")
     print(f"Corpus size: {loaded_stats['corpus_size']} melodies")
     print(f"N-gram lengths: {loaded_stats['n_range']}")

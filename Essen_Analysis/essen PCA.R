@@ -62,10 +62,6 @@ if(length(zero_var_features) > 0) {
   cat("No zero variance features found after scaling\n") 
 }
 
-source("/Users/davidwhyatt/R/joshpcatest.R")
-results <- simple_pca_perm_for_loop(features_scaled)
-View(results)
-
 pca_res <- PCAtest(features_scaled, nboot=1000, nperm=1000, alpha=0.05,
                    varcorr=TRUE, plot=FALSE)
 

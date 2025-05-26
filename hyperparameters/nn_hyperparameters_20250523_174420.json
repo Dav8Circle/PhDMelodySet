@@ -1,0 +1,30 @@
+{
+    "timestamp": "2025-05-23 17:44:20",
+    "best_r2_score": -0.4222884178161621,
+    "parameters": {
+        "n_layers": 4,
+        "units_0": 399,
+        "dropout_0": 0.4769245090549362,
+        "l2_reg_0": 0.08924399076235767,
+        "units_1": 286,
+        "dropout_1": 0.1795247047390856,
+        "l2_reg_1": 0.007505559821511215,
+        "units_2": 199,
+        "dropout_2": 0.18942197657809612,
+        "l2_reg_2": 0.0403353026430341,
+        "units_3": 90,
+        "dropout_3": 0.1384923655617919,
+        "l2_reg_3": 0.017278436386962196,
+        "learning_rate": 0.003134463637763442,
+        "patience": 22,
+        "lr_factor": 0.37111718781453473,
+        "lr_patience": 18,
+        "batch_size": 59
+    },
+    "n_trials": 50,
+    "dataset_info": {
+        "n_features": 190,
+        "n_samples_train": 645,
+        "n_samples_test": 162
+    }
+}

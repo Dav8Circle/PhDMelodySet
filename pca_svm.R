@@ -4,6 +4,7 @@ library(tidyverse)
 library(caret)
 library(gbm)
 library(ggplot2)
+library(doParallel)
 
 # Load in the original item bank file
 item_bank <- 
@@ -42,123 +43,13 @@ features <- features %>%
 features <- scale(features)
 features <- features[, colSums(is.na(features)) == 0]
 
-# Perform PCA
-pca_result <- prcomp(features, center = TRUE, scale. = TRUE)
+# --- Remove PCA and use raw features ---
+# features is already scaled and cleaned above
+raw_features <- as.data.frame(features)
+raw_features$melody_id <- melody_ids
 
-# Try different variance thresholds
-var_thresholds <- c(0.70, 0.75, 0.80, 0.85)
-var_explained <- cumsum(pca_result$sdev^2 / sum(pca_result$sdev^2))
-n_components_list <- sapply(var_thresholds, function(x) which(var_explained >= x)[1])
-
-# Create parameter grid for GBM
-gbm_grid <- expand.grid(
-  n.trees = c(100, 500, 1000),
-  interaction.depth = c(3, 5, 7),
-  shrinkage = c(0.01, 0.05, 0.1),
-  n.minobsinnode = c(5, 10)
-)
-
-# Set up cross-validation control
-ctrl <- trainControl(
-  method = "repeatedcv",
-  number = 10,
-  repeats = 5,
-  search = "grid",
-  savePredictions = TRUE
-)
-
-# Function to train and evaluate GBM model
-train_and_evaluate_gbm <- function(n_components, X, y, gbm_grid, ctrl) {
-  # Extract PC scores for selected components
-  pc_scores <- pca_result$x[, 1:n_components]
-  
-  # Prepare data for GBM
-  gbm_data <- as.data.frame(pc_scores) %>%
-    mutate(melody_id = melody_ids) %>%
-    left_join(
-      df %>% 
-      group_by(item_id) %>%
-      summarise(mean_score = mean(score)),
-      by = c("melody_id" = "item_id")
-    ) %>%
-    na.omit()
-  
-  # Split response and predictors
-  y <- gbm_data$mean_score
-  X <- gbm_data %>% select(-c(mean_score, melody_id))
-  
-  # Train GBM with cross-validation
-  set.seed(123)
-  gbm_cv <- train(
-    x = X,
-    y = y,
-    method = "gbm",
-    trControl = ctrl,
-    tuneGrid = gbm_grid,
-    verbose = FALSE
-  )
-  
-  # Get best model
-  best_model <- gbm_cv$finalModel
-  
-  # Calculate predictions
-  y_pred <- predict(gbm_cv, X)
-  
-  # Calculate metrics
-  r2 <- cor(y, y_pred)^2
-  mae <- mean(abs(y - y_pred))
-  mse <- mean((y - y_pred)^2)
-  rmse <- sqrt(mse)
-  
-  # Get variable importance
-  var_imp <- summary(best_model, n.trees = best_model$n.trees)
-  
-  return(list(
-    model = gbm_cv,
-    metrics = list(
-      r2 = r2,
-      mae = mae,
-      rmse = rmse,
-      n_components = n_components,
-      var_explained = var_explained[n_components],
-      best_params = gbm_cv$bestTune
-    ),
-    importance = var_imp
-  ))
-}
-
-# Train models for different numbers of components
-results <- lapply(n_components_list, function(n) {
-  cat("\nTraining model with", n, "components...")
-  train_and_evaluate_gbm(n, X, y, gbm_grid, ctrl)
-})
-
-# Print results for each model
-cat("\n\nModel Comparison Results:")
-for(i in 1:length(results)) {
-  cat("\n\nModel", i, "(", n_components_list[i], "components,", 
-      round(var_explained[n_components_list[i]] * 100, 2), "% variance explained):")
-  cat("\nR-squared:", round(results[[i]]$metrics$r2, 3))
-  cat("\nRMSE:", round(results[[i]]$metrics$rmse, 3))
-  cat("\nMAE:", round(results[[i]]$metrics$mae, 3))
-  cat("\nBest parameters:")
-  cat("\nNumber of trees:", results[[i]]$metrics$best_params$n.trees)
-  cat("\nInteraction depth:", results[[i]]$metrics$best_params$interaction.depth)
-  cat("\nLearning rate:", results[[i]]$metrics$best_params$shrinkage)
-  cat("\nMin observations in node:", results[[i]]$metrics$best_params$n.minobsinnode)
-}
-
-# Find best model based on R-squared
-best_model_idx <- which.max(sapply(results, function(x) x$metrics$r2))
-best_model <- results[[best_model_idx]]
-best_n_components <- n_components_list[best_model_idx]
-
-# Extract PC scores for best model
-pc_scores <- pca_result$x[, 1:best_n_components]
-
-# Prepare data for best model
-gbm_data <- as.data.frame(pc_scores) %>%
-  mutate(melody_id = melody_ids) %>%
+# Prepare data for GBM
+raw_gbm_data <- raw_features %>%
   left_join(
     df %>% 
     group_by(item_id) %>%
@@ -167,17 +58,72 @@ gbm_data <- as.data.frame(pc_scores) %>%
   ) %>%
   na.omit()
 
-# Split response and predictors for best model
-y <- gbm_data$mean_score
-X <- gbm_data %>% select(-c(mean_score, melody_id))
+# Create train-test split (80-20)
+set.seed(123)
+train_idx <- createDataPartition(raw_gbm_data$mean_score, p = 0.8, list = FALSE)
+train_data <- raw_gbm_data[train_idx, ]
+test_data <- raw_gbm_data[-train_idx, ]
 
-# Get predictions from best model
-y_pred <- predict(best_model$model, X)
+# Split response and predictors for training
+X_train <- train_data %>% select(-c(mean_score, melody_id))
+y_train <- train_data$mean_score
+X_test <- test_data %>% select(-c(mean_score, melody_id))
+y_test <- test_data$mean_score
 
-# Create scatter plot of predicted vs actual values
+# Train GBM with cross-validation
+set.seed(123)
+gbm_cv <- train(
+  x = X_train,
+  y = y_train,
+  method = "gbm",
+  trControl = ctrl,
+  tuneGrid = gbm_grid,
+  verbose = FALSE,
+  distribution = "gaussian"
+)
+
+# Get best model
+best_model <- gbm_cv$finalModel
+
+# Calculate predictions for both train and test sets
+train_pred <- predict(gbm_cv, X_train)
+test_pred <- predict(gbm_cv, X_test)
+
+# Calculate metrics for both sets
+train_r2 <- cor(y_train, train_pred)^2
+train_mae <- mean(abs(y_train - train_pred))
+train_rmse <- sqrt(mean((y_train - train_pred)^2))
+
+test_r2 <- cor(y_test, test_pred)^2
+test_mae <- mean(abs(y_test - test_pred))
+test_rmse <- sqrt(mean((y_test - test_pred)^2))
+
+# Get variable importance
+var_imp <- summary(best_model, n.trees = best_model$n.trees)
+
+# Stop parallel processing
+stopCluster(cl)
+
+# Print results
+cat("\n\nRaw Feature Model Results:")
+cat("\nTraining Metrics:")
+cat("\nR-squared:", round(train_r2, 3))
+cat("\nRMSE:", round(train_rmse, 3))
+cat("\nMAE:", round(train_mae, 3))
+cat("\nTest Metrics:")
+cat("\nR-squared:", round(test_r2, 3))
+cat("\nRMSE:", round(test_rmse, 3))
+cat("\nMAE:", round(test_mae, 3))
+cat("\nBest parameters:")
+cat("\nNumber of trees:", gbm_cv$bestTune$n.trees)
+cat("\nInteraction depth:", gbm_cv$bestTune$interaction.depth)
+cat("\nLearning rate:", gbm_cv$bestTune$shrinkage)
+cat("\nMin observations in node:", gbm_cv$bestTune$n.minobsinnode)
+
+# Create scatter plot of predicted vs actual values for test set
 pred_vs_actual <- data.frame(
-  Actual = y,
-  Predicted = y_pred
+  Actual = y_test,
+  Predicted = test_pred
 )
 
 # Create main prediction plot
@@ -186,38 +132,36 @@ p1 <- ggplot(pred_vs_actual, aes(x = Actual, y = Predicted)) +
   geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
   theme_minimal() +
   labs(
-    title = "GBM Predictions vs Actual Values",
-    subtitle = paste("Using", best_n_components, "PCA components explaining", 
-                    round(var_explained[best_n_components] * 100, 2), "% of variance"),
+    title = "GBM Predictions vs Actual Values (Test Set, Raw Features)",
     x = "Actual Values",
     y = "Predicted Values"
   ) +
   coord_fixed(ratio = 1)
 
-# Create residual plot
-residuals <- y_pred - y
-p2 <- ggplot(data.frame(Predicted = y_pred, Residuals = residuals), 
+# Create residual plot for test set
+residuals <- test_pred - y_test
+p2 <- ggplot(data.frame(Predicted = test_pred, Residuals = residuals), 
              aes(x = Predicted, y = Residuals)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
   theme_minimal() +
   labs(
-    title = "Residual Plot",
+    title = "Residual Plot (Test Set, Raw Features)",
     x = "Predicted Values",
     y = "Residuals"
   )
 
-# Plot variable importance for top 20 components
-importance_df <- as.data.frame(best_model$importance)
-importance_df$Component <- rownames(importance_df)
+# Plot variable importance for top 20 features
+importance_df <- as.data.frame(var_imp)
+importance_df$Feature <- rownames(importance_df)
 p3 <- ggplot(importance_df %>% head(20), 
-             aes(x = reorder(Component, rel.inf), y = rel.inf)) +
+             aes(x = reorder(Feature, rel.inf), y = rel.inf)) +
   geom_bar(stat = "identity") +
   coord_flip() +
   theme_minimal() +
   labs(
-    title = "Top 20 Most Important Components",
-    x = "PCA Component",
+    title = "Top 20 Most Important Raw Features",
+    x = "Feature",
     y = "Relative Importance (%)"
   )
 
@@ -226,17 +170,17 @@ gridExtra::grid.arrange(p1, p2, p3, ncol = 2)
 
 # Print final model summary
 cat("\n\nBest Model Summary:")
-cat("\nNumber of PCA components used:", best_n_components)
-cat("\nVariance explained by PCA components:", round(var_explained[best_n_components] * 100, 2), "%")
+cat("\nNumber of PCA components used:", 0)
+cat("\nVariance explained by PCA components:", 0, "%")
 cat("\nBest GBM parameters:")
-cat("\nNumber of trees:", best_model$metrics$best_params$n.trees)
-cat("\nInteraction depth:", best_model$metrics$best_params$interaction.depth)
-cat("\nLearning rate:", best_model$metrics$best_params$shrinkage)
-cat("\nMin observations in node:", best_model$metrics$best_params$n.minobsinnode)
+cat("\nNumber of trees:", gbm_cv$bestTune$n.trees)
+cat("\nInteraction depth:", gbm_cv$bestTune$interaction.depth)
+cat("\nLearning rate:", gbm_cv$bestTune$shrinkage)
+cat("\nMin observations in node:", gbm_cv$bestTune$n.minobsinnode)
 cat("\n\nFinal Model Metrics:")
-cat("\nR-squared:", round(best_model$metrics$r2, 3))
-cat("\nRMSE:", round(best_model$metrics$rmse, 3))
-cat("\nMAE:", round(best_model$metrics$mae, 3))
+cat("\nR-squared:", round(test_r2, 3))
+cat("\nRMSE:", round(test_rmse, 3))
+cat("\nMAE:", round(test_mae, 3))
 
 # Calculate and print additional insights
 cat("\n\nModel Insights:")
@@ -305,5 +249,7 @@ plot_ly(loadings_df,
          xaxis = list(title = "PC1"),
          yaxis = list(title = "PC9"))
 
-library(PCAtest)
-PC_sig <- PCAtest(features, nboot=1000, nperm=1000, plot=FALSE)
+# library(PCAtest)
+# PC_sig <- PCAtest(features, nboot=1000, nperm=1000, plot=FALSE)
+
+on.exit(stopCluster(cl))

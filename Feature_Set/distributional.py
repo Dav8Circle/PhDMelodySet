@@ -7,13 +7,13 @@ __author__ = "David Whyatt"
 import numpy as np
 from scipy import stats
 
-def histogram_bins(values: list[float], num_bins: int) -> dict[str, int]:
+def histogram_bins(values, num_bins: int) -> dict[str, int]:
     """Places data into histogram bins and counts occurrences in each bin.
 
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to bin
+    values : list or numpy.ndarray
+        List or array of numeric values to bin
     num_bins : int
         Number of equal-width bins to create
 
@@ -25,33 +25,21 @@ def histogram_bins(values: list[float], num_bins: int) -> dict[str, int]:
 
     Raises
     ------
-    TypeError
-        If any element cannot be converted to float
     ValueError
         If num_bins is less than 1
-
-    Examples
-    --------
-    >>> histogram_bins([1, 2, 3, 4, 5], 2)
-    {'1.00-3.00': 2, '3.00-5.00': 3}
-    >>> histogram_bins([], 5)  # Empty list
-    {}
-    >>> histogram_bins([1, 1, 2, 2, 3], 3)
-    {'1.00-1.67': 2, '1.67-2.33': 2, '2.33-3.00': 1}
     """
-    if not values:
+    # Convert to numpy array if not already
+    values = np.asarray(values)
+    
+    # Check if array is empty
+    if values.size == 0:
         return {}
 
     if num_bins < 1:
         raise ValueError("Number of bins must be at least 1")
 
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
     # Calculate histogram
-    counts, bin_edges = np.histogram(values_array, bins=num_bins)
+    counts, bin_edges = np.histogram(values, bins=num_bins)
 
     # Create dictionary with formatted bin ranges as keys
     result = {}
@@ -161,89 +149,55 @@ def normalize_distribution(values: list[float]) -> tuple[list[float], float, flo
 
     return [float(x) for x in normalized], float(mean_val), float(std_dev)
 
-def kurtosis(values: list[float]) -> float:
-    """Calculates the kurtosis (peakedness) of a list of numbers.
-
+def kurtosis(values) -> float:
+    """Calculate kurtosis of values.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values
-
+    values : list or numpy.ndarray
+        List or array of values to analyze
+        
     Returns
     -------
     float
-        The kurtosis. Returns 0 for empty list or lists with less than 2 unique values.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> kurtosis([1, 2, 2, 3])
-    1.5
-    >>> kurtosis([]) # Empty list
-    0.0
-    >>> kurtosis([1, 1, 1]) # Less than 2 unique values
-    0.0
+        Kurtosis value
     """
-    if not values:
+    # Convert to numpy array if not already
+    values = np.asarray(values)
+    
+    # Check if array is empty
+    if values.size == 0:
         return 0.0
+        
+    # Calculate kurtosis using scipy
+    return float(stats.kurtosis(values))
 
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
-    # Check if there are at least 2 unique values
-    if len(np.unique(values_array)) < 2:
-        return 0.0
-
-    # Use bias=False to get the correct kurtosis for small sample sizes
-    return float(stats.kurtosis(values_array, fisher=True, bias=False))
-
-def skew(values: list[float]) -> float:
-    """Calculates the skewness (asymmetry) of a list of numbers.
-
+def skew(values) -> float:
+    """Calculate skewness of values.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values
-
+    values : list or numpy.ndarray
+        List or array of values to analyze
+        
     Returns
     -------
     float
-        The skewness. Returns 0 for empty list or lists with less than 2 unique values.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> skew([1, 2, 2, 3])  # doctest: +ELLIPSIS
-    0.0
-    >>> skew([])  # Empty list
-    0.0
-    >>> skew([1, 1, 1])  # Less than 2 unique values
-    0.0
+        Skewness value
     """
-    if not values:
+    # Convert to numpy array if not already
+    values = np.asarray(values)
+    
+    # Check if array is empty
+    if values.size == 0:
         return 0.0
-
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
+        
     # Check if there are at least 2 unique values
-    if len(np.unique(values_array)) < 2:
+    if np.unique(values).size < 2:
         return 0.0
-
-    # Use bias=False to get the correct skewness for small sample sizes
-    return float(stats.skew(values_array, bias=False))
+        
+    # Calculate skewness using scipy
+    return float(stats.skew(values, bias=False))
 
 def distribution_proportions(values: list[float]) -> dict[float, float]:
     """Calculates the proportion of each unique value in a list of numbers.

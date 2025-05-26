@@ -472,80 +472,61 @@ def contour_gradients(values: list[float]) -> list[float]:
 
     return gradients
 
-def compute_tonality_vector(pitch_classes: list[float]) -> list[float]:
-    """Computes the Krumhansl-Schmuckler key-finding correlation vector.
-
-    Correlates the distribution of pitch classes in the input with the Krumhansl-Kessler
-    key profiles for all 24 possible major and minor keys to determine key likelihood.
-
+def compute_tonality_vector(pitch_classes) -> list[tuple[str, float]]:
+    """Compute tonality vector for a sequence of pitch classes.
+    
     Parameters
     ----------
-    pitch_classes : list[float]
-        List of integers representing pitch classes (0-11)
-
+    pitch_classes : list or numpy.ndarray
+        List or array of pitch classes (0-11)
+        
     Returns
     -------
     list[tuple[str, float]]
-        List of tuples containing (key, correlation) pairs, sorted by correlation value.
-        Returns list of 24 (key, 0.0) tuples for empty input.
-
-    Raises
-    ------
-    TypeError
-        If pitch classes cannot be converted to integers between 0-11
-
-    Examples
-    --------
-    >>> compute_tonality_vector([0, 4, 7])  # C major triad
-    [('C major', 0.833...), ('e minor', 0.760...), ...]
-    >>> compute_tonality_vector([])  # Empty input
-    [('C major', 0.0), ('C# major', 0.0), ...]
+        List of (key, correlation) tuples sorted by correlation value
     """
-    # Krumhansl-Kessler key profiles
-    maj_vector = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
-    min_vector = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
-
+    # Convert to numpy array if not already
+    pitch_classes = np.asarray(pitch_classes)
+    
+    # Check if array is empty
+    if pitch_classes.size == 0:
+        return [('C major', 0.0), ('C# major', 0.0), ('D major', 0.0), ('D# major', 0.0),
+                ('E major', 0.0), ('F major', 0.0), ('F# major', 0.0), ('G major', 0.0),
+                ('G# major', 0.0), ('A major', 0.0), ('A# major', 0.0), ('B major', 0.0),
+                ('c minor', 0.0), ('c# minor', 0.0), ('d minor', 0.0), ('d# minor', 0.0),
+                ('e minor', 0.0), ('f minor', 0.0), ('f# minor', 0.0), ('g minor', 0.0),
+                ('g# minor', 0.0), ('a minor', 0.0), ('a# minor', 0.0), ('b minor', 0.0)]
+    
     # Create key name lists
     major_keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     minor_keys = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
-
-    if not pitch_classes:
-        return [(key + ' major', 0.0) for key in major_keys] + \
-               [(key + ' minor', 0.0) for key in minor_keys]
-
-    # Validate and convert pitch classes to integers
-    try:
-        pc_ints = [int(pc) for pc in pitch_classes]
-        if not all(0 <= pc < 12 for pc in pc_ints):
-            raise ValueError
-    except (TypeError, ValueError) as exc:
-        raise TypeError("Pitch classes must be convertible to integers between 0-11") from exc
-
-    # Compute distribution of pitch classes
-    pc_dist = [0.0] * 12
-    for pc in pc_ints:
-        pc_dist[pc] += 1.0
-
-    # Normalize distribution
-    total = sum(pc_dist)
-    if total > 0:  # Avoid division by zero
-        pc_dist = [count / total for count in pc_dist]
-
-    # Initialize results list
+    
+    # Define major and minor key profiles (pre-normalized)
+    major_profile = np.array([6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88])
+    minor_profile = np.array([6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17])
+    
+    # Normalize profiles once
+    major_profile = major_profile / np.sum(major_profile)
+    minor_profile = minor_profile / np.sum(minor_profile)
+    
+    # Count pitch class occurrences once
+    pc_counts = np.bincount(pitch_classes, minlength=12)
+    pc_dist = pc_counts / np.sum(pc_counts)
+    
+    # Pre-compute all rotated profiles
+    rotated_major = np.array([np.roll(major_profile, i) for i in range(12)])
+    rotated_minor = np.array([np.roll(minor_profile, i) for i in range(12)])
+    
+    # Compute correlations for all keys at once
+    major_corrs = np.array([np.corrcoef(pc_dist, rm)[0, 1] for rm in rotated_major])
+    minor_corrs = np.array([np.corrcoef(pc_dist, rm)[0, 1] for rm in rotated_minor])
+    
+    # Create list of (key, correlation) tuples
     key_correlations = []
-
-    # Compute correlations for all possible keys
-    for i in range(12):  # For each possible root note
-        # Major keys
-        shifted_maj = maj_vector[-i:] + maj_vector[:-i]
-        maj_corr = float(np.corrcoef(pc_dist, shifted_maj)[0,1])
-        key_correlations.append((major_keys[i] + ' major', maj_corr))
-
-        # Minor keys
-        shifted_min = min_vector[-i:] + min_vector[:-i]
-        min_corr = float(np.corrcoef(pc_dist, shifted_min)[0,1])
-        key_correlations.append((minor_keys[i] + ' minor', min_corr))
-
+    for i in range(12):
+        key_correlations.append((major_keys[i] + ' major', float(major_corrs[i])))
+        key_correlations.append((minor_keys[i] + ' minor', float(minor_corrs[i])))
+    
     # Sort by correlation value, descending
     return sorted(key_correlations, key=lambda x: x[1], reverse=True)
 
@@ -731,6 +712,22 @@ def repeated_notes_proportion(pitch_values: list[float]) -> float:
 
     return value
 
+def get_durations(starts: list[float], ends: list[float]) -> list[float]:
+    """Calculate durations from start and end times.
+    
+    Parameters
+    ----------
+    """
+    if not starts or not ends or len(starts) != len(ends):
+        return []
+        
+    try:
+        return [end - start for start, end in zip(starts, ends)]
+    except (TypeError, ValueError):
+        return []
+
+
+
 def melodic_embellishment_proportion(pitch_values: list[float], 
                           note_starts: list[float], 
                           note_ends: list[float]) -> float:
@@ -765,7 +762,7 @@ def melodic_embellishment_proportion(pitch_values: list[float],
         return -1.0
 
     # Calculate the duration of each note
-    note_durations = [note_ends[i] - note_starts[i] for i in range(len(note_starts))]
+    note_durations = get_durations(note_starts, note_ends)
     # Count embellished notes (notes surrounded by shorter notes)
     embellished = 0
     for i in range(1, len(note_durations)-1):

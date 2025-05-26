@@ -407,55 +407,31 @@ def mean_productivity(ngram_counts: list[Counter]) -> float:
     return float(np.mean(productivity_values)) if productivity_values else 0.0
 
 
-def repetition_rate(values: list[float]) -> float:
-    """Calculates the average distance between all repeated values in the list.
-
+def repetition_rate(values) -> float:
+    """Calculate rate of repetition in a sequence.
+    
     Parameters
     ----------
-    values : list[float]
-        List of numeric values to check for repetitions
-
+    values : list or numpy.ndarray
+        List or array of values to analyze
+        
     Returns
     -------
     float
-        Average distance between repeated values.
-        Returns 0 if list is empty or has no repeats.
-
-    Raises
-    ------
-    TypeError
-        If any element cannot be converted to float
-
-    Examples
-    --------
-    >>> repetition_rate([1, 2, 1, 3, 2])  # Multiple repeats with different distances
-    2.5
-    >>> repetition_rate([1, 2, 3])  # No repeats
-    0.0
-    >>> repetition_rate([])  # Empty list
-    0.0
+        Rate of repetition (0.0-1.0)
     """
-    if not values:
+    # Convert to numpy array if not already
+    values = np.asarray(values)
+    
+    # Check if array is empty
+    if values.size == 0:
         return 0.0
-
-    try:
-        values_array = np.array(values, dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise TypeError("All elements must be numbers") from exc
-
-    # Track all distances between repeats
-    distances = []
-
-    # Check each value against subsequent values
-    for i, _ in enumerate(values_array):
-        # Look ahead for all repeats
-        for j, val in enumerate(values_array[i + 1:], start=i + 1):
-            if values_array[i] == val:
-                distance = j - i
-                distances.append(distance)
-
-    # Calculate average distance if we found any repeats
-    return float(np.mean(distances)) if distances else 0.0
+        
+    # Count unique values
+    unique_values = np.unique(values)
+    
+    # Calculate repetition rate
+    return 1.0 - (len(unique_values) / values.size)
 
 def repetition_count(values: list[float]) -> list[float]:
     """Counts the number of times each value repeats in the list.

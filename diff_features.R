@@ -79,12 +79,25 @@ df_with_pcs <- left_join(df, pca_scores, by = c("item_id" = "melody_id"))
 # Handle NA values before model fitting
 df_with_pcs <- na.omit(df_with_pcs)
 
+# Print column names to check what we have
+print("Column names in df_with_pcs:")
+print(names(df_with_pcs))
+
+# Calculate mean scores per item while preserving participant information
 df_with_pcs <- df_with_pcs %>%
   group_by(item_id) %>%
-  mutate(
-    score_item = mean(score))
+  mutate(score_item = mean(score)) %>%
+  ungroup()
 
+library(lme4)
 # Fit linear model using first 5 PCs to predict score
-pc_model <- lm(score_item ~ PC1 + PC2 + PC3 + PC4 + PC5 + difficulty
-               + ability_WL, data = df_with_pcs)
+pc_model <- lmer(score_item ~ PC1 + PC2 + PC3 + PC4 + PC5 + (1|user_id),
+                 data = df_with_pcs)
 summary(pc_model)
+# Calculate R-squared for the mixed model
+# Method from Nakagawa & Schielzeth (2013)
+library(MuMIn)
+r2_values <- r.squaredGLMM(pc_model)
+print("R-squared values for mixed model:")
+print(paste("Marginal R2 (fixed effects):", round(r2_values[1], 3)))
+print(paste("Conditional R2 (fixed + random effects):", round(r2_values[2], 3)))

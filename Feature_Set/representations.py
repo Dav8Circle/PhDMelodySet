@@ -73,9 +73,11 @@ class Melody:
         """
         ends = []
         for note in self._midi_sequence:
-            # Find end time between 'end=' and the next comma
+            # Find end time between 'end=' and the next comma or closing parenthesis
             end_start = note.find('end=') + 4
             end_end = note.find(',', end_start)
+            if end_end == -1:  # Handle the last note which ends with ')'
+                end_end = note.find(')', end_start)
             if end_end != -1:  # Only process if we found a valid end time
                 end = float(note[end_start:end_end])
                 ends.append(end)
