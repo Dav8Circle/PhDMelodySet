@@ -3,12 +3,11 @@ Module for computing corpus-based features from melodic n-grams, similar to FANT
 implementation. This module handles the corpus analysis and saves statistics to JSON.
 The actual feature calculations are handled in features.py.
 """
-from collections import Counter, defaultdict
+from collections import Counter
 import json
 from typing import List, Dict, Tuple
 from tqdm import tqdm
 import multiprocessing as mp
-import os
 from pathlib import Path
 from Feature_Set.melody_tokenizer import FantasticTokenizer
 from Feature_Set.representations import Melody, read_midijson
@@ -53,10 +52,10 @@ def process_melody_ngrams(args) -> set:
     """
     melody, n_range = args
     tokenizer = FantasticTokenizer()
-    
+
     # Segment the melody first
     segments = tokenizer.segment_melody(melody, phrase_gap=1.5, units="quarters")
-    
+
     # Get tokens for each segment
     all_tokens = []
     for segment in segments:
@@ -66,14 +65,14 @@ def process_melody_ngrams(args) -> set:
             segment.ends
         )
         all_tokens.extend(segment_tokens)
-    
+
     unique_ngrams = set()
     for n in range(n_range[0], n_range[1] + 1):
         # Count n-grams in the combined tokens
         for i in range(len(all_tokens) - n + 1):
             ngram = tuple(all_tokens[i:i + n])
             unique_ngrams.add(ngram)
-            
+
     return unique_ngrams
 
 def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1, 6)) -> Dict:
@@ -93,10 +92,10 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
     """
     # Prepare arguments for multiprocessing
     args = [(melody, n_range) for melody in melodies]
-    
+
     # Use all available CPU cores
     num_cores = mp.cpu_count()
-    
+
     # Create a pool of workers
     with mp.Pool(num_cores) as pool:
         # Process melodies in parallel with progress bar
@@ -105,12 +104,12 @@ def compute_corpus_ngrams(melodies: List[Melody], n_range: Tuple[int, int] = (1,
             total=len(melodies),
             desc=f"Computing n-grams using {num_cores} cores"
         ))
-    
+
     # Count document frequency (number of melodies containing each n-gram)
     doc_freq = Counter()
     for ngrams in results:
         doc_freq.update(ngrams)
-    
+
     # Format results for JSON serialization
     frequencies = {'document_frequencies': {}}
     for k, v in doc_freq.items():
@@ -132,7 +131,7 @@ def save_corpus_stats(stats: Dict, filename: str) -> None:
     filename : str
         Path to save JSON file
     """
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         json.dump(stats, f, indent=2)
 
 def load_corpus_stats(filename: str) -> Dict:
@@ -268,7 +267,7 @@ if __name__ == "__main__":
     # Example usage
     midi_dir = '/Users/davidwhyatt/Downloads/01_Essen Folksong Database (.mid-conversions)'
     output_file = "essen_corpus_stats.json"
-    
+
     # Load melodies from MIDI files
     melodies = load_melodies_from_directory(midi_dir, file_type="midi")
     # Filter out None values
@@ -277,13 +276,13 @@ if __name__ == "__main__":
         print("Error: No valid melodies found")
         exit(1)
     print(f"Processing {len(melodies)} valid melodies")
-    
+
     # Compute corpus statistics
     corpus_stats = compute_corpus_ngrams(melodies)
-    
+
     # Save to JSON
     save_corpus_stats(corpus_stats, output_file)
-    
+
     # Load and verify
     loaded_stats = load_corpus_stats(output_file)
     print("Corpus statistics saved and loaded successfully.")

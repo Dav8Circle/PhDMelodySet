@@ -1,10 +1,13 @@
 Metadata-Version: 2.1
 Name: PhDMelodySet
 Version: 0.1
-Summary: UNKNOWN
-Home-page: UNKNOWN
+Summary: A toolkit for computing melodic features found in the literature
+Home-page: https://github.com/davidwhyatt/PhDMelodySet
+Author: David Whyatt
+Author-email: dmw56@cam.ac.uk
 License: UNKNOWN
 Platform: UNKNOWN
+Requires-Python: >=3.8
 
 UNKNOWN
 

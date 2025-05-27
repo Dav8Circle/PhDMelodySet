@@ -7,7 +7,7 @@ __author__ = "David Whyatt"
 import json
 import math
 import csv
-from collections import Counter
+import warnings
 from random import choices
 from typing import Dict
 from multiprocessing import Pool, cpu_count
@@ -100,7 +100,7 @@ def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float
     """
     if not pitches or not starts or not ends:
         return 0.0
-        
+
     durations = [ends[i] - starts[i] for i in range(len(starts))]
     # Create weighted list by repeating each pitch class according to its duration
     weighted_pitch_classes = []
@@ -113,7 +113,7 @@ def pcdist1(pitches: list[int], starts: list[float], ends: list[float]) -> float
 
     if not weighted_pitch_classes:
         return 0.0
-        
+
     return distribution_proportions(weighted_pitch_classes)
 
 def basic_pitch_histogram(pitches: list[int]) -> dict:
@@ -131,7 +131,7 @@ def basic_pitch_histogram(pitches: list[int]) -> dict:
     """
     if not pitches:
         return {}
-        
+
     # Use number of unique pitches as number of bins, with minimum of 1
     num_midi_notes = max(1, len(set(pitches)))
     return histogram_bins(pitches, num_midi_notes)
@@ -981,7 +981,7 @@ def ioi_ratio(starts: list[float]) -> tuple[float, float]:
 
     # Calculate intervals first
     intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
-    
+
     if len(intervals) < 2:
         return 0.0, 0.0
 
@@ -1053,7 +1053,7 @@ def ioi_contour(starts: list[float]) -> tuple[float, float]:
     intervals = [starts[i] - starts[i-1] for i in range(1, len(starts))]
     if len(intervals) < 2:
         return 0.0, 0.0
-        
+
     ratios = [intervals[i]/intervals[i-1] for i in range(1, len(intervals))]
     contour = [int(np.sign(ratio - 1)) for ratio in ratios]
     return float(np.mean(contour)), float(np.std(contour))
@@ -1278,9 +1278,10 @@ def temperley_likelihood(pitches: list[int]) -> float:
     range_profile = scipy.stats.norm.pdf(notes_ints, loc=central_pitch, scale=np.sqrt(23.0))
 
     # Get key probabilities
-
-    rpk_major = [0.184, 0.001, 0.155, 0.003, 0.191, 0.109, 0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 10
-    rpk_minor = [0.192, 0.005, 0.149, 0.179, 0.002, 0.144, 0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 10
+    rpk_major = [0.184, 0.001, 0.155, 0.003, 0.191, 0.109,
+                0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 10
+    rpk_minor = [0.192, 0.005, 0.149, 0.179, 0.002, 0.144,
+                0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 10
 
     # Calculate total probability
     total_prob = 1.0
@@ -1453,10 +1454,10 @@ def get_mtype_features(melody: Melody) -> dict:
     """
     # Initialize tokenizer and get M-type tokens
     tokenizer = FantasticTokenizer()
-    
+
     # Segment the melody first, using quarters as the time unit
     segments = tokenizer.segment_melody(melody, phrase_gap=1.5, units="quarters")
-    
+
     # Get tokens for each segment
     all_tokens = []
     for segment in segments:
@@ -1470,14 +1471,12 @@ def get_mtype_features(melody: Melody) -> dict:
     # Create a fresh counter for this melody
     ngram_counter = NGramCounter()
     ngram_counter.ngram_counts = {}  # Explicitly reset the counter
-    
-    # Get n-gram counts for n=1 to n=min(5, len(tokens))
-    max_n = min(5, len(all_tokens))
+
     ngram_counter.count_ngrams(all_tokens)
-    
+
     # Calculate complexity measures for each n-gram length
     mtype_features = {}
-    
+
     # Initialize all features to NaN
     mtype_features['yules_k'] = float('nan')
     mtype_features['simpsons_d'] = float('nan')
@@ -1485,45 +1484,38 @@ def get_mtype_features(melody: Melody) -> dict:
     mtype_features['honores_h'] = float('nan')
     mtype_features['mean_entropy'] = float('nan')
     mtype_features['mean_productivity'] = float('nan')
-    
+
     # Try to calculate each feature individually
     if ngram_counter.ngram_counts:
         try:
             mtype_features['yules_k'] = ngram_counter.yules_k
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating Yule's K: {str(e)}")
-            
         try:
             mtype_features['simpsons_d'] = ngram_counter.simpsons_d
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating Simpson's D: {str(e)}")
-            
+
         try:
             mtype_features['sichels_s'] = ngram_counter.sichels_s
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating Sichel's S: {str(e)}")
-            
+
         try:
             mtype_features['honores_h'] = ngram_counter.honores_h
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating Honoré's H: {str(e)}")
-            
+
         try:
             mtype_features['mean_entropy'] = ngram_counter.mean_entropy
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating mean entropy: {str(e)}")
-            
+
         try:
             mtype_features['mean_productivity'] = ngram_counter.mean_productivity
         except Exception as e:
-            import warnings
             warnings.warn(f"Error calculating mean productivity: {str(e)}")
-        
+
     return mtype_features
 
 
@@ -1544,601 +1536,12 @@ def get_ngram_document_frequency(ngram: tuple, corpus_stats: dict) -> int:
     """
     # Get document frequencies dictionary once
     doc_freqs = corpus_stats.get('document_frequencies', {})
-    
+
     # Convert ngram to string only once
     ngram_str = str(ngram)
-    
+
     # Look up the count directly
     return doc_freqs.get(ngram_str, {}).get('count', 0)
-
-def compute_tfdf_spearman(melody: Melody, corpus_stats: dict) -> float:
-    """Compute Spearman correlation between term and document frequencies.
-    
-    This follows FANTASTIC's implementation where:
-    - TF is the frequency of an n-gram in the melody 
-    - DF is the number of melodies in the corpus containing the n-gram
-    - Spearman correlation is calculated between TF and DF values
-    - For ties in TF/DF values, the maximum rank is assigned
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-        
-    Returns
-    -------
-    float
-        Spearman correlation coefficient between -1 and 1, or 0.0 if insufficient n-grams
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    tf_values = []
-    df_values = []
-    
-    # Get TF and DF values for each n-gram length
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        for ngram, tf in ngram_counts.items():
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:
-                tf_values.append(tf)
-                df_values.append(df)
-
-    # Need at least 2 points for correlation
-    if len(tf_values) < 2:
-        return 0.0
-
-    # Check if arrays have any variance
-    if np.var(tf_values) == 0 or np.var(df_values) == 0:
-        return 0.0
-
-    # Calculate Spearman correlation with maximum rank for ties
-    if len(tf_values) > 0 and len(df_values) > 0:
-        correlation = scipy.stats.spearmanr(tf_values, df_values)[0]
-        return float(correlation) if not math.isnan(correlation) else 0.0
-    else:
-        return 0.0
-
-def compute_tfdf_kendall(melody: Melody, corpus_stats: dict) -> float:
-    """Compute Kendall correlation between term and document frequencies.
-    
-    This follows FANTASTIC's implementation where:
-    - TF is the frequency of an n-gram in the melody 
-    - DF is the number of melodies in the corpus containing the n-gram
-    - Kendall correlation is calculated between TF and DF values
-    - For ties in TF/DF values, the minimum rank is assigned
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-        
-    Returns
-    -------
-    float
-        Kendall correlation coefficient between -1 and 1, or 0.0 if insufficient n-grams
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    tf_values = []
-    df_values = []
-    
-    # Get TF and DF values for each n-gram length
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        for ngram, tf in ngram_counts.items():
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:
-                tf_values.append(tf)
-                df_values.append(df)
-
-    # Need at least 2 points for correlation
-    if len(tf_values) < 2:
-        return 0.0
-
-    # Calculate Kendall correlation with minimum rank for ties
-    if len(tf_values) > 0 and len(df_values) > 0:
-        correlation = scipy.stats.kendalltau(tf_values, df_values)[0]
-        return float(correlation) if not math.isnan(correlation) else 0.0
-    else:
-        return 0.0
-
-def compute_tfdf(melody: Melody, corpus_stats: dict) -> float:
-    """Compute mean log TFDF (Term Frequency-Document Frequency) for a melody.
-    
-    This follows FANTASTIC's implementation where:
-    - TF is the frequency of an n-gram in the melody
-    - DF is the number of melodies in the corpus containing the n-gram
-    - TFDF is calculated for each n-gram and averaged
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Mean log TFDF score, or 0.0 if no n-grams found
-    """
-    # Pre-compute tokenization and n-gram counts once
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-    
-    # Pre-compute n-gram counts and document frequencies for all n-gram lengths
-    ngram_data = []
-    doc_freqs = corpus_stats.get('document_frequencies', {})
-    total_docs = len(corpus_stats['document_frequencies'])
-    
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        if not ngram_counts:
-            continue
-            
-        # Get document frequencies for all n-grams at once
-        ngram_df_data = {
-            'counts': ngram_counts,
-            'total_tf': sum(ngram_counts.values()),
-            'df_values': [],
-            'tf_values': [],
-            'ngrams': []  # Store the actual n-grams
-        }
-        
-        for ngram, tf in ngram_counts.items():
-            df = doc_freqs.get(str(ngram), {}).get('count', 0)
-            if df > 0:
-                ngram_df_data['df_values'].append(df)
-                ngram_df_data['tf_values'].append(tf)
-                ngram_df_data['ngrams'].append(ngram)
-                
-        if ngram_df_data['df_values']:
-            ngram_data.append(ngram_df_data)
-
-    # Compute TFDF values
-    tfdf_values = []
-    
-    for data in ngram_data:
-        tf_array = np.array(data['tf_values'])
-        df_array = np.array(data['df_values'])
-        if len(tf_array) > 0:
-            # Normalize vectors
-            tf_norm = tf_array / np.sqrt(np.sum(tf_array**2))
-            df_norm = df_array / np.sqrt(np.sum(df_array**2))
-            tfdf = np.dot(tf_norm, df_norm)
-            tfdf_values.append(tfdf)
-
-    return float(np.mean(tfdf_values) if tfdf_values else 0.0)
-
-def compute_norm_log_dist(melody: Melody, corpus_stats: dict) -> float:
-    """Compute normalized distance between term and document frequencies.
-    
-    This follows FANTASTIC's implementation where:
-    - TF is the frequency of an n-gram in the melody
-    - DF is the number of melodies in the corpus containing the n-gram
-    - Instead of multiplying TF*DF, takes difference between normalized vectors
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Normalized log distance score, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    distances = []
-    # Calculate distances for each n-gram length
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        if not ngram_counts:
-            continue
-            
-        # Get total term frequency for normalization
-        total_tf = sum(ngram_counts.values())
-        
-        for ngram, tf in ngram_counts.items():
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:
-                # Normalize frequencies by total counts
-                norm_tf = tf / total_tf
-                norm_df = df / len(corpus_stats['document_frequencies'])
-                
-                # Calculate absolute difference
-                dist = abs(norm_tf - norm_df)
-                distances.append(dist)
-
-    # Calculate mean normalized distance
-    if distances:
-        mean_dist = float(np.mean(distances))
-    else:
-        mean_dist = 0.0
-
-    return mean_dist
-
-def compute_max_log_df(melody: Melody, corpus_stats: dict) -> float:
-    """Compute maximum document frequency feature (mtcf.max.log.DF).
-    
-    This is the logarithm of the m-type contained in the analysis that occurs 
-    in the maximum number of melodies in the corpus.
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Maximum log document frequency, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    max_df = 0
-    # Find maximum document frequency across all n-gram lengths
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        for ngram in ngram_counts:
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            max_df = max(max_df, df)
-
-    # Take log of maximum document frequency
-    if max_df > 0:
-        return math.log(max_df)
-    return 0.0
-
-def compute_min_log_df(melody: Melody, corpus_stats: dict) -> float:
-    """Compute minimum document frequency feature (mtcf.min.log.DF).
-    
-    This is the logarithm of the m-type contained in the analysis that occurs 
-    in the minimum number of melodies in the corpus.
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Minimum log document frequency, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    min_df = float('inf')  # Initialize to infinity
-    # Find minimum document frequency across all n-gram lengths
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        for ngram in ngram_counts:
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:  # Only consider non-zero frequencies
-                min_df = min(min_df, df)
-
-    # Take log of minimum document frequency
-    if min_df < float('inf'):
-        return math.log(min_df)
-    return 0.0
-
-def compute_mean_log_df(melody: Melody, corpus_stats: dict) -> float:
-    """Compute mean document frequency feature (mtcf.mean.log.DF).
-    
-    This is the mean logarithm of the document frequencies of all m-types
-    contained in the analysis.
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Mean log document frequency, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    total_log_df = 0.0
-    count = 0
-    # Calculate sum of log document frequencies across all n-gram lengths
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        for ngram in ngram_counts:
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:  # Only consider non-zero frequencies
-                total_log_df += math.log(df)
-                count += 1
-
-    # Calculate mean log document frequency
-    if count > 0:
-        return total_log_df / count
-    return 0.0
-
-def compute_mean_df_entropy(melody: Melody, corpus_stats: dict) -> float:
-    """Compute mean document frequency entropy feature (mtcf.mean.entropy).
-    
-    This is similar to mean.entropy but uses document frequencies from the corpus
-    instead of frequencies within the analysis melody. The entropy values are
-    averaged over the various m-type lengths.
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Mean document frequency entropy, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    total_entropy = 0.0
-    n_lengths = 0
-    
-    # Calculate entropy for each n-gram length
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        if not ngram_counts:
-            continue
-            
-        # Get document frequencies for this n-gram length
-        dfs = []
-        total_df = 0
-        for ngram in ngram_counts:
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:
-                dfs.append(df)
-                total_df += df
-                
-        if dfs and total_df > 0:
-            # Calculate probabilities
-            probs = [df/total_df for df in dfs]
-            # Use shannon_entropy function
-            entropy = shannon_entropy(probs)
-            total_entropy += entropy
-            n_lengths += 1
-    
-    # Return average entropy across n-gram lengths
-    if n_lengths > 0:
-        return total_entropy / n_lengths
-    return 0.0
-
-def compute_mean_df_productivity(melody: Melody, corpus_stats: dict) -> float:
-    """Compute mean document frequency productivity for a melody.
-    
-    This follows FANTASTIC's implementation where:
-    - For each n-gram length, calculate productivity as the proportion of hapax legomena
-    - Hapax legomena are n-grams that appear exactly once in the corpus
-    - The final result is the mean productivity across all n-gram lengths
-    
-    Parameters
-    ----------
-    melody : Melody
-        The melody to analyze
-    corpus_stats : dict
-        Dictionary containing corpus statistics
-    
-    Returns
-    -------
-    float
-        Mean document frequency productivity, or 0.0 if no n-grams found
-    """
-    tokenizer = FantasticTokenizer()
-    tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-
-    productivities = []
-    
-    # Calculate productivity for each n-gram length
-    for n in range(1, 6):
-        ngram_counts = tokenizer.ngram_counts(n=n)
-        if not ngram_counts:
-            continue
-            
-        # Get document frequencies for this n-gram length
-        df_counts = Counter()
-        for ngram in ngram_counts:
-            df = get_ngram_document_frequency(ngram, corpus_stats)
-            if df > 0:
-                df_counts[ngram] = df
-                
-        if df_counts:
-            # Calculate productivity as proportion of hapax legomena
-            hapax = sum(1 for df in df_counts.values() if df == 1)
-            total = sum(df_counts.values())
-            if total > 0:
-                productivity = hapax / total
-                productivities.append(productivity)
-    
-    # Return mean productivity across n-gram lengths
-    if productivities:
-        return sum(productivities) / len(productivities)
-    return 0.0
-
-# note from DW - we are not convinced these features are meaningful
-# def compute_mean_df_yules_k(melody: Melody, corpus_stats: dict) -> float:
-#     """Compute mean document frequency Yule's K for a melody.
-    
-#     Parameters
-#     ----------
-#     melody : Melody
-#         The melody to analyze
-#     corpus_stats : dict
-#         Dictionary containing corpus statistics
-    
-#     Returns
-#     -------
-#     float
-#         Mean document frequency Yule's K, or 0.0 if no n-grams found
-#     """
-#     tokenizer = FantasticTokenizer()
-#     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-    
-#     # Get document frequencies for each n-gram length
-#     ngram_counts = []
-#     for n in range(1, 6):
-#         counts = tokenizer.ngram_counts(n=n)
-#         if not counts:
-#             continue
-            
-#         # Convert term frequencies to document frequencies
-#         df_counts = Counter()
-#         for ngram in counts:
-#             df = get_ngram_document_frequency(ngram, corpus_stats)
-#             if df > 0:
-#                 df_counts[ngram] = df
-                
-#         if df_counts:
-#             ngram_counts.append(df_counts)
-    
-#     # Use yules_k function to calculate result
-#     if not ngram_counts:
-#         return 0.0
-#     return yules_k(ngram_counts)
-
-# def compute_mean_df_simpsons_d(melody: Melody, corpus_stats: dict) -> float:
-#     """Compute mean document frequency Simpson's D for a melody.
-    
-#     Parameters
-#     ----------
-#     melody : Melody
-#         The melody to analyze
-#     corpus_stats : dict
-#         Dictionary containing corpus statistics
-    
-#     Returns
-#     -------
-#     float
-#         Mean document frequency Simpson's D, or 0.0 if no n-grams found
-#     """
-#     tokenizer = FantasticTokenizer()
-#     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-    
-#     # Get document frequencies for each n-gram length
-#     ngram_counts = []
-#     for n in range(1, 6):
-#         counts = tokenizer.ngram_counts(n=n)
-#         if not counts:
-#             continue
-            
-#         # Convert term frequencies to document frequencies
-#         df_counts = Counter()
-#         for ngram in counts:
-#             df = get_ngram_document_frequency(ngram, corpus_stats)
-#             if df > 0:
-#                 df_counts[ngram] = df
-                
-#         if df_counts:
-#             ngram_counts.append(df_counts)
-    
-#     # Use simpsons_d function to calculate result
-#     if not ngram_counts:
-#         return 0.0
-#     return simpsons_d(ngram_counts)
-
-# def compute_mean_df_sichels_s(melody: Melody, corpus_stats: dict) -> float:
-#     """Compute mean document frequency Sichel's S for a melody.
-    
-#     Parameters
-#     ----------
-#     melody : Melody
-#         The melody to analyze
-#     corpus_stats : dict
-#         Dictionary containing corpus statistics
-    
-#     Returns
-#     -------
-#     float
-#         Mean document frequency Sichel's S, or 0.0 if no n-grams found
-#     """
-#     tokenizer = FantasticTokenizer()
-#     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-    
-#     # Get document frequencies for each n-gram length
-#     ngram_counts = []
-#     for n in range(1, 6):
-#         counts = tokenizer.ngram_counts(n=n)
-#         if not counts:
-#             continue
-            
-#         # Convert term frequencies to document frequencies
-#         df_counts = Counter()
-#         for ngram in counts:
-#             df = get_ngram_document_frequency(ngram, corpus_stats)
-#             if df > 0:
-#                 df_counts[ngram] = df
-                
-#         if df_counts:
-#             ngram_counts.append(df_counts)
-    
-#     # Use sichels_s function to calculate result
-#     if not ngram_counts:
-#         return 0.0
-#     return sichels_s(ngram_counts)
-
-# def compute_mean_df_honores_h(melody: Melody, corpus_stats: dict) -> float:
-#     """Compute mean document frequency Honoré's H for a melody.
-    
-#     Parameters
-#     ----------
-#     melody : Melody
-#         The melody to analyze
-#     corpus_stats : dict
-#         Dictionary containing corpus statistics
-    
-#     Returns
-#     -------
-#     float
-#         Mean document frequency Honoré's H, or 0.0 if no n-grams found
-#     """
-#     tokenizer = FantasticTokenizer()
-#     tokens = tokenizer.tokenize_melody(melody.pitches, melody.starts, melody.ends)
-    
-#     # Get document frequencies for each n-gram length
-#     ngram_counts = []
-#     for n in range(1, 6):
-#         counts = tokenizer.ngram_counts(n=n)
-#         if not counts:
-#             continue
-            
-#         # Convert term frequencies to document frequencies
-#         df_counts = Counter()
-#         for ngram in counts:
-#             df = get_ngram_document_frequency(ngram, corpus_stats)
-#             if df > 0:
-#                 df_counts[ngram] = df
-                
-#         if df_counts:
-#             ngram_counts.append(df_counts)
-    
-#     # Use honores_h function to calculate result
-#     if not ngram_counts:
-#         return 0.0
-#     return honores_h(ngram_counts)
 
 def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     """Compute all corpus-based features for a melody.
@@ -2157,10 +1560,10 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     """
     # Pre-compute tokenization and n-gram counts once
     tokenizer = FantasticTokenizer()
-    
+
     # Segment the melody first
     segments = tokenizer.segment_melody(melody, phrase_gap=1.5, units="quarters")
-    
+
     # Get tokens for each segment
     all_tokens = []
     for segment in segments:
@@ -2174,20 +1577,20 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     # Get document frequencies from corpus stats upfront
     doc_freqs = corpus_stats.get('document_frequencies', {})
     total_docs = len(doc_freqs)
-    
+
     # Pre-compute n-gram counts and document frequencies for all n-gram lengths
     ngram_data = []
-    
+
     for n in range(1, 6):
         # Count n-grams in the combined tokens
         ngram_counts = {}
         for i in range(len(all_tokens) - n + 1):
             ngram = tuple(all_tokens[i:i + n])
             ngram_counts[ngram] = ngram_counts.get(ngram, 0) + 1
-            
+
         if not ngram_counts:
             continue
-            
+
         # Get document frequencies for all n-grams at once
         ngram_df_data = {
             'counts': ngram_counts,
@@ -2196,7 +1599,7 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
             'tf_values': [],
             'ngrams': []
         }
-        
+
         # Batch lookup document frequencies
         for ngram, tf in ngram_counts.items():
             ngram_str = str(ngram)
@@ -2205,12 +1608,12 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
                 ngram_df_data['df_values'].append(df)
                 ngram_df_data['tf_values'].append(tf)
                 ngram_df_data['ngrams'].append(ngram)
-                
+
         if ngram_df_data['df_values']:
             ngram_data.append(ngram_df_data)
-    
+
     features = {}
-    
+
     # Compute correlation features using pre-computed values
     if ngram_data:
         all_tf = []
@@ -2218,7 +1621,7 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
         for data in ngram_data:
             all_tf.extend(data['tf_values'])
             all_df.extend(data['df_values'])
-            
+
         if len(all_tf) >= 2:
             try:
                 spearman = scipy.stats.spearmanr(all_tf, all_df)[0]
@@ -2234,7 +1637,7 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     else:
         features['tfdf_spearman'] = 0.0
         features['tfdf_kendall'] = 0.0
-    
+
     # Compute TFDF and distance features
     tfdf_values = []
     distances = []
@@ -2242,7 +1645,7 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
     min_df = float('inf')
     total_log_df = 0.0
     df_count = 0
-    
+
     for data in ngram_data:
         # TFDF calculation
         tf_array = np.array(data['tf_values'])
@@ -2253,22 +1656,22 @@ def get_corpus_features(melody: Melody, corpus_stats: dict) -> Dict:
             df_norm = df_array / total_docs
             tfdf = np.dot(tf_norm, df_norm)
             tfdf_values.append(tfdf)
-            
+
             # Distance calculation
             distances.extend(np.abs(tf_norm - df_norm))
-            
+
             # Track max/min/total log DF
             max_df = max(max_df, max(data['df_values']))
             min_df = min(min_df, min(x for x in data['df_values'] if x > 0))
             total_log_df += np.sum(np.log1p(df_array))
             df_count += len(df_array)
-    
+
     features['mean_log_tfdf'] = float(np.mean(tfdf_values) if tfdf_values else 0.0)
     features['norm_log_dist'] = float(np.mean(distances) if distances else 0.0)
     features['max_log_df'] = float(np.log1p(max_df) if max_df > 0 else 0.0)
     features['min_log_df'] = float(np.log1p(min_df) if min_df < float('inf') else 0.0)
     features['mean_log_df'] = float(total_log_df / df_count if df_count > 0 else 0.0)
-    
+
     return features
 
 def get_pitch_features(melody: Melody) -> Dict:
@@ -2286,7 +1689,7 @@ def get_pitch_features(melody: Melody) -> Dict:
     
     """
     pitch_features = {}
-    
+
     pitch_features['pitch_range'] = pitch_range(melody.pitches)
     pitch_features['pitch_standard_deviation'] = pitch_standard_deviation(melody.pitches)
     pitch_features['pitch_entropy'] = pitch_entropy(melody.pitches)
@@ -2301,7 +1704,7 @@ def get_pitch_features(melody: Melody) -> Dict:
     pitch_features['pitch_class_kurtosis_after_folding'] = pitch_class_kurtosis_after_folding(melody.pitches)
     pitch_features['pitch_class_skewness_after_folding'] = pitch_class_skewness_after_folding(melody.pitches)
     pitch_features['pitch_class_variability_after_folding'] = pitch_class_variability_after_folding(melody.pitches)
-    
+
     return pitch_features
 
 def get_interval_features(melody: Melody) -> Dict:
@@ -2319,7 +1722,7 @@ def get_interval_features(melody: Melody) -> Dict:
     
     """
     interval_features = {}
-    
+
     interval_features['pitch_interval'] = pitch_interval(melody.pitches)
     interval_features['absolute_interval_range'] = absolute_interval_range(melody.pitches)
     interval_features['mean_absolute_interval'] = mean_absolute_interval(melody.pitches)
@@ -2336,7 +1739,7 @@ def get_interval_features(melody: Melody) -> Dict:
     interval_features['variable_melodic_intervals'] = variable_melodic_intervals(melody.pitches, 7)  # TODO: Add more interval levels
     interval_features['number_of_common_melodic_intervals'] = number_of_common_melodic_intervals(melody.pitches)
     interval_features['prevalence_of_most_common_melodic_interval'] = prevalence_of_most_common_melodic_interval(melody.pitches)
-    
+
     return interval_features
 
 def get_contour_features(melody: Melody) -> Dict:
@@ -2354,13 +1757,13 @@ def get_contour_features(melody: Melody) -> Dict:
     
     """
     contour_features = {}
-    
+
     # Calculate step contour features
     step_contour = get_step_contour_features(melody.pitches, melody.starts, melody.ends)
     contour_features['step_contour_global_variation'] = step_contour[0]
     contour_features['step_contour_global_direction'] = step_contour[1]
     contour_features['step_contour_local_variation'] = step_contour[2]
-    
+
     # Calculate interpolation contour features
     interpolation_contour = get_interpolation_contour_features(melody.pitches, melody.starts)
     contour_features['interpolation_contour_global_direction'] = interpolation_contour[0]
@@ -2368,7 +1771,7 @@ def get_contour_features(melody: Melody) -> Dict:
     contour_features['interpolation_contour_gradient_std'] = interpolation_contour[2]
     contour_features['interpolation_contour_direction_changes'] = interpolation_contour[3]
     contour_features['interpolation_contour_class_label'] = interpolation_contour[4]
-    
+
     return contour_features
 
 def get_duration_features(melody: Melody) -> Dict:
@@ -2425,19 +1828,19 @@ def get_tonality_features(melody: Melody) -> Dict:
     
     """
     tonality_features = {}
-    
+
     # Pre-compute pitch classes and tonality vector once
     pitches = melody.pitches
     pitch_classes = [pitch % 12 for pitch in pitches]
     correlations = compute_tonality_vector(pitch_classes)
-    
+
     # Pre-compute absolute correlation values
     abs_correlations = [(key, abs(val)) for key, val in correlations]
     abs_corr_values = [val for _, val in abs_correlations]
-    
+
     # Basic tonality features using cached correlations
     tonality_features['tonalness'] = abs_corr_values[0]
-    
+
     if len(correlations) >= 2:
         tonality_features['tonal_clarity'] = abs_corr_values[0] / abs_corr_values[1] if abs_corr_values[1] != 0 else 1.0
         other_sum = sum(abs_corr_values[1:])
@@ -2445,28 +1848,28 @@ def get_tonality_features(melody: Melody) -> Dict:
     else:
         tonality_features['tonal_clarity'] = -1.0
         tonality_features['tonal_spike'] = -1.0
-    
+
     # Entropy using cached values
     tonality_features['tonal_entropy'] = shannon_entropy(abs_corr_values) if correlations else -1.0
-    
+
     # Key-based features using cached correlations
     if correlations:
         key_name = correlations[0][0].split()[0]
         key_distances = get_key_distances()
         root = key_distances[key_name]
         tonality_features['referent'] = root
-        
+
         # Determine scale type and pattern
         is_major = 'major' in correlations[0][0]
         scale = [0, 2, 4, 5, 7, 9, 11] if is_major else [0, 2, 3, 5, 7, 8, 10]
         scale = [(note + root) % 12 for note in scale]
-        
+
         # Check if all notes are in scale
         tonality_features['inscale'] = int(all(pc in scale for pc in pitch_classes))
     else:
         tonality_features['referent'] = -1
         tonality_features['inscale'] = 0
-    
+
     # Optimize temperley_likelihood calculation
     if len(pitches) > 1:
         # Pre-compute constant arrays
@@ -2474,42 +1877,42 @@ def get_tonality_features(melody: Melody) -> Dict:
         central_pitch_profile = scipy.stats.norm.pdf(notes_ints, loc=68, scale=np.sqrt(5.0))
         central_pitch = np.random.choice(notes_ints, p=central_pitch_profile/central_pitch_profile.sum())
         range_profile = scipy.stats.norm.pdf(notes_ints, loc=central_pitch, scale=np.sqrt(23.0))
-        
+
         # Pre-compute key profile
         rpk = (np.array([0.184, 0.001, 0.155, 0.003, 0.191, 0.109, 0.005, 0.214, 0.001, 0.078, 0.004, 0.055] * 10) 
-               if is_major else 
+               if is_major else
                np.array([0.192, 0.005, 0.149, 0.179, 0.002, 0.144, 0.002, 0.201, 0.038, 0.012, 0.053, 0.022] * 10))
-        
+
         # Vectorize probability calculation
         total_prob = 1.0
         prev_pitches = np.array(pitches[:-1])
         curr_pitches = np.array(pitches[1:])
-        
+
         # Calculate all proximity profiles at once
         prox_profiles = scipy.stats.norm.pdf(notes_ints[:, np.newaxis], 
                                            loc=prev_pitches, 
                                            scale=np.sqrt(10))
-        
+
         # Calculate probabilities for each note transition
         for i in range(len(prev_pitches)):
             rp = range_profile * prox_profiles[:, i]
             rpk_combined = rp * rpk
             rpk_normed = rpk_combined / np.sum(rpk_combined)
             total_prob *= rpk_normed[curr_pitches[i]]
-            
+
         tonality_features['temperley_likelihood'] = total_prob
     else:
         tonality_features['temperley_likelihood'] = 0.0
-    
+
     # Scalar passage features
     tonality_features['longest_monotonic_conjunct_scalar_passage'] = longest_monotonic_conjunct_scalar_passage(pitches)
     tonality_features['longest_conjunct_scalar_passage'] = longest_conjunct_scalar_passage(pitches)
     tonality_features['proportion_conjunct_scalar'] = proportion_conjunct_scalar(pitches)
     tonality_features['proportion_scalar'] = proportion_scalar(pitches)
-    
+
     # Histogram using cached correlations
     tonality_features['tonalness_histogram'] = histogram_bins(correlations[0][1], 24)
-    
+
     return tonality_features
 
 def get_melodic_movement_features(melody: Melody) -> Dict:
@@ -2527,13 +1930,13 @@ def get_melodic_movement_features(melody: Melody) -> Dict:
     
     """
     movement_features = {}
-    
+
     movement_features['amount_of_arpeggiation'] = amount_of_arpeggiation(melody.pitches)
     movement_features['chromatic_motion'] = chromatic_motion(melody.pitches)
     movement_features['melodic_embellishment'] = melodic_embellishment(melody.pitches, melody.starts, melody.ends)
     movement_features['repeated_notes'] = repeated_notes(melody.pitches)
     movement_features['stepwise_motion'] = stepwise_motion(melody.pitches)
-    
+
     return movement_features
 
 def process_melody(args):
@@ -2551,45 +1954,45 @@ def process_melody(args):
     """
     import time
     start_total = time.time()
-    
+
     melody_data, corpus_stats = args
     mel = Melody(melody_data, tempo=100)
 
     # Time each feature category
     timings = {}
-    
+
     start = time.time()
     pitch_features = get_pitch_features(mel)
     timings['pitch'] = time.time() - start
-    
+
     start = time.time()
     interval_features = get_interval_features(mel)
     timings['interval'] = time.time() - start
-    
+
     start = time.time()
     contour_features = get_contour_features(mel)
     timings['contour'] = time.time() - start
-    
+
     start = time.time()
     duration_features = get_duration_features(mel)
     timings['duration'] = time.time() - start
-    
+
     start = time.time()
     tonality_features = get_tonality_features(mel)
     timings['tonality'] = time.time() - start
-    
+
     start = time.time()
     narmour_features = get_narmour_features(mel)
     timings['narmour'] = time.time() - start
-    
+
     start = time.time()
     melodic_movement_features = get_melodic_movement_features(mel)
     timings['melodic_movement'] = time.time() - start
-    
+
     start = time.time()
     mtype_features = get_mtype_features(mel)
     timings['mtype'] = time.time() - start
-    
+
     melody_features = {
         'pitch_features': pitch_features,
         'interval_features': interval_features,
@@ -2600,15 +2003,15 @@ def process_melody(args):
         'melodic_movement_features': melodic_movement_features,
         'mtype_features': mtype_features
     }
-    
+
     # Add corpus features only if corpus stats are available
     if corpus_stats:
         start = time.time()
         melody_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
         timings['corpus'] = time.time() - start
-    
+
     timings['total'] = time.time() - start_total
-    
+
     return melody_data['ID'], melody_features, timings
 def get_all_features(input_path, output_path, corpus_path=None) -> None:
     """Generate CSV file with features for all melodies using multiprocessing.
@@ -2629,7 +2032,7 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
     """
     import threading
     import time
-    
+
     # Spinner animation thread
     class SpinnerThread(threading.Thread):
         def __init__(self):
@@ -2637,20 +2040,20 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
             self.stop_event = threading.Event()
             self.spinner = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
             self.idx = 0
-            
+
         def run(self):
             while not self.stop_event.is_set():
                 print(f"\r{self.spinner[self.idx]} Processing melodies...", end='', flush=True)
                 self.idx = (self.idx + 1) % len(self.spinner)
                 time.sleep(0.1)  # Control animation speed
-                
+
         def stop(self):
             self.stop_event.set()
             self.join()
             print("\r", end='', flush=True)  # Clear the spinner line
-    
+
     print("Starting job...\n")
-    
+
     # Load corpus statistics if path is provided
     corpus_stats = None
     if corpus_path:
@@ -2658,20 +2061,19 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
             corpus_stats = json.load(f)
     else:
         print("No corpus path provided, corpus features will not be computed")
-    
+
     # Load melody data from JSON or import MIDI files
     melody_data_list = []
     import os
-    
+
     if os.path.isdir(input_path):
         # Handle directory of MIDI files
         import glob
         midi_files = glob.glob(os.path.join(input_path, '*.mid'))
         midi_files.extend(glob.glob(os.path.join(input_path, '*.midi')))
-        
+
         # Process MIDI files in parallel
         with Pool(cpu_count()) as pool:
-            results = []
             for midi_file in midi_files:
                 try:
                     midi_data = import_midi(midi_file)
@@ -2707,7 +2109,7 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
         'melodic_movement_features': get_melodic_movement_features(mel),
         'mtype_features': get_mtype_features(mel)
     }
-    
+
     # Add corpus features only if corpus stats are available
     if corpus_stats:
         first_features['corpus_features'] = get_corpus_features(mel, corpus_stats)
@@ -2724,11 +2126,11 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
 
     # Prepare arguments for parallel processing
     melody_args = [(melody_data, corpus_stats) for melody_data in melody_data_list]
-    
+
     # Process melodies in parallel with chunking for better performance
     chunk_size = max(1, len(melody_args) // (n_cores * 4))  # Adjust chunk size based on number of cores
     all_features = []
-    
+
     # Track timing statistics
     timing_stats = {
         'pitch': [],
@@ -2742,11 +2144,11 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
         'corpus': [],
         'total': []
     }
-    
+
     # Start spinner thread
     spinner = SpinnerThread()
     spinner.start()
-    
+
     try:
         with Pool(n_cores) as pool:
             # Use imap for better memory efficiency and progress tracking
@@ -2758,7 +2160,7 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
                     for category, features in melody_features.items():
                         row.extend(features.values())
                     all_features.append(row)
-                    
+
                     # Update timing statistics
                     for category, duration in timings.items():
                         timing_stats[category].append(duration)
@@ -2768,26 +2170,26 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
     finally:
         # Stop spinner thread
         spinner.stop()
-    
+
     if not all_features:
         print("No features were successfully extracted from any melodies")
         return
-        
+
     print("Processing complete")
-    
+
     # Sort results by melody_id
     all_features.sort(key=lambda x: x[0])
-    
+
     # Write results to CSV
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(all_features)
-    
+
     end_time = time.time()
     print(f"\nTotal processing time: {end_time - start_time:.2f} seconds")
     print(f"Results written to {output_path}")
-    
+
     # Print timing statistics
     print("\nTiming Statistics (average milliseconds per melody):")
     for category, times in timing_stats.items():
