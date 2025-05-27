@@ -3,6 +3,4 @@ pytest
 scipy
 pretty-midi
 pandas
-multiprocessing
-csv
-time
+setuptools
