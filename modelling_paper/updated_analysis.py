@@ -22,9 +22,9 @@ from datetime import datetime
 
 # 1. Load data
 print("Loading original features...")
-original_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/testing.csv")
+original_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/modelling_paper/testing.csv")
 print("Loading odd one out features...")
-odd_one_out_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/miq_mels2.csv")
+odd_one_out_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/modelling_paper/miq_mels2.csv")
 print("Loading participant responses...")
 participant_responses = pd.read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", nrows=int(1e6))
 
@@ -469,7 +469,7 @@ def xgboost_raw():
     xgb = XGBRegressor(random_state=8, n_jobs=-1)
 
     # Check if we have cached best parameters
-    cache_file = 'xgb_best_params.npy'
+    cache_file = 'modelling_paper/xgb_best_params.npy'
     try:
         best_params = np.load(cache_file, allow_pickle=True).item()
         print("\nLoading cached best parameters:", best_params)
@@ -1020,7 +1020,7 @@ def irtxgboost_raw():
     xgb = XGBRegressor(random_state=8, n_jobs=-1)
 
     # Check if we have cached best parameters
-    cache_file = 'xgb_irt_best_params.npy'
+    cache_file = 'modelling_paper/xgb_irt_best_params.npy'
     try:
         best_params = np.load(cache_file, allow_pickle=True).item()
         print("\nLoading cached best parameters:", best_params)
