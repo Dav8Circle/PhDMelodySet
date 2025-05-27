@@ -6,9 +6,9 @@ The actual feature calculations are handled in features.py.
 from collections import Counter
 import json
 from typing import List, Dict, Tuple
-from tqdm import tqdm
 import multiprocessing as mp
 from pathlib import Path
+from tqdm import tqdm
 from Feature_Set.melody_tokenizer import FantasticTokenizer
 from Feature_Set.representations import Melody, read_midijson
 from Feature_Set.import_mid import import_midi

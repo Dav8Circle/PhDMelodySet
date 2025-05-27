@@ -13,6 +13,8 @@ setup(
         'scipy>=1.7.0',
         'tqdm>=4.65.0',
         'pretty_midi>=0.2.10',
+        'rpy2>=3.5.0',
     ],
-    python_requires='>=3.8'
+    python_requires='>=3.8',
+    setup_requires=['rpy2>=3.5.0'],
 ) 
