@@ -263,11 +263,16 @@ def load_melodies_from_directory(directory: str, file_type: str = "json") -> Lis
         
     return melodies
 
-if __name__ == "__main__":
-    # Example usage
-    midi_dir = '/Users/davidwhyatt/Downloads/01_Essen Folksong Database (.mid-conversions)'
-    output_file = "essen_corpus_stats.json"
-
+def make_corpus_stats(midi_dir: str, output_file: str) -> None:
+    """Process a directory of MIDI files and save corpus statistics.
+    
+    Parameters
+    ----------
+    midi_dir : str
+        Path to directory containing MIDI files
+    output_file : str
+        Path where to save the corpus statistics JSON file
+    """
     # Load melodies from MIDI files
     melodies = load_melodies_from_directory(midi_dir, file_type="midi")
     # Filter out None values
