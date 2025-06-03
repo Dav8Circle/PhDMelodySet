@@ -135,8 +135,8 @@ def calculate_accuracy(predictions, actuals, tolerance=0.1):
 def main():
     # Load the data
     print("Loading data...")
-    original_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/original_mel_miq_mels.csv")
-    miq_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/miq_mels.csv")
+    original_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/modelling_paper/original_mel_miq_mels.csv")
+    miq_features = pd.read_csv("/Users/davidwhyatt/Documents/GitHub/PhDMelodySet/modelling_paper/miq_mels.csv")
     participant_responses = pd.read_csv("/Users/davidwhyatt/Downloads/miq_trials.csv", nrows=1e7)
 
     # Keep melody ID column

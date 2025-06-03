@@ -2013,6 +2013,7 @@ def process_melody(args):
     timings['total'] = time.time() - start_total
 
     return melody_data['ID'], melody_features, timings
+
 def get_all_features(input_path, output_path, corpus_path=None) -> None:
     """Generate CSV file with features for all melodies using multiprocessing.
     
@@ -2051,6 +2052,7 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
             self.stop_event.set()
             self.join()
             print("\r", end='', flush=True)  # Clear the spinner line
+            print("\n")
 
     print("Starting job...\n")
 

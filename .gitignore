@@ -7,5 +7,13 @@ venv/
 .idea/
 .DS_Store
 __pycache__/
-
+cache/
+.Rhistory
 .Rproj.user
+modelling_paper/rf_data_cache_merged.pkl
+modelling_paper/rf_data_cache.pkl
+modelling_paper/data_cache.pkl
+modelling_paper/data_cache_merged.pkl
+modelling_paper/data_cache_merged_big.pkl
+# Explicitly not ignoring RotationForest
+!RotationForest/
