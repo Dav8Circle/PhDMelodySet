@@ -10,3 +10,52 @@ DRAFT: This repo collects all the work I am currently conducting for my PhD. It 
 - `modelling_paper` contains all scripts relevant to the Harvard MDT modelling I've done so far
 
 This is very much a living repository and I can only apologise for the disorder - I will clean it up again soon!
+
+**Feature Set**
+
+To use the feature set, first clone the repo to a destination of your choosing.
+Navigate to this directory and create a new virtual environment, this can be achieved using:  
+
+`python3 -m venv venv`  
+
+`source venv/bin/activate`  
+
+(this assumes you are using `zsh` as your terminal)  
+
+
+Once in your venv, dependencies can be installed using `pip install -r "requirements.txt"`  
+This will automatically gather the required Python packages needed to run the feature set.  
+
+We can then build the feature set as a module by running `pip install -e .`  
+This will allow us to import the feature set as a proper Python module.
+
+**Example Usage**
+
+Once built, the feature set is very easy to use. Where a corpus is not required, we can compute all the other features in a simple script:
+
+```py
+from Feature_Set.features import get_all_features
+
+if __name__ == "__main__":
+    get_all_features("path_to_midi_file_directory", "name_of_output_file")
+```
+
+(for technical reasons, we must use the 'if name main' convention here - omitting this guard will result in a circular import)
+
+If we wish to produce corpus features, we have to do some more work first. We build a corpus dictionary using `corpus.py` as follows:
+
+```py
+from Feature_Set.corpus import make_corpus_stats
+
+# using the same name is main guard
+if __name__ == "__main__":
+    make_corpus_stats("path_to_midi_file_directory", "name_of_output_dict")
+```
+
+We can then use the produced `name_of_output_dict.json` file as the third argument in our `get_all_features` function from before, like so:
+```py
+from Feature_Set.features import get_all_features
+
+if __name__ == "__main__":
+    get_all_features("path_to_midi_file_directory", "name_of_output_file", "name_of_output_dict.json")
+```
