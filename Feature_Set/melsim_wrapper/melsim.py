@@ -90,10 +90,12 @@ Num:        Name:
 
 from functools import cache, wraps
 from types import SimpleNamespace
+from pathlib import Path
+from typing import Union, Tuple
 
 from tenacity import RetryError, Retrying, stop_after_attempt, wait_exponential
-from typing import List, Union
 import numpy as np
+from Feature_Set.import_mid import import_midi
 
 r_base_packages = ["base", "utils"]
 r_cran_packages = [
@@ -395,4 +397,83 @@ def r_get_similarity(
         ro.r(f"{melody_1}$similarity")(ro.r(f"{melody_2}"), ro.r(f"{method}_sim")).rx2(
             "sim"
         )[0]
+    )
+
+
+def load_midi_file(midi_path: Union[str, Path]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Load a MIDI file and extract pitch, start, and end arrays.
+    
+    Parameters
+    ----------
+    midi_path : Union[str, Path]
+        Path to the MIDI file
+        
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray, np.ndarray]
+        Tuple containing (pitches, starts, ends) arrays
+        
+    Raises
+    ------
+    ValueError
+        If the MIDI file cannot be imported or contains no melody track
+    """
+
+    midi_data = import_midi(str(midi_path))
+    
+    if midi_data is None:
+        raise ValueError(f"Could not import MIDI file: {midi_path}")
+    
+    # Convert lists to numpy arrays
+    pitches = np.array(midi_data['pitches'])
+    starts = np.array(midi_data['starts'])
+    ends = np.array(midi_data['ends'])
+    
+    return pitches, starts, ends
+
+
+@requires_melsim
+def get_similarity_from_midi(
+    midi_path1: Union[str, Path],
+    midi_path2: Union[str, Path],
+    method: str,
+    transformation: str
+) -> float:
+    """Calculate similarity between two MIDI files using the specified method.
+    
+    Parameters
+    ----------
+    midi_path1 : Union[str, Path]
+        Path to first MIDI file
+    midi_path2 : Union[str, Path]
+        Path to second MIDI file
+    method : str
+        Name of the similarity method to use from the list in the module docstring
+    transformation : str
+        Name of the transformation to use from the list in the module docstring
+        
+    Returns
+    -------
+    float
+        Similarity value between the two melodies
+        
+    Examples
+    --------
+    >>> # Calculate similarity between two MIDI files
+    >>> similarity = get_similarity_from_midi(
+    ...     "path/to/melody1.mid",
+    ...     "path/to/melody2.mid",
+    ...     "Jaccard",
+    ...     "pitch"
+    ... )
+    """
+    # Load MIDI files
+    melody1_pitches, melody1_starts, melody1_ends = load_midi_file(midi_path1)
+    melody2_pitches, melody2_starts, melody2_ends = load_midi_file(midi_path2)
+    
+    # Calculate similarity using existing function
+    return get_similarity(
+        melody1_pitches, melody1_starts, melody1_ends,
+        melody2_pitches, melody2_starts, melody2_ends,
+        method, transformation
     )

@@ -131,6 +131,10 @@ def save_corpus_stats(stats: Dict, filename: str) -> None:
     filename : str
         Path to save JSON file
     """
+    # Ensure filename has .json extension
+    if not filename.endswith('.json'):
+        filename = filename + '.json'
+        
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(stats, f, indent=2)
 

@@ -34,6 +34,7 @@ from Feature_Set.stats import range_func, standard_deviation, shannon_entropy, m
 from Feature_Set.step_contour import StepContour
 import numpy as np
 import scipy
+import pandas as pd
 
 # Pitch Features
 def pitch_range(pitches: list[int]) -> int:
@@ -2031,6 +2032,10 @@ def get_all_features(input_path, output_path, corpus_path=None) -> None:
     None
         Writes features to CSV file with each melody as a row
     """
+    # Ensure output_path has .csv extension
+    if not output_path.endswith('.csv'):
+        output_path = output_path + '.csv'
+        
     import threading
     import time
 
