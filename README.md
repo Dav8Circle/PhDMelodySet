@@ -9,6 +9,10 @@ This repo collects all the work I am currently conducting for my PhD. It is orga
 
 - `modelling_paper` contains all scripts relevant to the Harvard MDT modelling I've done so far
 
+- `requirements.txt` is used to install dependencies for the feature set
+
+- `setup.py` builds the feature set as a Python module
+
 This is very much a living repository and I can only apologise for the disorder - I will clean it up again soon!  
 
 ========================================= 
