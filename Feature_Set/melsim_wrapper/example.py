@@ -1,4 +1,4 @@
-from melsim import get_similarity_from_midi, install_dependencies
+from .melsim import get_similarity_from_midi, install_dependencies
 
 # Install dependencies
 install_dependencies()
