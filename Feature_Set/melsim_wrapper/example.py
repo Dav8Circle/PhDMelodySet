@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # example of using a directory and multiple methods and transformations
 
     midi_corpus_similarity = get_similarity_from_midi(
-        '/Users/davidwhyatt/Documents/mid',
+        midi_dir,
         transformation=['pitch', 'parsons'],
         method=['Jaccard', 'edit_sim'],
         output_file="midi_corpus_similarity.json"
