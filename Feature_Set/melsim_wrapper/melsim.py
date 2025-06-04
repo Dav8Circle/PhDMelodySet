@@ -407,10 +407,11 @@ def _batch_compute_similarities(args_list: List[Tuple]) -> List[float]:
     List[float]
         List of similarity values
     """
-    # Create R script for batch similarity calculation
+    # Create R script for batch similarity calculation with improved efficiency
     r_script = """
     library(melsim)
     library(jsonlite)
+    library(purrr)
     
     # Function to create melody object
     create_melody <- function(pitches, starts, ends) {
@@ -439,16 +440,46 @@ def _batch_compute_similarities(args_list: List[Tuple]) -> List[float]:
     n_args <- length(args)
     n_comparisons <- n_args / 8  # Each comparison has 8 arguments
     
+    # Pre-allocate results vector
     results <- numeric(n_comparisons)
     
-    for (i in seq_len(n_comparisons)) {
-        idx <- (i-1) * 8 + 1
-        melody1 <- create_melody(args[idx], args[idx+1], args[idx+2])
-        melody2 <- create_melody(args[idx+3], args[idx+4], args[idx+5])
-        method <- args[idx+6]
-        transformation <- args[idx+7]
+    # Create a cache for melody objects
+    melody_cache <- new.env()
+    
+    # Process in chunks for better memory management
+    chunk_size <- 1000
+    n_chunks <- ceiling(n_comparisons / chunk_size)
+    
+    for (chunk in seq_len(n_chunks)) {
+        start_idx <- (chunk - 1) * chunk_size + 1
+        end_idx <- min(chunk * chunk_size, n_comparisons)
         
-        results[i] <- calc_similarity(melody1, melody2, method, transformation)
+        # Process chunk
+        for (i in start_idx:end_idx) {
+            idx <- (i-1) * 8 + 1
+            
+            # Get or create melody1
+            melody1_key <- paste(args[idx], args[idx+1], args[idx+2], sep="|")
+            if (!exists(melody1_key, envir=melody_cache)) {
+                melody_cache[[melody1_key]] <- create_melody(args[idx], args[idx+1], args[idx+2])
+            }
+            melody1 <- melody_cache[[melody1_key]]
+            
+            # Get or create melody2
+            melody2_key <- paste(args[idx+3], args[idx+4], args[idx+5], sep="|")
+            if (!exists(melody2_key, envir=melody_cache)) {
+                melody_cache[[melody2_key]] <- create_melody(args[idx+3], args[idx+4], args[idx+5])
+            }
+            melody2 <- melody_cache[[melody2_key]]
+            
+            method <- args[idx+6]
+            transformation <- args[idx+7]
+            
+            results[i] <- calc_similarity(melody1, melody2, method, transformation)
+        }
+        
+        # Force garbage collection after each chunk
+        gc()
     }
     
     cat(toJSON(results))
@@ -482,6 +513,14 @@ def _batch_compute_similarities(args_list: List[Tuple]) -> List[float]:
         return [float(x) for x in json.loads(result.stdout.strip())]
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Error calculating similarities: {e.stderr}")
+
+def _load_melody(file):
+    """Helper function to load a melody file for parallel processing."""
+    try:
+        return file.name, load_midi_file(file)
+    except Exception as e:
+        print(f"Warning: Could not load {file.name}: {str(e)}")
+        return None
 
 def get_similarity_from_midi(
     midi_path1: Union[str, Path],
@@ -539,14 +578,18 @@ def get_similarity_from_midi(
         if not midi_files:
             raise ValueError(f"No MIDI files found in {midi_path1}")
         
-        # Load all melodies first with progress bar
+        # Load all melodies in parallel with progress bar
         print("Loading melodies...")
-        melody_data = {}
-        for file in tqdm(midi_files, desc="Loading MIDI files"):
-            try:
-                melody_data[file.name] = load_midi_file(file)
-            except Exception as e:
-                print(f"Warning: Could not load {file.name}: {str(e)}")
+        n_cores = n_cores or cpu_count()
+        
+        with Pool(n_cores) as pool:
+            results = list(tqdm(
+                pool.imap(_load_melody, midi_files),
+                total=len(midi_files),
+                desc="Loading MIDI files"
+            ))
+        
+        melody_data = {name: data for name, data in results if data is not None}
         
         if len(melody_data) < 2:
             raise ValueError("Need at least 2 valid MIDI files for comparison")
