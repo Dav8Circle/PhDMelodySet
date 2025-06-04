@@ -144,13 +144,17 @@ def load_corpus_stats(filename: str) -> Dict:
     Parameters
     ----------
     filename : str
-        Path to JSON file
+        Path to JSON file. If no extension is provided, .json will be added.
         
     Returns
     -------
     Dict
         Corpus statistics dictionary
     """
+    # Ensure filename has .json extension
+    if not filename.endswith('.json'):
+        filename = filename + '.json'
+        
     with open(filename, encoding='utf-8') as f:
         stats = json.load(f)
 
