@@ -5,11 +5,13 @@ miq_trials.csv.zip
 venv/
 .venv/
 .idea/
+.vscode/
 .DS_Store
 __pycache__/
 cache/
 .Rhistory
 .Rproj.user
+.pytest_cache/
 modelling_paper/rf_data_cache_merged.pkl
 modelling_paper/rf_data_cache.pkl
 modelling_paper/data_cache.pkl

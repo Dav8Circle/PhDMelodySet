@@ -1,73 +1,46 @@
 #!/usr/bin/env Rscript
 
-# Create caches
-melody_cache <- new.env()
-sim_measure_cache <- new.env()
+# Load required packages
+if (!require("memoise")) {
+    install.packages("memoise")
+    library(memoise)
+}
 
-# Function to get or create a melody object
-get_melody <- function(pitches, starts, ends) {
-    # Create a unique key for this melody
-    key <- paste(pitches, starts, ends, collapse = ",")
-    
-    # Check if melody exists in cache
-    if (exists(key, envir = melody_cache)) {
-        return(get(key, envir = melody_cache))
-    }
-    
-    # Create new melody object
-    melody <- melody_factory$new(
+# Create memoized functions for better caching
+get_melody <- memoise(function(pitches, starts, ends) {
+    melody_factory$new(
         mel_data = tibble::tibble(
             onset = as.numeric(starts),
             pitch = as.numeric(pitches),
             duration = as.numeric(ends) - as.numeric(starts)
         )
     )
-    
-    # Store in cache
-    assign(key, melody, envir = melody_cache)
-    
-    return(melody)
-}
+})
 
-# Function to get or create a similarity measure
-get_sim_measure <- function(method, transformation) {
-    # Create a unique key for this measure
-    key <- paste(method, transformation, sep = "_")
-    
-    # Check if measure exists in cache
-    if (exists(key, envir = sim_measure_cache)) {
-        return(get(key, envir = sim_measure_cache))
-    }
-    
-    # Create new similarity measure
-    sim_measure <- sim_measure_factory$new(
+get_sim_measure <- memoise(function(method, transformation) {
+    sim_measure_factory$new(
         name = method,
         full_name = method,
         transformation = transformation,
         parameters = list(),
         sim_measure = method
     )
-    
-    # Store in cache
-    assign(key, sim_measure, envir = sim_measure_cache)
-    
-    return(sim_measure)
-}
+})
 
 # Function to run melsim with given melody attributes
 run_melsim <- function(melody1_pitches, melody1_starts, melody1_ends,
                       melody2_pitches, melody2_starts, melody2_ends,
                       method = "Jaccard", transformation = "pitch") {
-    # Load required packages
+    
     if (!require("melsim")) {
         stop("melsim package not found. Please install it first.")
     }
     
-    # Get or create melody objects
+    # Get or create melody objects (now using memoized functions)
     melody1 <- get_melody(melody1_pitches, melody1_starts, melody1_ends)
     melody2 <- get_melody(melody2_pitches, melody2_starts, melody2_ends)
     
-    # Get or create similarity measure
+    # Get or create similarity measure (now using memoized function)
     sim_measure <- get_sim_measure(method, transformation)
     
     # Run melsim
@@ -85,7 +58,7 @@ if (length(args) < 6) {
     stop("Usage: Rscript melsim.R melody1_pitches melody1_starts melody1_ends melody2_pitches melody2_starts melody2_ends [method] [transformation]")
 }
 
-# Convert string arguments to vectors
+# Convert string arguments to vectors (vectorized operation)
 melody1_pitches <- as.numeric(strsplit(args[1], ",")[[1]])
 melody1_starts <- as.numeric(strsplit(args[2], ",")[[1]])
 melody1_ends <- as.numeric(strsplit(args[3], ",")[[1]])
