@@ -198,28 +198,69 @@ def install_r_package(package: str):
 
 def install_dependencies():
     """Install all required R packages."""
-    # Install CRAN packages
-    print("Installing CRAN packages...")
-    cran_script = f"""
-    utils::chooseCRANmirror(ind=1)
-    utils::install.packages(c({", ".join([f'"{p}"' for p in r_cran_packages])}), dependencies=TRUE)
+    # Check which packages need to be installed
+    check_script = """
+    packages <- c({packages})
+    missing <- packages[!sapply(packages, requireNamespace, quietly = TRUE)]
+    cat(jsonlite::toJSON(missing))  # Always return a JSON array, even if empty
     """
-    subprocess.run(["Rscript", "-e", cran_script], check=True)
     
-    # Install GitHub packages
-    print("Installing GitHub packages...")
-    for package in r_github_packages:
-        repo = github_repos[package]
-        print(f"Installing {package} from {repo}...")
-        install_script = f"""
-        if (!requireNamespace("remotes", quietly = TRUE)) {{
-            utils::install.packages("remotes")
-        }}
-        remotes::install_github("{repo}", upgrade="always", dependencies=TRUE)
-        """
-        subprocess.run(["Rscript", "-e", install_script], check=True)
+    # Check CRAN packages
+    packages_str = ", ".join([f'"{p}"' for p in r_cran_packages])
+    check_script_cran = check_script.format(packages=packages_str)
     
-    print("All dependencies installed successfully!")
+    try:
+        result = subprocess.run(
+            ["Rscript", "-e", check_script_cran],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        missing_cran = json.loads(result.stdout.strip())
+        
+        if missing_cran:
+            print("Installing missing CRAN packages...")
+            cran_script = f"""
+            utils::chooseCRANmirror(ind=1)
+            utils::install.packages(c({", ".join([f'"{p}"' for p in missing_cran])}), dependencies=TRUE)
+            """
+            subprocess.run(["Rscript", "-e", cran_script], check=True)
+        else:
+            print("Skipping install: All CRAN packages are already installed.")
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Error checking CRAN packages: {e.stderr}")
+    
+    # Check GitHub packages
+    packages_str = ", ".join([f'"{p}"' for p in r_github_packages])
+    check_script_github = check_script.format(packages=packages_str)
+    
+    try:
+        result = subprocess.run(
+            ["Rscript", "-e", check_script_github],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        missing_github = json.loads(result.stdout.strip())
+        
+        if missing_github:
+            print("Installing missing GitHub packages...")
+            for package in missing_github:
+                repo = github_repos[package]
+                print(f"Installing {package} from {repo}...")
+                install_script = f"""
+                if (!requireNamespace("remotes", quietly = TRUE)) {{
+                    utils::install.packages("remotes")
+                }}
+                remotes::install_github("{repo}", upgrade="always", dependencies=TRUE)
+                """
+                subprocess.run(["Rscript", "-e", install_script], check=True)
+        else:
+            print("Skipping install: All GitHub packages are already installed.")
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Error checking GitHub packages: {e.stderr}")
+    
+    print("All dependencies are installed and up to date.")
 
 def check_python_package_installed(package: str):
     """Check if a Python package is installed."""
