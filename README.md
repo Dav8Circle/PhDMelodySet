@@ -75,10 +75,9 @@ It's as simple as that!
 
 
 =========================================  
-**A Note on Melsim**
+**Melsim**
 
-I am currently aware of issues with using `melsim.py` - this seems to be linked to the version of R that the user has stored in their `$PATH` variable.  
+Melsim is included through a wrapper approach - take a look at `example.py` and the supplied MIDI files!  
+(P.S. Don't forget to update the path to your desired directory of MIDI files)
 
-My best guess is that `rpy2` isn't currently up-to-date with R 4.5.0 - will introduce a robust fix in time, but for now I encourage the user to use R 4.4.x if they wish to use this wrapper.  
-
-Sorry for the inconvenience!
+We hope to one day implement a version of this package in Python ourselves, but for now, this will do!
