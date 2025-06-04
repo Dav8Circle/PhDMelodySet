@@ -91,7 +91,11 @@ Num:        Name:
 from functools import cache, wraps
 from types import SimpleNamespace
 from pathlib import Path
-from typing import Union, Tuple
+from typing import Union, Tuple, List, Dict
+import os
+from multiprocessing import Pool, cpu_count
+from itertools import combinations
+from tqdm import tqdm
 
 from tenacity import RetryError, Retrying, stop_after_attempt, wait_exponential
 import numpy as np
@@ -432,48 +436,202 @@ def load_midi_file(midi_path: Union[str, Path]) -> Tuple[np.ndarray, np.ndarray,
     return pitches, starts, ends
 
 
+def _compute_similarity(args):
+    """Helper function for multiprocessing similarity computation."""
+    melody1_data, melody2_data, method, transformation = args
+    return get_similarity(
+        melody1_data[0], melody1_data[1], melody1_data[2],
+        melody2_data[0], melody2_data[1], melody2_data[2],
+        method, transformation
+    )
+
+
 @requires_melsim
 def get_similarity_from_midi(
     midi_path1: Union[str, Path],
-    midi_path2: Union[str, Path],
-    method: str,
-    transformation: str
-) -> float:
-    """Calculate similarity between two MIDI files using the specified method.
+    midi_path2: Union[str, Path] = None,
+    method: Union[str, List[str]] = "Jaccard",
+    transformation: Union[str, List[str]] = "pitch",
+    output_file: Union[str, Path] = None,
+    n_cores: int = None
+) -> Union[float, Dict[Tuple[str, str, str, str], float]]:
+    """Calculate similarity between MIDI files.
+    
+    If midi_path1 is a directory, performs pairwise comparisons between all MIDI files
+    in the directory, ignoring midi_path2.
+
+    You can provide a single method and transformation, or a list of methods and transformations.
+    If you provide a list of methods and transformations, the function will return a dictionary
+    mapping tuples of (file1, file2, method, transformation) to their similarity values.
     
     Parameters
     ----------
     midi_path1 : Union[str, Path]
-        Path to first MIDI file
-    midi_path2 : Union[str, Path]
-        Path to second MIDI file
-    method : str
-        Name of the similarity method to use from the list in the module docstring
-    transformation : str
-        Name of the transformation to use from the list in the module docstring
+        Path to first MIDI file or directory containing MIDI files
+    midi_path2 : Union[str, Path], optional
+        Path to second MIDI file. Ignored if midi_path1 is a directory
+    method : Union[str, List[str]], default="Jaccard"
+        Name of the similarity method(s) to use. Can be a single method or a list of methods.
+    transformation : Union[str, List[str]], default="pitch"
+        Name of the transformation(s) to use. Can be a single transformation or a list of transformations.
+    output_file : Union[str, Path], optional
+        If provided and doing pairwise comparisons, save results to this CSV file
+    n_cores : int, optional
+        Number of CPU cores to use for parallel processing. Defaults to all available cores.
         
     Returns
     -------
-    float
-        Similarity value between the two melodies
-        
-    Examples
-    --------
-    >>> # Calculate similarity between two MIDI files
-    >>> similarity = get_similarity_from_midi(
-    ...     "path/to/melody1.mid",
-    ...     "path/to/melody2.mid",
-    ...     "Jaccard",
-    ...     "pitch"
-    ... )
+    Union[float, Dict[Tuple[str, str, str, str], float]]
+        If comparing two files, returns similarity value.
+        If comparing all files in a directory, returns dictionary mapping tuples of
+        (file1, file2, method, transformation) to their similarity values
     """
+    # Convert single method/transformation to lists
+    methods = [method] if isinstance(method, str) else method
+    transformations = [transformation] if isinstance(transformation, str) else transformation
+    
+    midi_path1 = Path(midi_path1)
+    
+    # If midi_path1 is a directory, do pairwise comparisons
+    if midi_path1.is_dir():
+        midi_files = list(midi_path1.glob("*.mid"))
+        
+        if not midi_files:
+            raise ValueError(f"No MIDI files found in {midi_path1}")
+        
+        # Load all melodies first
+        print("Loading melodies...")
+        melody_data = {}
+        for file in tqdm(midi_files, desc="Loading MIDI files"):
+            try:
+                melody_data[file.name] = load_midi_file(file)
+            except Exception as e:
+                print(f"Warning: Could not load {file.name}: {str(e)}")
+        
+        if len(melody_data) < 2:
+            raise ValueError("Need at least 2 valid MIDI files for comparison")
+        
+        # Prepare arguments for parallel processing
+        print("Computing similarities...")
+        args = []
+        file_pairs = []
+        for (name1, data1), (name2, data2) in combinations(melody_data.items(), 2):
+            for m in methods:
+                for t in transformations:
+                    args.append((data1, data2, m, t))
+                    file_pairs.append((name1, name2, m, t))
+        
+        # Use multiprocessing to compute similarities
+        n_cores = n_cores or cpu_count()
+        with Pool(n_cores) as pool:
+            similarities_list = list(tqdm(
+                pool.imap(_compute_similarity, args),
+                total=len(args),
+                desc="Computing similarities"
+            ))
+        
+        # Create dictionary of results
+        similarities = {}
+        for (name1, name2, m, t), sim in zip(file_pairs, similarities_list):
+            similarities[(name1, name2, m, t)] = sim
+        
+        # Save to CSV if output file specified
+        if output_file:
+            print("Saving results...")
+            import pandas as pd
+            df = pd.DataFrame([
+                {
+                    "file1": f1,
+                    "file2": f2,
+                    "method": m,
+                    "transformation": t,
+                    "similarity": sim
+                }
+                for (f1, f2, m, t), sim in similarities.items()
+            ])
+            df.to_csv(output_file, index=False)
+            print(f"Results saved to {output_file}")
+        
+        return similarities
+    
+    # For single file comparison, only use first method and transformation
+    if len(methods) > 1 or len(transformations) > 1:
+        print("Warning: Multiple methods/transformations provided for two-file pairwise comparison. Using first method and transformation.")
+    
     # Load MIDI files
     melody1_pitches, melody1_starts, melody1_ends = load_midi_file(midi_path1)
     melody2_pitches, melody2_starts, melody2_ends = load_midi_file(midi_path2)
     
-    # Calculate similarity using existing function
+    # Calculate similarity
     return get_similarity(
         melody1_pitches, melody1_starts, melody1_ends,
         melody2_pitches, melody2_starts, melody2_ends,
-        method, transformation
+        methods[0], transformations[0]
     )
+
+
+@requires_melsim
+def get_pairwise_similarities(
+    midi_dir: Union[str, Path],
+    method: str,
+    transformation: str,
+    output_file: Union[str, Path] = None
+) -> Dict[Tuple[str, str], float]:
+    """Calculate pairwise similarities between all MIDI files in a directory.
+    
+    Parameters
+    ----------
+    midi_dir : Union[str, Path]
+        Path to directory containing MIDI files
+    method : str
+        Name of the similarity method to use
+    transformation : str
+        Name of the transformation to use
+    output_file : Union[str, Path], optional
+        If provided, save results to this CSV file
+        
+    Returns
+    -------
+    Dict[Tuple[str, str], float]
+        Dictionary mapping pairs of filenames to their similarity values
+        
+    Examples
+    --------
+    >>> similarities = get_pairwise_similarities(
+    ...     "path/to/midi/directory",
+    ...     "Jaccard",
+    ...     "pitch",
+    ...     "similarities.csv"
+    ... )
+    """
+    midi_dir = Path(midi_dir)
+    midi_files = list(midi_dir.glob("*.mid"))
+    
+    if not midi_files:
+        raise ValueError(f"No MIDI files found in {midi_dir}")
+    
+    similarities = {}
+    
+    # Compare each pair of files
+    for i, file1 in enumerate(midi_files):
+        for file2 in midi_files[i+1:]:  # Only compare each pair once
+            try:
+                similarity = get_similarity_from_midi(
+                    file1, file2,
+                    method=method,
+                    transformation=transformation
+                )
+                similarities[(file1.name, file2.name)] = similarity
+            except Exception as e:
+                print(f"Warning: Could not compare {file1.name} and {file2.name}: {str(e)}")
+    
+    # Save to CSV if output file specified
+    if output_file:
+        import pandas as pd
+        df = pd.DataFrame([
+            {"file1": f1, "file2": f2, "similarity": sim}
+            for (f1, f2), sim in similarities.items()
+        ])
+        df.to_csv(output_file, index=False)
+    
+    return similarities
