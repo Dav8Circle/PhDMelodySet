@@ -100,6 +100,8 @@ from tqdm import tqdm
 from tenacity import RetryError, Retrying, stop_after_attempt, wait_exponential
 import numpy as np
 from Feature_Set.import_mid import import_midi
+import json
+import subprocess
 
 r_base_packages = ["base", "utils"]
 r_cran_packages = [
@@ -404,62 +406,147 @@ def r_get_similarity(
     )
 
 
-def load_midi_file(midi_path: Union[str, Path]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Load a MIDI file and extract pitch, start, and end arrays.
+def _convert_strings_to_tuples(d: Dict) -> Dict:
+    """Convert string keys back to tuples where needed."""
+    result = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            result[k] = _convert_strings_to_tuples(v)
+        else:
+            result[k] = v
+    return result
+
+
+def load_midi_file(file_path: Union[str, Path]) -> Tuple[List[int], List[float], List[float]]:
+    """Load MIDI file and extract melody attributes.
     
     Parameters
     ----------
-    midi_path : Union[str, Path]
-        Path to the MIDI file
+    file_path : Union[str, Path]
+        Path to MIDI file
         
     Returns
     -------
-    Tuple[np.ndarray, np.ndarray, np.ndarray]
-        Tuple containing (pitches, starts, ends) arrays
-        
-    Raises
-    ------
-    ValueError
-        If the MIDI file cannot be imported or contains no melody track
+    Tuple[List[int], List[float], List[float]]
+        Tuple of (pitches, start_times, end_times)
     """
-
-    midi_data = import_midi(str(midi_path))
+    midi_data = import_midi(str(file_path))
     
     if midi_data is None:
-        raise ValueError(f"Could not import MIDI file: {midi_path}")
+        raise ValueError(f"Could not import MIDI file: {file_path}")
     
-    # Convert lists to numpy arrays
-    pitches = np.array(midi_data['pitches'])
-    starts = np.array(midi_data['starts'])
-    ends = np.array(midi_data['ends'])
-    
-    return pitches, starts, ends
+    return midi_data['pitches'], midi_data['starts'], midi_data['ends']
 
 
-def _compute_similarity(args):
-    """Helper function for multiprocessing similarity computation."""
+def _compute_similarity(args: Tuple) -> float:
+    """Compute similarity between two melodies using R script.
+    
+    Parameters
+    ----------
+    args : Tuple
+        Tuple containing (melody1_data, melody2_data, method, transformation)
+        where melody_data is a tuple of (pitches, starts, ends)
+        
+    Returns
+    -------
+    float
+        Similarity value
+    """
     melody1_data, melody2_data, method, transformation = args
-    return get_similarity(
-        melody1_data[0], melody1_data[1], melody1_data[2],
-        melody2_data[0], melody2_data[1], melody2_data[2],
-        method, transformation
-    )
+    
+    # Convert lists to comma-separated strings
+    pitches1_str = ",".join(map(str, melody1_data[0]))
+    starts1_str = ",".join(map(str, melody1_data[1]))
+    ends1_str = ",".join(map(str, melody1_data[2]))
+    pitches2_str = ",".join(map(str, melody2_data[0]))
+    starts2_str = ",".join(map(str, melody2_data[1]))
+    ends2_str = ",".join(map(str, melody2_data[2]))
+    
+    # Get path to R script
+    script_dir = Path(__file__).parent
+    r_script = script_dir / "melsim.R"
+    
+    # Run R script
+    try:
+        result = subprocess.run(
+            ["Rscript", str(r_script),
+             pitches1_str, starts1_str, ends1_str,
+             pitches2_str, starts2_str, ends2_str,
+             method, transformation],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        # Parse JSON output and get first (and only) value
+        return float(json.loads(result.stdout.strip())[0])
+    except subprocess.CalledProcessError as e:
+        print(f"Error running R script: {e.stderr}")
+        raise
 
 
-@requires_melsim
+def _batch_compute_similarities(args_list: List[Tuple]) -> List[float]:
+    """Compute similarities for a batch of melody pairs.
+    
+    Parameters
+    ----------
+    args_list : List[Tuple]
+        List of argument tuples for _compute_similarity
+        
+    Returns
+    -------
+    List[float]
+        List of similarity values
+    """
+    # Get path to R script
+    script_dir = Path(__file__).parent
+    r_script = script_dir / "melsim.R"
+    
+    # Prepare all arguments
+    all_args = []
+    for melody1_data, melody2_data, method, transformation in args_list:
+        # Convert lists to comma-separated strings
+        pitches1_str = ",".join(map(str, melody1_data[0]))
+        starts1_str = ",".join(map(str, melody1_data[1]))
+        ends1_str = ",".join(map(str, melody1_data[2]))
+        pitches2_str = ",".join(map(str, melody2_data[0]))
+        starts2_str = ",".join(map(str, melody2_data[1]))
+        ends2_str = ",".join(map(str, melody2_data[2]))
+        
+        all_args.extend([
+            pitches1_str, starts1_str, ends1_str,
+            pitches2_str, starts2_str, ends2_str,
+            method, transformation
+        ])
+    
+    # Run R script with all arguments
+    try:
+        result = subprocess.run(
+            ["Rscript", str(r_script)] + all_args,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        # Parse JSON output and get all values
+        return [float(x) for x in json.loads(result.stdout.strip())]
+    except subprocess.CalledProcessError as e:
+        print(f"Error running R script: {e.stderr}")
+        raise
+
+
 def get_similarity_from_midi(
     midi_path1: Union[str, Path],
     midi_path2: Union[str, Path] = None,
     method: Union[str, List[str]] = "Jaccard",
     transformation: Union[str, List[str]] = "pitch",
     output_file: Union[str, Path] = None,
-    n_cores: int = None
+    n_cores: int = None,
+    batch_size: int = 500  # Process this many comparisons at once
 ) -> Union[float, Dict[Tuple[str, str, str, str], float]]:
     """Calculate similarity between MIDI files.
     
     If midi_path1 is a directory, performs pairwise comparisons between all MIDI files
     in the directory, ignoring midi_path2.
-
+    
     You can provide a single method and transformation, or a list of methods and transformations.
     If you provide a list of methods and transformations, the function will return a dictionary
     mapping tuples of (file1, file2, method, transformation) to their similarity values.
@@ -475,9 +562,12 @@ def get_similarity_from_midi(
     transformation : Union[str, List[str]], default="pitch"
         Name of the transformation(s) to use. Can be a single transformation or a list of transformations.
     output_file : Union[str, Path], optional
-        If provided and doing pairwise comparisons, save results to this CSV file
+        If provided and doing pairwise comparisons, save results to this file.
+        If no extension is provided, .json will be added.
     n_cores : int, optional
         Number of CPU cores to use for parallel processing. Defaults to all available cores.
+    batch_size : int, default=100
+        Number of comparisons to process in each batch
         
     Returns
     -------
@@ -521,21 +611,18 @@ def get_similarity_from_midi(
                     args.append((data1, data2, m, t))
                     file_pairs.append((name1, name2, m, t))
         
-        # Use multiprocessing to compute similarities
-        n_cores = n_cores or cpu_count()
-        with Pool(n_cores) as pool:
-            similarities_list = list(tqdm(
-                pool.imap(_compute_similarity, args),
-                total=len(args),
-                desc="Computing similarities"
-            ))
+        # Process in batches
+        similarities_list = []
+        for i in tqdm(range(0, len(args), batch_size), desc="Processing batches"):
+            batch = args[i:i + batch_size]
+            similarities_list.extend(_batch_compute_similarities(batch))
         
         # Create dictionary of results
         similarities = {}
         for (name1, name2, m, t), sim in zip(file_pairs, similarities_list):
             similarities[(name1, name2, m, t)] = sim
         
-        # Save to CSV if output file specified
+        # Save to file if output file specified
         if output_file:
             print("Saving results...")
             import pandas as pd
@@ -549,7 +636,13 @@ def get_similarity_from_midi(
                 }
                 for (f1, f2, m, t), sim in similarities.items()
             ])
-            df.to_csv(output_file, index=False)
+            
+            # Ensure output file has .json extension
+            output_file = Path(output_file)
+            if not output_file.suffix:
+                output_file = output_file.with_suffix('.json')
+            
+            df.to_json(output_file, orient='records', indent=2)
             print(f"Results saved to {output_file}")
         
         return similarities
@@ -563,11 +656,11 @@ def get_similarity_from_midi(
     melody2_pitches, melody2_starts, melody2_ends = load_midi_file(midi_path2)
     
     # Calculate similarity
-    return get_similarity(
-        melody1_pitches, melody1_starts, melody1_ends,
-        melody2_pitches, melody2_starts, melody2_ends,
+    return _compute_similarity((
+        (melody1_pitches, melody1_starts, melody1_ends),
+        (melody2_pitches, melody2_starts, melody2_ends),
         methods[0], transformations[0]
-    )
+    ))
 
 
 @requires_melsim
@@ -588,7 +681,7 @@ def get_pairwise_similarities(
     transformation : str
         Name of the transformation to use
     output_file : Union[str, Path], optional
-        If provided, save results to this CSV file
+        If provided, save results to this .json file
         
     Returns
     -------
@@ -601,7 +694,7 @@ def get_pairwise_similarities(
     ...     "path/to/midi/directory",
     ...     "Jaccard",
     ...     "pitch",
-    ...     "similarities.csv"
+    ...     "similarities.json"
     ... )
     """
     midi_dir = Path(midi_dir)
@@ -625,13 +718,13 @@ def get_pairwise_similarities(
             except Exception as e:
                 print(f"Warning: Could not compare {file1.name} and {file2.name}: {str(e)}")
     
-    # Save to CSV if output file specified
+    # Save to json if output file specified
     if output_file:
         import pandas as pd
         df = pd.DataFrame([
             {"file1": f1, "file2": f2, "similarity": sim}
             for (f1, f2), sim in similarities.items()
         ])
-        df.to_csv(output_file, index=False)
+        df.to_json(output_file, index=False)
     
     return similarities

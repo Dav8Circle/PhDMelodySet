@@ -4,11 +4,11 @@ if __name__ == "__main__":
     # Install dependencies
     install_dependencies()
 
+    # example files from Essen folksong corpus
     appenzel_path = "Feature_Set/melsim_wrapper/appenzel.mid"
     arabic_path = "Feature_Set/melsim_wrapper/arabic01.mid"
 
-    # if you wishes to use a directory, you would supply it like so:
-
+    # if you wished to use a directory, you would supply it like so:
     midi_dir = 'PATH_TO_MIDI_DIRECTORY'
 
     # Calculate similarity between two MIDI files
@@ -35,7 +35,5 @@ if __name__ == "__main__":
         '/Users/davidwhyatt/Documents/mid',
         transformation=['pitch', 'parsons'],
         method=['Jaccard', 'edit_sim'],
-        output_file="midi_corpus_similarity.csv"
+        output_file="midi_corpus_similarity.json"
         )
-
-    print(midi_corpus_similarity)

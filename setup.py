@@ -5,7 +5,8 @@ setup(
     version="0.1",
     author="David Whyatt",
     author_email="dmw56@cam.ac.uk",
-    description="A toolkit for computing melodic features found in the literature",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     url="https://github.com/davidwhyatt/PhDMelodySet",
     packages=find_packages(),
     install_requires=[
@@ -13,8 +14,5 @@ setup(
         'scipy>=1.7.0',
         'tqdm>=4.65.0',
         'pretty_midi>=0.2.10',
-        'rpy2>=3.5.0',
     ],
-    python_requires='>=3.8',
-    setup_requires=['rpy2>=3.5.0'],
 ) 
